@@ -1,0 +1,72 @@
+import { Link } from "@/i18n/navigation";
+import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import { PageTitle, Card } from "@/components/Ui";
+import { ForumReplyForm } from "@/components/ForumReplyForm";
+import { getLocale, getTranslations } from "next-intl/server";
+import { dateLocaleForUi } from "@/lib/dateLocale";
+
+export default async function ForumTopicPage({
+  params,
+}: {
+  params: Promise<{ topicId: string }>;
+}) {
+  const { topicId } = await params;
+  const locale = await getLocale();
+  const t = await getTranslations("forum");
+  const dateLocale = dateLocaleForUi(locale);
+
+  const topic = await prisma.forumTopic.findUnique({
+    where: { id: topicId },
+    include: {
+      user: { select: { name: true } },
+      posts: {
+        orderBy: { createdAt: "asc" },
+        include: { user: { select: { name: true } } },
+      },
+    },
+  });
+
+  if (!topic) notFound();
+
+  return (
+    <>
+      <PageTitle title={topic.title} />
+      <p className="mb-6 text-xs text-zinc-500">
+        {t("authorTopic")} {topic.user.name} ·{" "}
+        {topic.createdAt.toLocaleString(dateLocale)}
+      </p>
+
+      <div className="flex flex-col gap-4">
+        {topic.posts.map((p) => (
+          <Card key={p.id}>
+            <p className="text-xs text-zinc-500">{p.user.name}</p>
+            <p className="mt-2 whitespace-pre-wrap text-sm">{p.body}</p>
+            {p.imageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={p.imageUrl}
+                alt=""
+                className="mt-3 max-h-72 w-full rounded-xl object-cover ring-1 ring-black/5"
+              />
+            )}
+            <p className="mt-2 text-xs text-zinc-400">
+              {p.createdAt.toLocaleString(dateLocale)}
+            </p>
+          </Card>
+        ))}
+      </div>
+
+      <h2 className="mb-3 mt-8 text-sm font-semibold">{t("replyHeading")}</h2>
+      <Card>
+        <ForumReplyForm topicId={topic.id} />
+      </Card>
+
+      <p className="mt-8 text-center text-sm">
+        <Link href="/community/forum" className="text-emerald-700 hover:underline">
+          {t("backList")}
+        </Link>
+      </p>
+    </>
+  );
+}

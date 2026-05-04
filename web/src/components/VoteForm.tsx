@@ -1,0 +1,75 @@
+"use client";
+
+import { submitVote } from "@/actions/votes";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { primaryButtonClass } from "@/lib/formStyles";
+
+export function VoteForm({
+  voteId,
+  options,
+  disabled,
+}: {
+  voteId: string;
+  options: { id: string; text: string }[];
+  disabled?: boolean;
+}) {
+  const router = useRouter();
+  const t = useTranslations("votes");
+  const te = useTranslations("errors");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    const form = new FormData(e.currentTarget);
+    const res = await submitVote(form);
+    setLoading(false);
+    if (res && "error" in res && res.error) {
+      setError(te(res.error));
+      return;
+    }
+    router.refresh();
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+      <input type="hidden" name="voteId" value={voteId} />
+      <div className="flex flex-col gap-2">
+        {options.map((o) => (
+          <label
+            key={o.id}
+            className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-200 px-3 py-3 dark:border-zinc-700"
+          >
+            <input
+              type="radio"
+              name="optionId"
+              value={o.id}
+              required
+              disabled={disabled || loading}
+              className="h-4 w-4"
+            />
+            <span className="text-sm">{o.text}</span>
+          </label>
+        ))}
+      </div>
+      {error && (
+        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+      )}
+      <button
+        type="submit"
+        disabled={disabled || loading}
+        className={primaryButtonClass}
+      >
+        {loading
+          ? t("saving")
+          : disabled
+            ? t("ballotClosed")
+            : t("submitVote")}
+      </button>
+    </form>
+  );
+}

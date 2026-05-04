@@ -1,0 +1,4 @@
+# Repo root — доповнює правила в web/.gitignore
+.idea/
+.vscode/
+*.log

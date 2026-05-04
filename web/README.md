@@ -27,7 +27,9 @@ npm run dev
 
 ## Prisma і помилка `Unknown field balanceUah`
 
-- Після зміни `prisma/schema.prisma` завжди виконуйте **`npx prisma db push`** і **`npx prisma generate`**.  
+- **`npm run dev`** автоматично виконує **`prisma generate`** (скрипт `predev`). Це зменшує шанс підняти Next із застарілим `@prisma/client` у пам’яті після зміни схеми.
+- Якщо в тексті помилки все ще фігурує **`balanceRub`** — процес `next dev` тримає **старий** згенерований клієнт: **зупиніть** сервер, за потреби видаліть **`web/.next`**, виконайте **`npx prisma generate`**, знову **`npm run dev`**.
+- Після зміни `prisma/schema.prisma` виконуйте **`npx prisma db push`** (і при потребі **`prisma generate`** — уже входить у `npm run dev`).
 - У Windows якщо `prisma generate` падає з **EPERM** (не вдається перейменувати `query_engine-*.dll`), **зупиніть** `npm run dev` / інші процеси Node, повторіть `generate`.  
 - Стара БД з колонкою **`balanceRub`**: перейменуйте колонку (дані збережуться), потім `db push`:
 

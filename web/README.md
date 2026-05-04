@@ -25,6 +25,8 @@ npm run dev
 
 В `.env` задайте `AUTH_SECRET` (довипадковий рядок). Для автосхвалення реєстрації — `INVITE_CODE` (у прикладі `HAPPY2026`).
 
+**Auth.js: `ClientFetchError` / `Failed to fetch` на дашборді** — зазвичай браузер на `http://localhost:ПОРТ` звертається до `/api/auth/session`, а в `.env` вказано **інший порт** (наприклад, додаток на **3300**, а `AUTH_URL` / `NEXTAUTH_URL` лишились на **3000**). Виправлення: у `.env` виставте **`AUTH_URL` і `NEXTAUTH_URL`** на той самий базовий URL, що в адресному рядку (включно з портом), перезапустіть `npm run dev`. Якщо після цього помилка лишається — відкрийте в новій вкладці `http://localhost:ПОРТ/api/auth/session`: при 500 див. лог сервера (часто Prisma після оновлення схеми).
+
 ## Prisma і помилка `Unknown field balanceUah`
 
 - **`npm run dev`** автоматично виконує **`prisma generate`** (скрипт `predev`). Це зменшує шанс підняти Next із застарілим `@prisma/client` у пам’яті після зміни схеми.

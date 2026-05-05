@@ -10,6 +10,7 @@
     "lint": "eslint",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
+    "db:cleanup:demo-news": "tsx scripts/cleanup_demo_news.ts",
     "db:generate:sqlite": "prisma generate --schema prisma/schema.sqlite.prisma",
     "db:migrate:sqlite-to-postgres": "tsx scripts/migrate_sqlite_to_postgres.ts",
     "postinstall": "prisma generate"

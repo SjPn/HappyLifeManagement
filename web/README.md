@@ -50,6 +50,15 @@ npm run dev
 | mod@hlm.kiev.ua | M0deR@toR$ | Модератор |
 | neighbor@happylife.demo | demo123 | Мешканець |
 
+## Удаление демо-новости “Добро пожаловать…”
+
+Если вы уже сидили БД раньше и в ленте видите демо-новость “Добро пожаловать в Happy Life”, её можно удалить разово:
+
+```bash
+cd web
+npm run db:cleanup:demo-news
+```
+
 ## Сборка
 
 ```bash

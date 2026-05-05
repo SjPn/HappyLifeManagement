@@ -63,14 +63,6 @@ async function main() {
     },
   });
 
-  await prisma.newsPost.create({
-    data: {
-      title: "Добро пожаловать в Happy Life",
-      body: "Это демо-посёлок. Новости, заявки и голосования доступны после входа. Тестовые учётки: chair@hlm.kiev.ua / mod@hlm.kiev.ua / neighbor@happylife.demo.",
-      authorId: chair.id,
-    },
-  });
-
   const vote = await prisma.vote.create({
     data: {
       title: "Провести ямочный ремонт главной дороги в июне?",

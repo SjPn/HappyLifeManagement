@@ -3,11 +3,11 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// SQLite: храним строковые коды; см. src/lib/enums.ts
+// Postgres: храним строковые коды; см. src/lib/enums.ts
 
 model User {
   id           String @id @default(cuid())

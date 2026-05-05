@@ -6,7 +6,7 @@
 
 - **Next.js 16** (App Router), React 19, TypeScript  
 - **Tailwind CSS 4**  
-- **Prisma 5** + **SQLite** (`dev.db` в корне `web/`)  
+- **Prisma 5** + **Postgres** (например Neon/Render Postgres)  
 - **Auth.js (next-auth v5 beta)** — вхід за email/паролем  
 - **next-intl** — три мови з префіксом у URL: **`/uk`** (типово), **`/ru`**, **`/en`**. Російська в інтерфейсі позначається як **«Київський»** (не «російська»). У шапці — перемикач мов.  
 
@@ -59,13 +59,18 @@ npm start
 
 ## Деплой (Render / Vercel) — заметки
 
-- **SQLite (`dev.db`) подходит только для локальной разработки.** Для продакшена нужен внешний Postgres (Render Postgres / Neon / Supabase и т.д.). Иначе при масштабировании/перезапусках легко потерять данные.
+- Для продакшена используйте внешний **Postgres** (Render Postgres / Neon / Supabase и т.д.).
 - **Render**:
   - На бесплатных/cheap инстансах часто есть **cold start** (пауза после простоя). Это нормально для MVP/пилота.
   - Лечится: платный план без сна, keep-alive пинг (cron), либо перенос SSR в более «always-on» окружение.
 - **Vercel**:
   - Отлично подходит для Next.js и обычно даёт более быстрые старты, но приложение всё равно должно ходить в **внешнюю БД** (Postgres). SQLite-файл на Vercel — плохая идея.
   - Для Prisma на Vercel обычно делают `prisma migrate deploy` на этапе build/deploy и используют пулер/accelerate при необходимости.
+
+### Neon (важно)
+
+- Для Prisma **миграций/`db push`** чаще надёжнее использовать **direct endpoint** (не `-pooler`), а `-pooler` оставлять для runtime-коннектов приложения.
+- Если указываете `-pooler`, может понадобиться параметр `pgbouncer=true` (зависит от конфигурации Neon).
 
 Минимальный план миграции на Postgres:
 1) Заменить `DATABASE_URL` на Postgres.

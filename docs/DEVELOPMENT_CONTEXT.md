@@ -57,3 +57,8 @@
 - Текущая БД в `web/` — **SQLite** для дев-режима. Для продакшена лучше перейти на **Postgres** (Render Postgres / Neon / Supabase и т.д.).
 - Render на недорогих тарифах может «усыплять» сервис → **cold start** (десятки секунд). Для MVP это ок; для UX — переход на always-on план или хостинг без сна.
 - Vercel часто быстрее для Next.js, но требует внешнюю БД; SQLite-файл на Vercel — нецелевой путь.
+
+#### Neon Postgres (заметка)
+
+- Для операций Prisma уровня схемы (`prisma db push`, миграции) обычно лучше использовать **direct endpoint** (не `-pooler`).
+- Если используете pooler endpoint, иногда требуется `?pgbouncer=true` (см. документацию Neon по pooling).

@@ -222,7 +222,15 @@
     "metersLink": "Meters & balance",
     "chairPanel": "Chair / moderation panel",
     "signOut": "Sign out",
-    "tenancyTitle": "Residency"
+    "tenancyTitle": "Residency",
+    "editProfile": "Edit profile"
+  },
+  "profileEdit": {
+    "name": "Full name",
+    "street": "Street",
+    "house": "House / plot",
+    "phone": "Phone",
+    "tenancy": "Residency status"
   },
   "chair": {
     "title": "Management",

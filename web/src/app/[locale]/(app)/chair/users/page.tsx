@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { PageTitle, Card } from "@/components/Ui";
 import { UserApproveSelect } from "@/components/UserApproveSelect";
 import { BalanceEditForm } from "@/components/BalanceEditForm";
+import { UserEditForm } from "@/components/UserEditForm";
 import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function ChairUsersPage() {
@@ -23,7 +24,8 @@ export default async function ChairUsersPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  const isChair = session!.user!.role === "CHAIR";
+  const isStaff =
+    session!.user!.role === "CHAIR" || session!.user!.role === "MODERATOR";
 
   return (
     <>
@@ -56,10 +58,20 @@ export default async function ChairUsersPage() {
                 </div>
               </div>
             </div>
-            {isChair && (
+            {isStaff && (
               <div className="mt-4 border-t border-zinc-100 pt-3 dark:border-zinc-800">
                 <BalanceEditForm userId={u.id} balanceUah={u.balanceUah} />
               </div>
+            )}
+            {isStaff && (
+              <UserEditForm
+                userId={u.id}
+                name={u.name}
+                street={u.street}
+                houseNumber={u.houseNumber}
+                phone={u.phone ?? null}
+                tenancyType={u.tenancyType}
+              />
             )}
           </Card>
         ))}

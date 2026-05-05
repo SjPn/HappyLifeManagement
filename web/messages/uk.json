@@ -238,7 +238,15 @@
     "metersLink": "Лічильники та баланс",
     "chairPanel": "Панель голови / модерації",
     "signOut": "Вийти",
-    "tenancyTitle": "Проживання"
+    "tenancyTitle": "Проживання",
+    "editProfile": "Редагувати профіль"
+  },
+  "profileEdit": {
+    "name": "ПІБ",
+    "street": "Вулиця",
+    "house": "Буд / ділянка",
+    "phone": "Телефон",
+    "tenancy": "Статус проживання"
   },
   "chair": {
     "title": "Управління",

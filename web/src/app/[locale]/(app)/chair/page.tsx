@@ -13,14 +13,13 @@ export default async function ChairHomePage() {
     redirect(`/${locale}/dashboard`);
   }
 
-  const chair = session!.user!.role === "CHAIR";
   const t = await getTranslations("chair");
 
   return (
     <>
       <PageTitle
         title={t("title")}
-        subtitle={chair ? t("subtitleChair") : t("subtitleMod")}
+        subtitle={t("subtitleChair")}
       />
 
       <div className="mb-8 flex flex-col gap-2">

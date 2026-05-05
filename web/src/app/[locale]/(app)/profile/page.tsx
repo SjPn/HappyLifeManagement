@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { PageTitle, Card } from "@/components/Ui";
 import { SignOutButton } from "@/components/AppShell";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ProfileEditForm } from "@/components/ProfileEditForm";
 import { getTranslations } from "next-intl/server";
 
 export default async function ProfilePage() {
@@ -43,6 +44,19 @@ export default async function ProfilePage() {
             : "—"}
         </p>
       </Card>
+
+      {user && (
+        <Card className="mb-6">
+          <p className="mb-3 text-sm font-semibold">{t("editProfile")}</p>
+          <ProfileEditForm
+            name={user.name}
+            street={user.street}
+            houseNumber={user.houseNumber}
+            phone={user.phone ?? null}
+            tenancyType={user.tenancyType ?? "OWNER"}
+          />
+        </Card>
+      )}
 
       <div className="mb-6 flex justify-center">
         <LanguageSwitcher />

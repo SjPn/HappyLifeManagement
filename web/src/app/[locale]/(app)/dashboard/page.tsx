@@ -5,6 +5,7 @@ import { PageTitle, Card, ButtonLink } from "@/components/Ui";
 import { getLocale, getTranslations } from "next-intl/server";
 import { formatUah } from "@/lib/money";
 import { dateLocaleForUi } from "@/lib/dateLocale";
+import { voteAudienceWhere } from "@/lib/audience";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -22,7 +23,13 @@ export default async function DashboardPage() {
     }),
     prisma.vote.findMany({
       where: {
-        OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }],
+        AND: [
+          { OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }] },
+          voteAudienceWhere({
+            role: session!.user!.role,
+            tenancyType: session!.user!.tenancyType,
+          }),
+        ],
       },
       orderBy: { createdAt: "desc" },
       take: 5,

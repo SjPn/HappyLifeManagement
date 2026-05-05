@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { PageTitle, Card } from "@/components/Ui";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
+import { voteAudienceWhere } from "@/lib/audience";
 
 export default async function VotesListPage() {
   const session = await auth();
@@ -13,6 +14,10 @@ export default async function VotesListPage() {
   const dateLocale = dateLocaleForUi(locale);
 
   const votes = await prisma.vote.findMany({
+    where: voteAudienceWhere({
+      role: session!.user!.role,
+      tenancyType: session!.user!.tenancyType,
+    }),
     orderBy: { createdAt: "desc" },
     include: {
       options: { orderBy: { sortOrder: "asc" } },

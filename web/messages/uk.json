@@ -17,7 +17,8 @@
     "titleRequired": "Вкажіть заголовок",
     "voteTypeMvp": "У MVP лише тип «так / ні»",
     "forbidden": "Недостатньо прав",
-    "badStatus": "Некоректний статус"
+    "badStatus": "Некоректний статус",
+    "audienceDenied": "Немає доступу до цього голосування або теми для вашого статусу (власник / орендар)."
   },
   "meta": {
     "title": "Happy Life — онлайн ОСББ / котеджі",
@@ -74,6 +75,9 @@
     "phone": "Телефон (необов’язково)",
     "invite": "Код запрошення (необов’язково)",
     "invitePh": "Для запрошених мешканців",
+    "tenancyLegend": "Статус проживання",
+    "tenancyOwner": "Власник (або представник власника)",
+    "tenancyTenant": "Орендар",
     "passwordMin": "Пароль (мін. 6 символів)",
     "signIn": "Увійти",
     "signingIn": "Вхід…",
@@ -189,6 +193,7 @@
     "authorTopic": "Автор теми:",
     "messages": "повід.",
     "backList": "← Усі теми",
+    "audienceField": "Хто може бачити тему й відповідати",
     "image": "Фото до повідомлення (необов’язково)",
     "postCount": "{count} відп.",
     "replyHeading": "Відповісти",
@@ -232,7 +237,8 @@
     "votesLink": "Голосування",
     "metersLink": "Лічильники та баланс",
     "chairPanel": "Панель голови / модерації",
-    "signOut": "Вийти"
+    "signOut": "Вийти",
+    "tenancyTitle": "Проживання"
   },
   "chair": {
     "title": "Управління",
@@ -245,6 +251,7 @@
     "backProfile": "← Назад до профілю",
     "usersTitle": "Мешканці",
     "usersSubtitle": "Підтвердження адреси та (для голови) орієнтовний баланс.",
+    "tenancyColTitle": "Проживання",
     "addressStatus": "Статус адреси",
     "balance": "Баланс ₴",
     "reportsModTitle": "Модерація звернень",
@@ -270,7 +277,8 @@
     "voteOptNoPh": "Ні",
     "voteDaysLabel": "Термін (днів до закриття)",
     "voteLaunchBtn": "Запустити голосування",
-    "voteCreating": "Створення…"
+    "voteCreating": "Створення…",
+    "voteAudienceField": "Хто може бачити й голосувати"
   },
   "categories": {
     "ticket": {
@@ -307,6 +315,15 @@
       "RESIDENT": "Мешканець",
       "MODERATOR": "Модератор",
       "CHAIR": "Голова"
+    },
+    "audience": {
+      "ALL": "Усі мешканці (власники та орендарі)",
+      "OWNERS_ONLY": "Лише власники",
+      "TENANTS_ONLY": "Лише орендарі"
+    },
+    "tenancy": {
+      "OWNER": "Власник",
+      "TENANT": "Орендар"
     },
     "userStatus": {
       "PENDING": "Очікує",

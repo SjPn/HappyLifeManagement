@@ -5,10 +5,12 @@ import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
+import { AudienceScope } from "@/lib/audience";
 
 export function ForumNewForm() {
   const router = useRouter();
   const t = useTranslations("forum");
+  const ta = useTranslations("categories.audience");
   const te = useTranslations("errors");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -45,6 +47,14 @@ export function ForumNewForm() {
           rows={6}
           className={inputClass}
         />
+      </label>
+      <label className="flex flex-col gap-1 text-sm">
+        <span className={labelClass}>{t("audienceField")}</span>
+        <select name="audience" className={inputClass} defaultValue={AudienceScope.ALL}>
+          <option value={AudienceScope.ALL}>{ta("ALL")}</option>
+          <option value={AudienceScope.OWNERS_ONLY}>{ta("OWNERS_ONLY")}</option>
+          <option value={AudienceScope.TENANTS_ONLY}>{ta("TENANTS_ONLY")}</option>
+        </select>
       </label>
       <label className="flex flex-col gap-1 text-sm">
         <span className={labelClass}>{t("image")}</span>

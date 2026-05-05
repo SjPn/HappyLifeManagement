@@ -5,6 +5,8 @@ import { PageTitle, Card } from "@/components/Ui";
 import { ForumReplyForm } from "@/components/ForumReplyForm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
+import { auth } from "@/auth";
+import { userMatchesAudience } from "@/lib/audience";
 
 export default async function ForumTopicPage({
   params,
@@ -12,6 +14,7 @@ export default async function ForumTopicPage({
   params: Promise<{ topicId: string }>;
 }) {
   const { topicId } = await params;
+  const session = await auth();
   const locale = await getLocale();
   const t = await getTranslations("forum");
   const dateLocale = dateLocaleForUi(locale);
@@ -28,6 +31,16 @@ export default async function ForumTopicPage({
   });
 
   if (!topic) notFound();
+
+  if (
+    !userMatchesAudience(
+      session!.user!.role,
+      session!.user!.tenancyType,
+      topic.audience,
+    )
+  ) {
+    notFound();
+  }
 
   return (
     <>

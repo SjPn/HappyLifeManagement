@@ -3,6 +3,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { Role, UserStatus } from "@/lib/enums";
+import { TenancyType } from "@/lib/audience";
 
 const schema = z.object({
   email: z.string().email(),
@@ -12,6 +13,7 @@ const schema = z.object({
   houseNumber: z.string().min(1),
   phone: z.string().optional(),
   inviteCode: z.string().optional(),
+  tenancyType: z.enum([TenancyType.OWNER, TenancyType.TENANT]),
 });
 
 export async function POST(req: Request) {
@@ -30,8 +32,16 @@ export async function POST(req: Request) {
     );
   }
 
-  const { email, password, name, street, houseNumber, phone, inviteCode } =
-    parsed.data;
+  const {
+    email,
+    password,
+    name,
+    street,
+    houseNumber,
+    phone,
+    inviteCode,
+    tenancyType,
+  } = parsed.data;
   const normalized = email.trim().toLowerCase();
 
   const existing = await prisma.user.findUnique({
@@ -61,6 +71,7 @@ export async function POST(req: Request) {
       phone: phone?.trim() || null,
       role: Role.RESIDENT,
       status,
+      tenancyType,
     },
   });
 

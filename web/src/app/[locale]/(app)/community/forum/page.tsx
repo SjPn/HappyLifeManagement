@@ -1,15 +1,22 @@
 import { Link } from "@/i18n/navigation";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PageTitle, Card, ButtonLink } from "@/components/Ui";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
+import { forumTopicAudienceWhere } from "@/lib/audience";
 
 export default async function ForumListPage() {
+  const session = await auth();
   const locale = await getLocale();
   const t = await getTranslations("forum");
   const dateLocale = dateLocaleForUi(locale);
 
   const topics = await prisma.forumTopic.findMany({
+    where: forumTopicAudienceWhere({
+      role: session!.user!.role,
+      tenancyType: session!.user!.tenancyType,
+    }),
     orderBy: { createdAt: "desc" },
     take: 40,
     include: {

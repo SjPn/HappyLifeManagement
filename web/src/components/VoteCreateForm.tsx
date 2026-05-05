@@ -5,10 +5,12 @@ import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
+import { AudienceScope } from "@/lib/audience";
 
 export function VoteCreateForm() {
   const router = useRouter();
   const t = useTranslations("chair");
+  const ta = useTranslations("categories.audience");
   const te = useTranslations("errors");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -71,6 +73,14 @@ export function VoteCreateForm() {
           defaultValue={14}
           className={inputClass}
         />
+      </label>
+      <label className="flex flex-col gap-1 text-sm">
+        <span className={labelClass}>{t("voteAudienceField")}</span>
+        <select name="audience" className={inputClass} defaultValue={AudienceScope.ALL}>
+          <option value={AudienceScope.ALL}>{ta("ALL")}</option>
+          <option value={AudienceScope.OWNERS_ONLY}>{ta("OWNERS_ONLY")}</option>
+          <option value={AudienceScope.TENANTS_ONLY}>{ta("TENANTS_ONLY")}</option>
+        </select>
       </label>
       {error && (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>

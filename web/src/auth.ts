@@ -33,6 +33,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           name: user.name,
           role: user.role,
           status: user.status,
+          tenancyType: user.tenancyType,
         };
       },
     }),
@@ -43,6 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id as string;
         token.role = user.role ?? "RESIDENT";
         token.status = user.status ?? "PENDING";
+        token.tenancyType = (user as { tenancyType?: string }).tenancyType ?? "OWNER";
       }
       return token;
     },
@@ -51,6 +53,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.status = token.status as string;
+        session.user.tenancyType =
+          (token.tenancyType as string | undefined) ?? "OWNER";
       }
       return session;
     },

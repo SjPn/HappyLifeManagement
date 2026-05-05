@@ -10,6 +10,7 @@ export default async function ProfilePage() {
   const session = await auth();
   const t = await getTranslations("profile");
   const tr = await getTranslations("categories.roles");
+  const tt = await getTranslations("categories.tenancy");
 
   const user = await prisma.user.findUnique({
     where: { id: session!.user!.id },
@@ -34,6 +35,12 @@ export default async function ProfilePage() {
         <p className="mt-2 text-xs text-zinc-500">
           {t("role")}{" "}
           {user?.role ? tr(user.role as "RESIDENT" | "MODERATOR" | "CHAIR") : "—"}
+        </p>
+        <p className="mt-1 text-xs text-zinc-500">
+          {t("tenancyTitle")}:{" "}
+          {user?.tenancyType
+            ? tt(user.tenancyType as "OWNER" | "TENANT")
+            : "—"}
         </p>
       </Card>
 

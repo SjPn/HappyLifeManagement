@@ -22,6 +22,9 @@ model User {
   role   String @default("RESIDENT") // RESIDENT | MODERATOR | CHAIR
   status String @default("PENDING") // PENDING | APPROVED | REJECTED
 
+  /// OWNER | TENANT — з реєстрації; впливає на доступ до голосувань / тем за audience
+  tenancyType String @default("OWNER")
+
   balanceUah Float @default(0)
 
   createdAt DateTime @default(now())
@@ -64,6 +67,8 @@ model Vote {
   title       String
   description String?
   type        String // YES_NO | SINGLE_CHOICE
+  /// ALL | OWNERS_ONLY | TENANTS_ONLY — хто бачить і голосує
+  audience    String    @default("ALL")
   endsAt      DateTime?
   createdAt   DateTime  @default(now())
   options     VoteOption[]
@@ -106,6 +111,8 @@ model BoardPost {
 model ForumTopic {
   id        String      @id @default(cuid())
   title     String
+  /// ALL | OWNERS_ONLY | TENANTS_ONLY
+  audience  String      @default("ALL")
   userId    String
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime    @default(now())

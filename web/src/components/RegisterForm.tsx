@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
+import { TenancyType } from "@/lib/audience";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -30,6 +31,9 @@ export function RegisterForm() {
       phone: (form.elements.namedItem("phone") as HTMLInputElement).value,
       inviteCode: (form.elements.namedItem("inviteCode") as HTMLInputElement)
         .value,
+      tenancyType:
+        form.querySelector<HTMLInputElement>('input[name="tenancyType"]:checked')
+          ?.value ?? TenancyType.OWNER,
     };
     const res = await fetch("/api/register", {
       method: "POST",
@@ -100,6 +104,30 @@ export function RegisterForm() {
         <span className={labelClass}>{t("phone")}</span>
         <input name="phone" type="tel" className={inputClass} />
       </label>
+      <fieldset className="flex flex-col gap-2 rounded-xl border border-zinc-200 p-3 dark:border-zinc-700">
+        <legend className={labelClass}>{t("tenancyLegend")}</legend>
+        <label className="flex cursor-pointer items-center gap-2 text-sm">
+          <input
+            type="radio"
+            name="tenancyType"
+            value={TenancyType.OWNER}
+            defaultChecked
+            required
+            className="h-4 w-4"
+          />
+          {t("tenancyOwner")}
+        </label>
+        <label className="flex cursor-pointer items-center gap-2 text-sm">
+          <input
+            type="radio"
+            name="tenancyType"
+            value={TenancyType.TENANT}
+            required
+            className="h-4 w-4"
+          />
+          {t("tenancyTenant")}
+        </label>
+      </fieldset>
       <label className="flex flex-col gap-1.5">
         <span className={labelClass}>{t("invite")}</span>
         <input

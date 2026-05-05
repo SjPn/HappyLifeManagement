@@ -6,12 +6,14 @@ declare module "next-auth" {
       id: string;
       role: string;
       status: string;
+      tenancyType?: string;
     };
   }
 
   interface User {
     role?: string;
     status?: string;
+    tenancyType?: string;
   }
 }
 
@@ -20,5 +22,6 @@ declare module "next-auth/jwt" {
     id: string;
     role: string;
     status: string;
+    tenancyType?: string;
   }
 }

@@ -3,6 +3,10 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
+import {
+  parseAudienceScope,
+  userMatchesAudience,
+} from "@/lib/audience";
 
 export async function submitVote(formData: FormData) {
   const session = await auth();
@@ -26,6 +30,16 @@ export async function submitVote(formData: FormData) {
 
   const opt = vote.options.find((o) => o.id === optionId);
   if (!opt) return { error: "generic" as const };
+
+  if (
+    !userMatchesAudience(
+      session.user.role,
+      session.user.tenancyType,
+      vote.audience,
+    )
+  ) {
+    return { error: "audienceDenied" as const };
+  }
 
   await prisma.voteResponse.upsert({
     where: {
@@ -58,6 +72,7 @@ export async function createVote(formData: FormData) {
   const days = Number(formData.get("days") || 7);
   const optA = String(formData.get("optA") || "").trim();
   const optB = String(formData.get("optB") || "").trim();
+  const audience = parseAudienceScope(String(formData.get("audience") || ""));
 
   if (!title) return { error: "titleRequired" as const };
 
@@ -70,6 +85,7 @@ export async function createVote(formData: FormData) {
         title,
         description,
         type: "YES_NO",
+        audience,
         endsAt,
         options: {
           create: [

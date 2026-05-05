@@ -8,6 +8,7 @@ import {
   UserStatus,
   VoteType,
 } from "../src/lib/enums";
+import { AudienceScope, TenancyType } from "../src/lib/audience";
 
 const prisma = new PrismaClient();
 
@@ -16,7 +17,7 @@ async function main() {
 
   const chair = await prisma.user.upsert({
     where: { email: "chair@happylife.demo" },
-    update: {},
+    update: { tenancyType: TenancyType.OWNER },
     create: {
       email: "chair@happylife.demo",
       passwordHash: hash("demo123"),
@@ -25,13 +26,14 @@ async function main() {
       houseNumber: "1",
       role: Role.CHAIR,
       status: UserStatus.APPROVED,
+      tenancyType: TenancyType.OWNER,
       balanceUah: 0,
     },
   });
 
   const mod = await prisma.user.upsert({
     where: { email: "mod@happylife.demo" },
-    update: {},
+    update: { tenancyType: TenancyType.OWNER },
     create: {
       email: "mod@happylife.demo",
       passwordHash: hash("demo123"),
@@ -40,13 +42,14 @@ async function main() {
       houseNumber: "2",
       role: Role.MODERATOR,
       status: UserStatus.APPROVED,
+      tenancyType: TenancyType.OWNER,
       balanceUah: 0,
     },
   });
 
   const resident = await prisma.user.upsert({
     where: { email: "neighbor@happylife.demo" },
-    update: {},
+    update: { tenancyType: TenancyType.TENANT },
     create: {
       email: "neighbor@happylife.demo",
       passwordHash: hash("demo123"),
@@ -55,6 +58,7 @@ async function main() {
       houseNumber: "15",
       role: Role.RESIDENT,
       status: UserStatus.APPROVED,
+      tenancyType: TenancyType.TENANT,
       balanceUah: 3500,
     },
   });
@@ -72,6 +76,7 @@ async function main() {
       title: "Провести ямочный ремонт главной дороги в июне?",
       description: "Работы планируются за счёт целевого взноса.",
       type: VoteType.YES_NO,
+      audience: AudienceScope.ALL,
       endsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
       options: {
         create: [
@@ -94,6 +99,7 @@ async function main() {
   const topic = await prisma.forumTopic.create({
     data: {
       title: "Организация дежурств по уборке",
+      audience: AudienceScope.ALL,
       userId: resident.id,
       posts: {
         create: {

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { PageTitle, Card } from "@/components/Ui";
 import { VoteForm } from "@/components/VoteForm";
 import { getTranslations } from "next-intl/server";
+import { userMatchesAudience } from "@/lib/audience";
 
 export default async function VoteDetailPage({
   params,
@@ -27,6 +28,16 @@ export default async function VoteDetailPage({
   });
 
   if (!vote) notFound();
+
+  if (
+    !userMatchesAudience(
+      session!.user!.role,
+      session!.user!.tenancyType,
+      vote.audience,
+    )
+  ) {
+    notFound();
+  }
 
   const now = new Date();
   const active = !vote.endsAt || vote.endsAt > now;

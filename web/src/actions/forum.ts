@@ -4,6 +4,10 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
 import { savePublicUpload } from "@/lib/upload";
+import {
+  parseAudienceScope,
+  userMatchesAudience,
+} from "@/lib/audience";
 
 export async function createForumTopic(formData: FormData) {
   const session = await auth();
@@ -14,6 +18,7 @@ export async function createForumTopic(formData: FormData) {
   const title = String(formData.get("title") || "").trim();
   const body = String(formData.get("body") || "").trim();
   const img = formData.get("image");
+  const audience = parseAudienceScope(String(formData.get("audience") || ""));
 
   if (!title || !body) return { error: "topicRequired" as const };
 
@@ -29,6 +34,7 @@ export async function createForumTopic(formData: FormData) {
   await prisma.forumTopic.create({
     data: {
       title,
+      audience,
       userId: session.user.id,
       posts: {
         create: {
@@ -59,6 +65,16 @@ export async function createForumReply(formData: FormData) {
 
   const topic = await prisma.forumTopic.findUnique({ where: { id: topicId } });
   if (!topic) return { error: "noTopic" as const };
+
+  if (
+    !userMatchesAudience(
+      session.user.role,
+      session.user.tenancyType,
+      topic.audience,
+    )
+  ) {
+    return { error: "audienceDenied" as const };
+  }
 
   let imageUrl: string | null = null;
   if (img instanceof File && img.size > 0) {

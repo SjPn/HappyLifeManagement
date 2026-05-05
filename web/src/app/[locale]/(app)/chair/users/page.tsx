@@ -17,6 +17,7 @@ export default async function ChairUsersPage() {
   const t = await getTranslations("chair");
   const tp = await getTranslations("profile");
   const tr = await getTranslations("categories.roles");
+  const tt = await getTranslations("categories.tenancy");
 
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
@@ -42,6 +43,10 @@ export default async function ChairUsersPage() {
                 <p className="mt-1 text-xs text-zinc-500">
                   {tp("role")}{" "}
                   {tr(u.role as "RESIDENT" | "MODERATOR" | "CHAIR")}
+                </p>
+                <p className="mt-1 text-xs text-zinc-500">
+                  {t("tenancyColTitle")}:{" "}
+                  {tt(u.tenancyType as "OWNER" | "TENANT")}
                 </p>
               </div>
               <div className="text-right text-sm">

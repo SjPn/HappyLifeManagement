@@ -17,7 +17,8 @@
     "titleRequired": "Title is required",
     "voteTypeMvp": "In MVP only yes/no votes",
     "forbidden": "Insufficient permissions",
-    "badStatus": "Invalid status"
+    "badStatus": "Invalid status",
+    "audienceDenied": "You don’t have access to this vote or topic for your residency status (owner / tenant)."
   },
   "meta": {
     "title": "Happy Life — HOA & cottage community online",
@@ -58,6 +59,9 @@
     "phone": "Phone (optional)",
     "invite": "Invite code (optional)",
     "invitePh": "For invited residents",
+    "tenancyLegend": "Residency status",
+    "tenancyOwner": "Owner (or owner’s representative)",
+    "tenancyTenant": "Tenant",
     "passwordMin": "Password (min. 6 characters)",
     "signIn": "Log in",
     "signingIn": "Signing in…",
@@ -173,6 +177,7 @@
     "authorTopic": "Topic author:",
     "messages": "msgs",
     "backList": "← All topics",
+    "audienceField": "Who can view the topic and reply",
     "image": "Photo with message (optional)",
     "postCount": "{count} replies",
     "replyHeading": "Reply",
@@ -216,7 +221,8 @@
     "votesLink": "Votes",
     "metersLink": "Meters & balance",
     "chairPanel": "Chair / moderation panel",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "tenancyTitle": "Residency"
   },
   "chair": {
     "title": "Management",
@@ -229,6 +235,7 @@
     "backProfile": "← Back to profile",
     "usersTitle": "Residents",
     "usersSubtitle": "Address verification and (for chair) indicative balance.",
+    "tenancyColTitle": "Residency",
     "addressStatus": "Address status",
     "balance": "Balance (UAH)",
     "reportsModTitle": "Moderate reports",
@@ -254,7 +261,8 @@
     "voteOptNoPh": "No",
     "voteDaysLabel": "Deadline (days until close)",
     "voteLaunchBtn": "Start vote",
-    "voteCreating": "Creating…"
+    "voteCreating": "Creating…",
+    "voteAudienceField": "Who can view and vote"
   },
   "categories": {
     "ticket": {
@@ -291,6 +299,15 @@
       "RESIDENT": "Resident",
       "MODERATOR": "Moderator",
       "CHAIR": "Chair"
+    },
+    "audience": {
+      "ALL": "All residents (owners and tenants)",
+      "OWNERS_ONLY": "Owners only",
+      "TENANTS_ONLY": "Tenants only"
+    },
+    "tenancy": {
+      "OWNER": "Owner",
+      "TENANT": "Tenant"
     },
     "userStatus": {
       "PENDING": "Pending",

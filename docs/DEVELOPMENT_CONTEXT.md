@@ -51,13 +51,18 @@
 - **Prisma / `balanceUah`:** в схеме поле `User.balanceUah`. Если сгенерированный клиент в `node_modules` ещё со старым `balanceRub` (не запускали `prisma generate` после смены схемы) — на дашборде будет `PrismaClientValidationError` на `balanceUah`. Решение: `npx prisma generate` (на Windows при EPERM — остановить dev-сервер). БД из старой ветки с колонкой `balanceRub`: `ALTER TABLE "User" RENAME COLUMN "balanceRub" TO "balanceUah";` через `prisma db execute --stdin`, затем `prisma db push`. См. `web/README.md`, раздел Prisma.
 - **`npm run dev`** вызывает **`predev`** → `prisma generate`, чтобы перед стартом Next подтянуть актуальный клиент. Если ошибка всё ещё упоминает `balanceRub`, процесс `next dev` держит старый клиент в памяти: полная остановка dev, при необходимости удалить `web/.next`, снова `npm run dev`.
 - **Auth.js / `ClientFetchError` (Failed to fetch):** в `.env` переменные **`AUTH_URL` и `NEXTAUTH_URL`** должны совпадать с фактическим origin в браузере (включая порт, например `http://localhost:3300` при `next dev -p 3300`). Иначе падает запрос к `/api/auth/session`. См. `web/README.md`.
+- **Sign out / редиректы:** в проде возможна ошибка, когда неверный `NEXTAUTH_URL` отправляет пользователя на `localhost` при выходе. Для устойчивости `SignOutButton` делает `signOut({ redirect: false })` и затем клиентский переход на `/${locale}`.
 - **Владелец / арендатор и аудитория:** у `User` поле `tenancyType` (`OWNER` | `TENANT`), задаётся при регистрации. У `Vote` и `ForumTopic` поле `audience` (`ALL` | `OWNERS_ONLY` | `TENANTS_ONLY`). Логика в `web/src/lib/audience.ts`; персонал (`CHAIR`, `MODERATOR`) обходит ограничения. Доска объявлений пока без аудитории.
+- **Меморандум/тарифы:** публичные страницы до логина: `/{locale}/info/memorandum`, `/{locale}/info/tariffs`. При регистрации требуется согласие с меморандумом; сохраняется `User.memorandumAcceptedAt` и `User.memorandumVersion`.
+- **Каталог жителей:** `/{locale}/residents` — список подтверждённых жителей (роль `RESIDENT`) с адресами и типом проживания.
+- **Редактирование/модерация:** автор может редактировать свои объявления и темы форума; модератор/председатель могут удалять объявления/темы/голосования через `/{locale}/chair/moderation`.
 
 ### Деплой и эксплуатация (заметки)
 
 - Текущая БД в `web/` — **SQLite** для дев-режима. Для продакшена лучше перейти на **Postgres** (Render Postgres / Neon / Supabase и т.д.).
 - Render на недорогих тарифах может «усыплять» сервис → **cold start** (десятки секунд). Для MVP это ок; для UX — переход на always-on план или хостинг без сна.
 - Vercel часто быстрее для Next.js, но требует внешнюю БД; SQLite-файл на Vercel — нецелевой путь.
+  - На Vercel `next build` тайпчекает весь TS. Скрипт `scripts/migrate_sqlite_to_postgres.ts` зависит от sqlite-клиента и исключён из typecheck через `web/tsconfig.json`.
 
 #### Neon Postgres (заметка)
 

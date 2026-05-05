@@ -13,9 +13,9 @@ export function LoginForm() {
   const search = useSearchParams();
   const raw = search.get("callbackUrl") ?? "";
   const supportedLocales = ["uk", "ru", "en"] as const;
-  const toLocalizedPath = (input: string): string => {
+  const toPathForIntlRouter = (input: string): string => {
     let value = input.trim();
-    if (!value) return `/${locale}/dashboard`;
+    if (!value) return "/dashboard";
 
     // next-auth may pass an absolute URL; normalize to a path.
     if (value.startsWith("http://") || value.startsWith("https://")) {
@@ -23,12 +23,12 @@ export function LoginForm() {
         const u = new URL(value);
         value = `${u.pathname}${u.search}${u.hash}`;
       } catch {
-        return `/${locale}/dashboard`;
+        return "/dashboard";
       }
     }
 
     if (!value.startsWith("/") || value.startsWith("/api")) {
-      return `/${locale}/dashboard`;
+      return "/dashboard";
     }
 
     // Guard against accidental double-prefix like /ru/ru/dashboard
@@ -37,13 +37,24 @@ export function LoginForm() {
       value = `/${locale}/` + value.slice(doublePrefix.length);
     }
 
-    const alreadyLocalized = supportedLocales.some(
+    const hasAnyLocalePrefix = supportedLocales.some(
       (l) => value === `/${l}` || value.startsWith(`/${l}/`),
     );
-    return alreadyLocalized ? value : `/${locale}${value}`;
+    // IMPORTANT: next-intl router adds the locale prefix itself.
+    // So we must pass an unprefixed, locale-agnostic path to avoid /ru/ru/...
+    if (hasAnyLocalePrefix) {
+      const parts = value.split("/");
+      const maybeLocale = parts[1] as (typeof supportedLocales)[number] | undefined;
+      if (maybeLocale && supportedLocales.includes(maybeLocale)) {
+        const rest = "/" + parts.slice(2).join("/");
+        return rest === "/" ? "/dashboard" : rest;
+      }
+    }
+
+    return value || "/dashboard";
   };
 
-  const callback = toLocalizedPath(raw);
+  const callback = toPathForIntlRouter(raw);
   const t = useTranslations("auth");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

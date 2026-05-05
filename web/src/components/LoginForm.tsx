@@ -12,12 +12,38 @@ export function LoginForm() {
   const locale = useLocale();
   const search = useSearchParams();
   const raw = search.get("callbackUrl") ?? "";
-  let callback = `/${locale}/dashboard`;
-  if (raw.startsWith(`/${locale}/`)) {
-    callback = raw;
-  } else if (raw.startsWith("/") && !raw.startsWith("/api")) {
-    callback = `/${locale}${raw}`;
-  }
+  const supportedLocales = ["uk", "ru", "en"] as const;
+  const toLocalizedPath = (input: string): string => {
+    let value = input.trim();
+    if (!value) return `/${locale}/dashboard`;
+
+    // next-auth may pass an absolute URL; normalize to a path.
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+      try {
+        const u = new URL(value);
+        value = `${u.pathname}${u.search}${u.hash}`;
+      } catch {
+        return `/${locale}/dashboard`;
+      }
+    }
+
+    if (!value.startsWith("/") || value.startsWith("/api")) {
+      return `/${locale}/dashboard`;
+    }
+
+    // Guard against accidental double-prefix like /ru/ru/dashboard
+    const doublePrefix = `/${locale}/${locale}/`;
+    if (value.startsWith(doublePrefix)) {
+      value = `/${locale}/` + value.slice(doublePrefix.length);
+    }
+
+    const alreadyLocalized = supportedLocales.some(
+      (l) => value === `/${l}` || value.startsWith(`/${l}/`),
+    );
+    return alreadyLocalized ? value : `/${locale}${value}`;
+  };
+
+  const callback = toLocalizedPath(raw);
   const t = useTranslations("auth");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

@@ -77,6 +77,31 @@ npm start
 2) Перейти с `db push` на `prisma migrate dev` (локально) → `prisma migrate deploy` (в проде).
 3) Загрузки изображений вынести из `public/uploads` в S3-совместимое хранилище.
 
+### Перенос данных из SQLite в Postgres (один раз)
+
+Если у вас есть локальная SQLite-база (`dev.db`) и нужно перелить данные в Postgres:
+
+1) Сгенерировать отдельный Prisma-клиент для SQLite:
+
+```bash
+npm run db:generate:sqlite
+```
+
+2) Убедиться, что Postgres-схема создана (на Postgres `DATABASE_URL`):
+
+```bash
+npx prisma db push
+```
+
+3) Задать SQLite URL (в окружении) и запустить перенос:
+
+```bash
+set SQLITE_DATABASE_URL=file:./dev.db
+npm run db:migrate:sqlite-to-postgres
+```
+
+Скрипт переносит сущности, сохраняя `id` и связи, и использует `createMany(skipDuplicates)` — его можно безопасно запускать повторно.
+
 ## Навігація (MVP)
 
 Усі сторінки додатку — під `[locale]`, наприклад `/uk/dashboard`, `/en/community/board`.

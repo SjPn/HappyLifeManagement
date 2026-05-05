@@ -1,0 +1,151 @@
+generator sqliteClient {
+  provider = "prisma-client-js"
+  // don't commit generated client
+  output   = "../src/generated/sqlite-client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("SQLITE_DATABASE_URL")
+}
+
+// SQLite schema used only for data migration to Postgres.
+
+model User {
+  id           String @id @default(cuid())
+  email        String @unique
+  passwordHash String
+  name         String
+  phone        String?
+
+  street      String
+  houseNumber String
+
+  role        String @default("RESIDENT")
+  status      String @default("PENDING")
+  tenancyType String @default("OWNER")
+  balanceUah  Float  @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tickets         Ticket[]
+  voteResponses   VoteResponse[]
+  boardPosts      BoardPost[]
+  forumTopics     ForumTopic[]
+  forumPosts      ForumPost[]
+  reportsAuthored ConfidentialReport[] @relation("ReportAuthor")
+  meterReadings   MeterReading[]
+  newsAuthored    NewsPost[]           @relation("NewsAuthor")
+}
+
+model NewsPost {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  authorId  String
+  author    User     @relation("NewsAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Ticket {
+  id           String @id @default(cuid())
+  category     String
+  description  String
+  photoUrl     String?
+  locationNote String?
+  status       String @default("NEW")
+  userId       String
+  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Vote {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  type        String
+  audience    String    @default("ALL")
+  endsAt      DateTime?
+  createdAt   DateTime  @default(now())
+  options     VoteOption[]
+  responses   VoteResponse[]
+}
+
+model VoteOption {
+  id        String @id @default(cuid())
+  text      String
+  sortOrder Int    @default(0)
+  voteId    String
+  vote      Vote   @relation(fields: [voteId], references: [id], onDelete: Cascade)
+  responses VoteResponse[]
+}
+
+model VoteResponse {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  voteId    String
+  vote      Vote       @relation(fields: [voteId], references: [id], onDelete: Cascade)
+  optionId  String
+  option    VoteOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+
+  @@unique([userId, voteId])
+}
+
+model BoardPost {
+  id        String   @id @default(cuid())
+  category  String
+  title     String
+  body      String
+  imageUrl  String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model ForumTopic {
+  id        String   @id @default(cuid())
+  title     String
+  audience  String   @default("ALL")
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  posts     ForumPost[]
+}
+
+model ForumPost {
+  id        String   @id @default(cuid())
+  body      String
+  imageUrl  String?
+  topicId   String
+  topic     ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model ConfidentialReport {
+  id        String   @id @default(cuid())
+  kind      String
+  category  String
+  body      String
+  photoUrl  String?
+  published Boolean  @default(false)
+  authorId  String
+  author    User     @relation("ReportAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  status    String   @default("NEW")
+  createdAt DateTime @default(now())
+}
+
+model MeterReading {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  value     Float
+  note      String?
+  createdAt DateTime @default(now())
+}
+

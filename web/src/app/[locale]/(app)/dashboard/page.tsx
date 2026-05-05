@@ -12,8 +12,30 @@ export default async function DashboardPage() {
   const userId = session!.user!.id;
   const locale = await getLocale();
   const t = await getTranslations("dashboard");
+  const tn = await getTranslations("nav");
   const tc = await getTranslations("categories.ticketStatus");
   const dateLocale = dateLocaleForUi(locale);
+
+  if (session!.user!.role === "MODERATOR") {
+    return (
+      <>
+        <PageTitle eyebrow={t("eyebrow")} title={t("greeting", { name: "MODERATOR" })} subtitle={t("addressLine", { street: "", house: "" })} />
+        <section className="grid gap-3">
+          <Card>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              {t("quickReport")}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <ButtonLink href="/chair/reports">{tn("community")}</ButtonLink>
+              <ButtonLink href="/chair/users" variant="secondary">
+                {tn("more")}
+              </ButtonLink>
+            </div>
+          </Card>
+        </section>
+      </>
+    );
+  }
 
   const [news, votes, myTickets, lastReading, user] = await Promise.all([
     prisma.newsPost.findMany({

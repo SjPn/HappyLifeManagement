@@ -5,9 +5,14 @@ import { PageTitle, Card, ButtonLink } from "@/components/Ui";
 import { TicketStatusForm } from "@/components/TicketStatusForm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
+import { redirect } from "next/navigation";
 
 export default async function RequestsPage() {
   const session = await auth();
+  if (session!.user!.role === "MODERATOR") {
+    const locale = await getLocale();
+    redirect(`/${locale}/chair`);
+  }
   const role = session!.user!.role;
   const staff = role === "CHAIR" || role === "MODERATOR";
   const locale = await getLocale();

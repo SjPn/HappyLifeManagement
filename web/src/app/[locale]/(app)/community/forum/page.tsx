@@ -5,9 +5,14 @@ import { PageTitle, Card, ButtonLink } from "@/components/Ui";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { forumTopicAudienceWhere } from "@/lib/audience";
+import { redirect } from "next/navigation";
 
 export default async function ForumListPage() {
   const session = await auth();
+  if (session!.user!.role === "MODERATOR") {
+    const locale = await getLocale();
+    redirect(`/${locale}/chair`);
+  }
   const locale = await getLocale();
   const t = await getTranslations("forum");
   const dateLocale = dateLocaleForUi(locale);

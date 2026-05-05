@@ -1,11 +1,12 @@
 import { Link } from "@/i18n/navigation";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PageTitle, Card } from "@/components/Ui";
 import { VoteForm } from "@/components/VoteForm";
 import { getTranslations } from "next-intl/server";
 import { userMatchesAudience } from "@/lib/audience";
+import { getLocale } from "next-intl/server";
 
 export default async function VoteDetailPage({
   params,
@@ -14,6 +15,10 @@ export default async function VoteDetailPage({
 }) {
   const { id } = await params;
   const session = await auth();
+  if (session!.user!.role === "MODERATOR") {
+    const locale = await getLocale();
+    redirect(`/${locale}/chair`);
+  }
   const userId = session!.user!.id;
   const t = await getTranslations("votes");
 

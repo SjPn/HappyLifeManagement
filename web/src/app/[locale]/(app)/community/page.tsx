@@ -1,8 +1,16 @@
 import { Link } from "@/i18n/navigation";
+import { auth } from "@/auth";
 import { PageTitle, Card } from "@/components/Ui";
 import { getTranslations } from "next-intl/server";
+import { getLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 export default async function CommunityHubPage() {
+  const session = await auth();
+  if (session!.user!.role === "MODERATOR") {
+    const locale = await getLocale();
+    redirect(`/${locale}/chair`);
+  }
   const t = await getTranslations("community");
   const links = [
     {

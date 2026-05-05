@@ -4,9 +4,15 @@ import { prisma } from "@/lib/prisma";
 import { PageTitle, Card } from "@/components/Ui";
 import { ConfidentialNewForm } from "@/components/ConfidentialNewForm";
 import { getTranslations } from "next-intl/server";
+import { getLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 export default async function ReportsPage() {
   const session = await auth();
+  if (session!.user!.role === "MODERATOR") {
+    const locale = await getLocale();
+    redirect(`/${locale}/chair`);
+  }
   const userId = session!.user!.id;
   const t = await getTranslations("reports");
   const tKind = await getTranslations("categories.reportKind");

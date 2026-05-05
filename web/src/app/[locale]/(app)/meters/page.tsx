@@ -5,9 +5,14 @@ import { MeterForm } from "@/components/MeterForm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { formatUah } from "@/lib/money";
 import { dateLocaleForUi } from "@/lib/dateLocale";
+import { redirect } from "next/navigation";
 
 export default async function MetersPage() {
   const session = await auth();
+  if (session!.user!.role === "MODERATOR") {
+    const locale = await getLocale();
+    redirect(`/${locale}/chair`);
+  }
   const userId = session!.user!.id;
   const locale = await getLocale();
   const t = await getTranslations("meters");

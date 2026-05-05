@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/navigation";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { PageTitle, Card } from "@/components/Ui";
 import { ForumReplyForm } from "@/components/ForumReplyForm";
@@ -16,6 +16,9 @@ export default async function ForumTopicPage({
   const { topicId } = await params;
   const session = await auth();
   const locale = await getLocale();
+  if (session!.user!.role === "MODERATOR") {
+    redirect(`/${locale}/chair`);
+  }
   const t = await getTranslations("forum");
   const dateLocale = dateLocaleForUi(locale);
 

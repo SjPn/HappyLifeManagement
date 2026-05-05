@@ -5,9 +5,14 @@ import { PageTitle, Card } from "@/components/Ui";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { voteAudienceWhere } from "@/lib/audience";
+import { redirect } from "next/navigation";
 
 export default async function VotesListPage() {
   const session = await auth();
+  if (session!.user!.role === "MODERATOR") {
+    const locale = await getLocale();
+    redirect(`/${locale}/chair`);
+  }
   const userId = session!.user!.id;
   const locale = await getLocale();
   const t = await getTranslations("votes");

@@ -14,6 +14,7 @@ export default async function ChairHomePage() {
   }
 
   const t = await getTranslations("chair");
+  const isChair = session!.user!.role === "CHAIR";
 
   return (
     <>
@@ -37,21 +38,23 @@ export default async function ChairHomePage() {
         </Link>
       </div>
 
-      <>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-          {t("newsEyebrow")}
-        </h2>
-        <Card className="mb-8">
-          <NewsCreateForm />
-        </Card>
+      {isChair ? (
+        <>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            {t("newsEyebrow")}
+          </h2>
+          <Card className="mb-8">
+            <NewsCreateForm />
+          </Card>
 
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-          {t("voteEyebrow")}
-        </h2>
-        <Card className="mb-8">
-          <VoteCreateForm />
-        </Card>
-      </>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            {t("voteEyebrow")}
+          </h2>
+          <Card className="mb-8">
+            <VoteCreateForm />
+          </Card>
+        </>
+      ) : null}
 
       <p className="text-center text-sm">
         <Link href="/profile" className="text-emerald-700 hover:underline">

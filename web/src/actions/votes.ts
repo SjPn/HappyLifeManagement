@@ -61,10 +61,7 @@ export async function submitVote(formData: FormData) {
 
 export async function createVote(formData: FormData) {
   const session = await auth();
-  if (
-    !session?.user?.id ||
-    (session.user.role !== "CHAIR" && session.user.role !== "MODERATOR")
-  ) {
+  if (!session?.user?.id || session.user.role !== "CHAIR") {
     return { error: "forbidden" as const };
   }
 

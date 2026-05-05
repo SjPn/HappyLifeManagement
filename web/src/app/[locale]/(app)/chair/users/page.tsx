@@ -25,7 +25,6 @@ export default async function ChairUsersPage() {
   });
 
   const isChair = session!.user!.role === "CHAIR";
-  const isStaff = isChair || session!.user!.role === "MODERATOR";
 
   return (
     <>
@@ -63,7 +62,8 @@ export default async function ChairUsersPage() {
                 <BalanceEditForm userId={u.id} balanceUah={u.balanceUah} />
               </div>
             )}
-            {isStaff && (
+            {(session!.user!.role === "CHAIR" ||
+              session!.user!.role === "MODERATOR") && (
               <UserEditForm
                 userId={u.id}
                 name={u.name}

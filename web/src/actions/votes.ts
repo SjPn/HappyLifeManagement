@@ -13,6 +13,10 @@ export async function submitVote(formData: FormData) {
   if (!session?.user?.id || session.user.status !== "APPROVED") {
     return { error: "noAccess" as const };
   }
+  // MODERATOR is a service role: can moderate, but does not participate as a resident
+  if (session.user.role === "MODERATOR") {
+    return { error: "forbidden" as const };
+  }
 
   const voteId = String(formData.get("voteId") || "");
   const optionId = String(formData.get("optionId") || "");
@@ -61,7 +65,10 @@ export async function submitVote(formData: FormData) {
 
 export async function createVote(formData: FormData) {
   const session = await auth();
-  if (!session?.user?.id || session.user.role !== "CHAIR") {
+  if (
+    !session?.user?.id ||
+    session.user.role !== "CHAIR"
+  ) {
     return { error: "forbidden" as const };
   }
 

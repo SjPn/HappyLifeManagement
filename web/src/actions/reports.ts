@@ -12,6 +12,9 @@ export async function createConfidentialReport(formData: FormData) {
   if (!session?.user?.id || session.user.status !== "APPROVED") {
     return { error: "noAccess" as const };
   }
+  if (session.user.role === "MODERATOR") {
+    return { error: "forbidden" as const };
+  }
 
   const kindRaw = String(formData.get("kind") || "");
   const kind = kinds.has(kindRaw) ? kindRaw : "SUGGESTION";

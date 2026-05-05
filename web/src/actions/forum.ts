@@ -14,6 +14,9 @@ export async function createForumTopic(formData: FormData) {
   if (!session?.user?.id || session.user.status !== "APPROVED") {
     return { error: "noAccess" as const };
   }
+  if (session.user.role === "MODERATOR") {
+    return { error: "forbidden" as const };
+  }
 
   const title = String(formData.get("title") || "").trim();
   const body = String(formData.get("body") || "").trim();
@@ -55,6 +58,9 @@ export async function createForumReply(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id || session.user.status !== "APPROVED") {
     return { error: "noAccess" as const };
+  }
+  if (session.user.role === "MODERATOR") {
+    return { error: "forbidden" as const };
   }
 
   const topicId = String(formData.get("topicId") || "");

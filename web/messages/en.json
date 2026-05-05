@@ -235,7 +235,7 @@
   "chair": {
     "title": "Management",
     "subtitleChair": "News and votes — chair only. Moderation also for moderators.",
-    "subtitleMod": "Reports and moderation tools.",
+    "subtitleModerator": "Your tools: confidential reports and user management. No publishing or finances.",
     "users": "Residents & address status",
     "reports": "Confidential reports",
     "newsEyebrow": "News post",

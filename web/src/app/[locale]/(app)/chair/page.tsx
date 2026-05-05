@@ -20,7 +20,7 @@ export default async function ChairHomePage() {
     <>
       <PageTitle
         title={t("title")}
-        subtitle={t("subtitleChair")}
+        subtitle={isChair ? t("subtitleChair") : t("subtitleModerator")}
       />
 
       <div className="mb-8 flex flex-col gap-2">
@@ -38,7 +38,7 @@ export default async function ChairHomePage() {
         </Link>
       </div>
 
-      {isChair ? (
+      {isChair && (
         <>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
             {t("newsEyebrow")}
@@ -54,7 +54,7 @@ export default async function ChairHomePage() {
             <VoteCreateForm />
           </Card>
         </>
-      ) : null}
+      )}
 
       <p className="text-center text-sm">
         <Link href="/profile" className="text-emerald-700 hover:underline">

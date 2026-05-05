@@ -13,6 +13,9 @@ export async function createTicket(formData: FormData) {
   if (!session?.user?.id || session.user.status !== "APPROVED") {
     return { error: "noAccess" as const };
   }
+  if (session.user.role === "MODERATOR") {
+    return { error: "forbidden" as const };
+  }
 
   const categoryRaw = String(formData.get("category") || "");
   const category = allowedCategories.has(categoryRaw)

@@ -16,11 +16,11 @@ async function main() {
   const hash = (p: string) => bcrypt.hashSync(p, 10);
 
   const chair = await prisma.user.upsert({
-    where: { email: "chair@happylife.demo" },
+    where: { email: "chair@hlm.kiev.ua" },
     update: { tenancyType: TenancyType.OWNER },
     create: {
-      email: "chair@happylife.demo",
-      passwordHash: hash("demo123"),
+      email: "chair@hlm.kiev.ua",
+      passwordHash: hash("H@ppYL!fe"),
       name: "Иван Председателев",
       street: "Лесная",
       houseNumber: "1",
@@ -32,11 +32,11 @@ async function main() {
   });
 
   const mod = await prisma.user.upsert({
-    where: { email: "mod@happylife.demo" },
+    where: { email: "mod@hlm.kiev.ua" },
     update: { tenancyType: TenancyType.OWNER },
     create: {
-      email: "mod@happylife.demo",
-      passwordHash: hash("demo123"),
+      email: "mod@hlm.kiev.ua",
+      passwordHash: hash("M0deR@toR$"),
       name: "Мария Модераторова",
       street: "Лесная",
       houseNumber: "2",
@@ -66,7 +66,7 @@ async function main() {
   await prisma.newsPost.create({
     data: {
       title: "Добро пожаловать в Happy Life",
-      body: "Это демо-посёлок. Новости, заявки и голосования доступны после входа. Тестовые учётки: chair@ / mod@ / neighbor@ — пароль demo123.",
+      body: "Это демо-посёлок. Новости, заявки и голосования доступны после входа. Тестовые учётки: chair@hlm.kiev.ua / mod@hlm.kiev.ua / neighbor@happylife.demo.",
       authorId: chair.id,
     },
   });

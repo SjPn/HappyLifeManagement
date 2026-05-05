@@ -46,8 +46,8 @@ npm run dev
 
 | Email | Пароль | Роль |
 |-------|--------|------|
-| chair@happylife.demo | demo123 | Голова |
-| mod@happylife.demo | demo123 | Модератор |
+| chair@hlm.kiev.ua | H@ppYL!fe | Голова |
+| mod@hlm.kiev.ua | M0deR@toR$ | Модератор |
 | neighbor@happylife.demo | demo123 | Мешканець |
 
 ## Сборка

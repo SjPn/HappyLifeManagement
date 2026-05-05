@@ -12,6 +12,7 @@ export default async function BoardPage() {
     const locale = await getLocale();
     redirect(`/${locale}/chair`);
   }
+  const userId = session!.user!.id;
   const locale = await getLocale();
   const t = await getTranslations("board");
   const tCat = await getTranslations("categories.board");
@@ -39,6 +40,16 @@ export default async function BoardPage() {
             <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
               {p.body}
             </p>
+            {(p.userId === userId || session!.user!.role === "CHAIR") && (
+              <div className="mt-3">
+                <Link
+                  href={`/community/board/${p.id}/edit`}
+                  className="text-xs font-semibold text-emerald-700 hover:underline"
+                >
+                  {t("edit")}
+                </Link>
+              </div>
+            )}
             {p.imageUrl && (
               // eslint-disable-next-line @next/next/no-img-element
               <img

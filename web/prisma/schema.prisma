@@ -25,6 +25,10 @@ model User {
   /// OWNER | TENANT — з реєстрації; впливає на доступ до голосувань / тем за audience
   tenancyType String @default("OWNER")
 
+  /// Consent to the resident memorandum (terms of community interaction)
+  memorandumAcceptedAt DateTime?
+  memorandumVersion    String?
+
   balanceUah Float @default(0)
 
   createdAt DateTime @default(now())

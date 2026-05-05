@@ -62,6 +62,8 @@
     "tenancyLegend": "Residency status",
     "tenancyOwner": "Owner (or owner’s representative)",
     "tenancyTenant": "Tenant",
+    "memorandumAcceptPrefix": "I agree with the",
+    "memorandumLinkText": "resident memorandum",
     "passwordMin": "Password (min. 6 characters)",
     "signIn": "Log in",
     "signingIn": "Signing in…",
@@ -160,6 +162,10 @@
     "photoHint": "JPEG, PNG, WebP, GIF, up to 5 MB",
     "publish": "Publish",
     "publishing": "Publishing…",
+    "edit": "Edit",
+    "editTitle": "Edit post",
+    "editSubtitle": "Update the text and optionally the image.",
+    "saveEdit": "Save changes",
     "back": "← Back to community"
   },
   "forum": {
@@ -182,6 +188,10 @@
     "postCount": "{count} replies",
     "replyHeading": "Reply",
     "photoHint": "JPEG, PNG, WebP, GIF, up to 5 MB",
+    "edit": "Edit topic",
+    "editTitle": "Edit topic",
+    "editSubtitle": "Update the title, first message, and audience.",
+    "saveEdit": "Save changes",
     "back": "← Back to community"
   },
   "reports": {
@@ -218,12 +228,37 @@
     "title": "More",
     "subtitle": "Profile and shortcuts.",
     "role": "Role:",
+    "residentsLink": "Residents (owners / tenants)",
     "votesLink": "Votes",
     "metersLink": "Meters & balance",
+    "tariffsLink": "Community tariffs",
+    "memorandumLink": "Resident memorandum",
     "chairPanel": "Chair / moderation panel",
     "signOut": "Sign out",
     "tenancyTitle": "Residency",
     "editProfile": "Edit profile"
+  },
+  "residents": {
+    "title": "Residents",
+    "subtitle": "A list of approved residents (owners and tenants) with addresses.",
+    "owners": "Owners",
+    "tenants": "Tenants",
+    "emptyOwners": "No owners in the list yet.",
+    "emptyTenants": "No tenants in the list yet.",
+    "moderatorHint": "For full user management, use the moderation panel."
+  },
+  "tariffs": {
+    "title": "Tariffs",
+    "subtitle": "An info page about community fees and tariffs.",
+    "placeholderTitle": "Tariffs page placeholder",
+    "placeholderBody": "Add the current tariffs, payment frequency, and contact details."
+  },
+  "memorandum": {
+    "title": "Memorandum",
+    "subtitle": "Rules and principles for community interaction.",
+    "placeholderTitle": "Memorandum placeholder",
+    "placeholderBody": "Add rules for behavior, communication, quiet hours, safety, and shared space maintenance.",
+    "versionLine": "Version: MVP (draft)"
   },
   "profileEdit": {
     "name": "Full name",
@@ -238,6 +273,7 @@
     "subtitleModerator": "Your tools: confidential reports and user management. No publishing or finances.",
     "users": "Residents & address status",
     "reports": "Confidential reports",
+    "moderation": "Content moderation",
     "newsEyebrow": "News post",
     "voteEyebrow": "New yes/no vote",
     "backProfile": "← Back to profile",
@@ -271,6 +307,17 @@
     "voteLaunchBtn": "Start vote",
     "voteCreating": "Creating…",
     "voteAudienceField": "Who can view and vote"
+  },
+  "moderation": {
+    "title": "Moderation",
+    "subtitle": "Delete topics, board posts, and votes.",
+    "board": "Board",
+    "forum": "Forum",
+    "votes": "Votes",
+    "by": "Author: {name}",
+    "posts": "{count} posts",
+    "delete": "Delete",
+    "empty": "Nothing here yet."
   },
   "categories": {
     "ticket": {

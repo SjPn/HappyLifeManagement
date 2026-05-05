@@ -104,3 +104,73 @@ export async function createForumReply(formData: FormData) {
   revalidateAllLocales("/community/forum");
   return { ok: true as const };
 }
+
+export async function updateForumTopic(formData: FormData) {
+  const session = await auth();
+  if (!session?.user?.id || session.user.status !== "APPROVED") {
+    return { error: "noAccess" as const };
+  }
+  const topicId = String(formData.get("topicId") || "");
+  const title = String(formData.get("title") || "").trim();
+  const body = String(formData.get("body") || "").trim();
+  const img = formData.get("image");
+  const audience = parseAudienceScope(String(formData.get("audience") || ""));
+
+  if (!topicId || !title || !body) return { error: "requiredFields" as const };
+
+  const topic = await prisma.forumTopic.findUnique({
+    where: { id: topicId },
+    include: { posts: { orderBy: { createdAt: "asc" }, take: 1 } },
+  });
+  if (!topic) return { error: "noTopic" as const };
+
+  const canEdit =
+    topic.userId === session.user.id ||
+    session.user.role === "CHAIR" ||
+    session.user.role === "MODERATOR";
+  if (!canEdit) return { error: "forbidden" as const };
+
+  let imageUrl: string | null | undefined = undefined;
+  if (img instanceof File && img.size > 0) {
+    try {
+      imageUrl = await savePublicUpload(img);
+    } catch {
+      return { error: "badFile" as const };
+    }
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.forumTopic.update({
+      where: { id: topicId },
+      data: { title, audience },
+    });
+    const first = topic.posts[0];
+    if (first) {
+      await tx.forumPost.update({
+        where: { id: first.id },
+        data: {
+          body,
+          ...(imageUrl !== undefined ? { imageUrl } : {}),
+        },
+      });
+    }
+  });
+
+  revalidateAllLocales(`/community/forum/${topicId}`);
+  revalidateAllLocales("/community/forum");
+  return { ok: true as const };
+}
+
+export async function deleteForumTopic(topicId: string) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "noAccess" as const };
+  if (session.user.role !== "MODERATOR" && session.user.role !== "CHAIR") {
+    return { error: "forbidden" as const };
+  }
+
+  await prisma.forumTopic.delete({ where: { id: topicId } });
+  revalidateAllLocales("/community/forum");
+  revalidateAllLocales("/community");
+  revalidateAllLocales("/chair");
+  return { ok: true as const };
+}

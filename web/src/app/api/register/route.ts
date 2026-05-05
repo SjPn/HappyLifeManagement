@@ -14,6 +14,7 @@ const schema = z.object({
   phone: z.string().optional(),
   inviteCode: z.string().optional(),
   tenancyType: z.enum([TenancyType.OWNER, TenancyType.TENANT]),
+  memorandumAccepted: z.literal(true),
 });
 
 export async function POST(req: Request) {
@@ -61,6 +62,7 @@ export async function POST(req: Request) {
       : UserStatus.PENDING;
 
   const passwordHash = await bcrypt.hash(password, 10);
+  const memorandumVersion = "MVP-2026-05-05";
   await prisma.user.create({
     data: {
       email: normalized,
@@ -72,6 +74,8 @@ export async function POST(req: Request) {
       role: Role.RESIDENT,
       status,
       tenancyType,
+      memorandumAcceptedAt: new Date(),
+      memorandumVersion,
     },
   });
 

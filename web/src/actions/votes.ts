@@ -111,3 +111,17 @@ export async function createVote(formData: FormData) {
   revalidateAllLocales("/chair");
   return { ok: true as const };
 }
+
+export async function deleteVote(voteId: string) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "noAccess" as const };
+  if (session.user.role !== "MODERATOR" && session.user.role !== "CHAIR") {
+    return { error: "forbidden" as const };
+  }
+
+  await prisma.vote.delete({ where: { id: voteId } });
+  revalidateAllLocales("/votes");
+  revalidateAllLocales("/dashboard");
+  revalidateAllLocales("/chair");
+  return { ok: true as const };
+}

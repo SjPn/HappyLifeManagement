@@ -6,6 +6,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
 import { TenancyType } from "@/lib/audience";
+import { Link } from "@/i18n/navigation";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -34,6 +35,9 @@ export function RegisterForm() {
       tenancyType:
         form.querySelector<HTMLInputElement>('input[name="tenancyType"]:checked')
           ?.value ?? TenancyType.OWNER,
+      memorandumAccepted:
+        (form.elements.namedItem("memorandumAccepted") as HTMLInputElement)
+          .checked ?? false,
     };
     const res = await fetch("/api/register", {
       method: "POST",
@@ -128,6 +132,26 @@ export function RegisterForm() {
           {t("tenancyTenant")}
         </label>
       </fieldset>
+
+      <label className="flex items-start gap-2 rounded-xl border border-zinc-200 p-3 text-sm dark:border-zinc-700">
+        <input
+          type="checkbox"
+          name="memorandumAccepted"
+          required
+          className="mt-0.5 h-4 w-4"
+        />
+        <span className="text-zinc-700 dark:text-zinc-300">
+          {t("memorandumAcceptPrefix")}{" "}
+          <Link
+            href="/info/memorandum"
+            target="_blank"
+            className="font-semibold text-emerald-700 hover:underline dark:text-emerald-300"
+          >
+            {t("memorandumLinkText")}
+          </Link>
+          .
+        </span>
+      </label>
       <label className="flex flex-col gap-1.5">
         <span className={labelClass}>{t("invite")}</span>
         <input

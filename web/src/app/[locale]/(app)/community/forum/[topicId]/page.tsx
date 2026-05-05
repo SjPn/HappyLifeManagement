@@ -52,6 +52,16 @@ export default async function ForumTopicPage({
         {t("authorTopic")} {topic.user.name} ·{" "}
         {topic.createdAt.toLocaleString(dateLocale)}
       </p>
+      {(topic.userId === session!.user!.id || session!.user!.role === "CHAIR") && (
+        <p className="mb-4">
+          <Link
+            href={`/community/forum/${topic.id}/edit`}
+            className="text-xs font-semibold text-emerald-700 hover:underline"
+          >
+            {t("edit")}
+          </Link>
+        </p>
+      )}
 
       <div className="flex flex-col gap-4">
         {topic.posts.map((p) => (

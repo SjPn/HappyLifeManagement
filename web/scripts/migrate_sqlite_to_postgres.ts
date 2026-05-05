@@ -9,13 +9,15 @@ function mustEnv(name: string): string {
 }
 
 async function main() {
-  // Postgres URL is read by @prisma/client from DATABASE_URL
-  mustEnv("DATABASE_URL");
+  // Postgres URL is read by @prisma/client from DATABASE_URL.
+  // For Neon, for schema ops / bulk copy it can be more reliable to use a direct endpoint.
+  const pgUrl =
+    process.env.POSTGRES_DATABASE_URL?.trim() || mustEnv("DATABASE_URL");
   // SQLite URL is read by generated sqlite client from SQLITE_DATABASE_URL
   mustEnv("SQLITE_DATABASE_URL");
 
   const sqlite = new SqlitePrismaClient();
-  const pg = new PgPrismaClient();
+  const pg = new PgPrismaClient({ datasources: { db: { url: pgUrl } } });
 
   try {
     console.log("Reading from SQLite…");

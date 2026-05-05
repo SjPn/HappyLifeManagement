@@ -96,7 +96,22 @@ npx prisma db push
 3) Задать SQLite URL (в окружении) и запустить перенос:
 
 ```bash
+:: Windows (cmd)
 set SQLITE_DATABASE_URL=file:./dev.db
+npm run db:migrate:sqlite-to-postgres
+```
+
+PowerShell:
+
+```bash
+$env:SQLITE_DATABASE_URL="file:./dev.db"
+npm run db:migrate:sqlite-to-postgres
+```
+
+Если Postgres подключение идёт через Neon pooler и периодически отваливается, для переноса можно временно задать **direct** URL:
+
+```bash
+$env:POSTGRES_DATABASE_URL="postgresql://USER:PASSWORD@DIRECT_HOST:5432/DB?sslmode=require"
 npm run db:migrate:sqlite-to-postgres
 ```
 

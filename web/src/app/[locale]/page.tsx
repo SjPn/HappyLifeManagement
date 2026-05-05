@@ -93,16 +93,6 @@ export default async function HomePage({
           ))}
         </ul>
 
-        <p className="mt-12 text-center text-sm text-slate-500 dark:text-slate-500">
-          {t("demoLine")}{" "}
-          <code className="rounded-lg bg-slate-200/80 px-2 py-1 font-mono text-xs text-slate-800 dark:bg-slate-800 dark:text-slate-200">
-            neighbor@happylife.demo
-          </code>{" "}
-          /{" "}
-          <code className="rounded-lg bg-slate-200/80 px-2 py-1 font-mono text-xs text-slate-800 dark:bg-slate-800 dark:text-slate-200">
-            demo123
-          </code>
-        </p>
       </div>
     </div>
   );

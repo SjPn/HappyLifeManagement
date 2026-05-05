@@ -32,16 +32,6 @@ export default async function LoginPage({
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
           {t("loginTitle")}
         </h1>
-        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-          Demo:{" "}
-          <code className="rounded-md bg-slate-200/80 px-1.5 py-0.5 text-xs dark:bg-slate-800">
-            neighbor@happylife.demo
-          </code>{" "}
-          /{" "}
-          <code className="rounded-md bg-slate-200/80 px-1.5 py-0.5 text-xs dark:bg-slate-800">
-            demo123
-          </code>
-        </p>
         <div className="mt-8 hl-glass rounded-2xl p-5 sm:p-6">
           <LoginForm />
         </div>

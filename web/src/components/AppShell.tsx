@@ -82,10 +82,13 @@ export function SignOutButton() {
     <button
       type="button"
       onClick={() => {
-        // Force redirect to current origin to avoid misconfigured AUTH_URL/NEXTAUTH_URL
-        // sending users to localhost in production.
-        const callbackUrl = new URL(`/${locale}`, window.location.origin).toString();
-        signOut({ callbackUrl });
+        // Do not rely on server-side redirect (NEXTAUTH_URL/AUTH_URL might be misconfigured).
+        // Sign out without redirect, then navigate on the client using the current origin.
+        signOut({ redirect: false })
+          .catch(() => null)
+          .finally(() => {
+            window.location.assign(`/${locale}`);
+          });
       }}
       className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-slate-200/90 bg-white px-5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:border-red-900/50 dark:hover:bg-red-950/40 dark:hover:text-red-200"
     >

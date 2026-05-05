@@ -51,3 +51,9 @@
 - **`npm run dev`** вызывает **`predev`** → `prisma generate`, чтобы перед стартом Next подтянуть актуальный клиент. Если ошибка всё ещё упоминает `balanceRub`, процесс `next dev` держит старый клиент в памяти: полная остановка dev, при необходимости удалить `web/.next`, снова `npm run dev`.
 - **Auth.js / `ClientFetchError` (Failed to fetch):** в `.env` переменные **`AUTH_URL` и `NEXTAUTH_URL`** должны совпадать с фактическим origin в браузере (включая порт, например `http://localhost:3300` при `next dev -p 3300`). Иначе падает запрос к `/api/auth/session`. См. `web/README.md`.
 - **Владелец / арендатор и аудитория:** у `User` поле `tenancyType` (`OWNER` | `TENANT`), задаётся при регистрации. У `Vote` и `ForumTopic` поле `audience` (`ALL` | `OWNERS_ONLY` | `TENANTS_ONLY`). Логика в `web/src/lib/audience.ts`; персонал (`CHAIR`, `MODERATOR`) обходит ограничения. Доска объявлений пока без аудитории.
+
+### Деплой и эксплуатация (заметки)
+
+- Текущая БД в `web/` — **SQLite** для дев-режима. Для продакшена лучше перейти на **Postgres** (Render Postgres / Neon / Supabase и т.д.).
+- Render на недорогих тарифах может «усыплять» сервис → **cold start** (десятки секунд). Для MVP это ок; для UX — переход на always-on план или хостинг без сна.
+- Vercel часто быстрее для Next.js, но требует внешнюю БД; SQLite-файл на Vercel — нецелевой путь.

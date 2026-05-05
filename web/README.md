@@ -57,6 +57,21 @@ npm run build
 npm start
 ```
 
+## Деплой (Render / Vercel) — заметки
+
+- **SQLite (`dev.db`) подходит только для локальной разработки.** Для продакшена нужен внешний Postgres (Render Postgres / Neon / Supabase и т.д.). Иначе при масштабировании/перезапусках легко потерять данные.
+- **Render**:
+  - На бесплатных/cheap инстансах часто есть **cold start** (пауза после простоя). Это нормально для MVP/пилота.
+  - Лечится: платный план без сна, keep-alive пинг (cron), либо перенос SSR в более «always-on» окружение.
+- **Vercel**:
+  - Отлично подходит для Next.js и обычно даёт более быстрые старты, но приложение всё равно должно ходить в **внешнюю БД** (Postgres). SQLite-файл на Vercel — плохая идея.
+  - Для Prisma на Vercel обычно делают `prisma migrate deploy` на этапе build/deploy и используют пулер/accelerate при необходимости.
+
+Минимальный план миграции на Postgres:
+1) Заменить `DATABASE_URL` на Postgres.
+2) Перейти с `db push` на `prisma migrate dev` (локально) → `prisma migrate deploy` (в проде).
+3) Загрузки изображений вынести из `public/uploads` в S3-совместимое хранилище.
+
 ## Навігація (MVP)
 
 Усі сторінки додатку — під `[locale]`, наприклад `/uk/dashboard`, `/en/community/board`.

@@ -6,8 +6,11 @@ import { revalidateAllLocales } from "@/lib/revalidateI18n";
 
 export async function createNewsPost(formData: FormData) {
   const session = await auth();
-  if (!session?.user?.id || session.user.role !== "CHAIR") {
-    return { error: "chairOnly" as const };
+  if (
+    !session?.user?.id ||
+    (session.user.role !== "CHAIR" && session.user.role !== "MODERATOR")
+  ) {
+    return { error: "forbidden" as const };
   }
 
   const title = String(formData.get("title") || "").trim();

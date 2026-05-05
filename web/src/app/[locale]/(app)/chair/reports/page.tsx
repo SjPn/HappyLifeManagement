@@ -14,6 +14,7 @@ export default async function ChairReportsPage() {
   }
 
   const t = await getTranslations("chair");
+  const canSeeAuthor = session!.user!.role === "MODERATOR";
 
   const reports = await prisma.confidentialReport.findMany({
     orderBy: { createdAt: "desc" },
@@ -32,7 +33,10 @@ export default async function ChairReportsPage() {
             status={r.status}
             published={r.published}
             body={r.body}
-            authorName={`${r.author.name} <${r.author.email}>`}
+            canSeeAuthor={canSeeAuthor}
+            authorName={
+              canSeeAuthor ? `${r.author.name} <${r.author.email}>` : undefined
+            }
           />
         ))}
         {reports.length === 0 && (

@@ -12,13 +12,15 @@ export function ReportModerationRow({
   published,
   body,
   authorName,
+  canSeeAuthor,
 }: {
   id: string;
   kind: string;
   status: string;
   published: boolean;
   body: string;
-  authorName: string;
+  authorName?: string;
+  canSeeAuthor?: boolean;
 }) {
   const router = useRouter();
   const t = useTranslations("chair");
@@ -35,12 +37,14 @@ export function ReportModerationRow({
 
   return (
     <div className="rounded-xl border border-zinc-200 p-3 dark:border-zinc-700">
-      <p className="text-xs text-zinc-500">
-        {t("authorOnly")}{" "}
-        <strong className="text-zinc-800 dark:text-zinc-200">
-          {authorName}
-        </strong>
-      </p>
+      {canSeeAuthor && authorName ? (
+        <p className="text-xs text-zinc-500">
+          {t("authorOnly")}{" "}
+          <strong className="text-zinc-800 dark:text-zinc-200">
+            {authorName}
+          </strong>
+        </p>
+      ) : null}
       <p className="mt-2 text-xs font-medium uppercase text-emerald-800 dark:text-emerald-200">
         {tKind(
           kind as "COMPLAINT" | "SUGGESTION" | "VIOLATION" | "IDEA"

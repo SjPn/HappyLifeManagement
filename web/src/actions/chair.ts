@@ -32,8 +32,8 @@ export async function setUserStatus(userId: string, status: string) {
 
 export async function setUserBalance(formData: FormData) {
   const session = await auth();
-  if (session?.user?.role !== "CHAIR") {
-    return { error: "chairOnly" as const };
+  if (session?.user?.role !== "CHAIR" && session?.user?.role !== "MODERATOR") {
+    return { error: "forbidden" as const };
   }
 
   const userId = String(formData.get("userId") || "");

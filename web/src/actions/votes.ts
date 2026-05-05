@@ -61,8 +61,11 @@ export async function submitVote(formData: FormData) {
 
 export async function createVote(formData: FormData) {
   const session = await auth();
-  if (!session?.user?.id || session.user.role !== "CHAIR") {
-    return { error: "chairOnlyVote" as const };
+  if (
+    !session?.user?.id ||
+    (session.user.role !== "CHAIR" && session.user.role !== "MODERATOR")
+  ) {
+    return { error: "forbidden" as const };
   }
 
   const title = String(formData.get("title") || "").trim();

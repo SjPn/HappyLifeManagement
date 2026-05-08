@@ -55,15 +55,6 @@ cd web
 npx prisma db push
 ```
 
-## Удаление демо-новости “Добро пожаловать…”
-
-Если вы уже сидили БД раньше и в ленте видите демо-новость “Добро пожаловать в Happy Life”, её можно удалить разово:
-
-```bash
-cd web
-npm run db:cleanup:demo-news
-```
-
 ## Сборка
 
 ```bash
@@ -80,7 +71,6 @@ npm start
 - **Vercel**:
   - Отлично подходит для Next.js и обычно даёт более быстрые старты, но приложение всё равно должно ходить в **внешнюю БД** (Postgres). SQLite-файл на Vercel — плохая идея.
   - Для Prisma на Vercel обычно делают `prisma migrate deploy` на этапе build/deploy и используют пулер/accelerate при необходимости.
-  - Если на Vercel падает сборка из‑за `scripts/migrate_sqlite_to_postgres.ts` (нет сгенерированного sqlite-клиента) — скрипт исключён из typecheck в `web/tsconfig.json`.
 
 ### Neon (важно)
 
@@ -91,46 +81,6 @@ npm start
 1) Заменить `DATABASE_URL` на Postgres.
 2) Перейти с `db push` на `prisma migrate dev` (локально) → `prisma migrate deploy` (в проде).
 3) Загрузки изображений вынести из `public/uploads` в S3-совместимое хранилище.
-
-### Перенос данных из SQLite в Postgres (один раз)
-
-Если у вас есть локальная SQLite-база (`dev.db`) и нужно перелить данные в Postgres:
-
-1) Сгенерировать отдельный Prisma-клиент для SQLite:
-
-```bash
-npm run db:generate:sqlite
-```
-
-2) Убедиться, что Postgres-схема создана (на Postgres `DATABASE_URL`):
-
-```bash
-npx prisma db push
-```
-
-3) Задать SQLite URL (в окружении) и запустить перенос:
-
-```bash
-:: Windows (cmd)
-set SQLITE_DATABASE_URL=file:./dev.db
-npm run db:migrate:sqlite-to-postgres
-```
-
-PowerShell:
-
-```bash
-$env:SQLITE_DATABASE_URL="file:./dev.db"
-npm run db:migrate:sqlite-to-postgres
-```
-
-Если Postgres подключение идёт через Neon pooler и периодически отваливается, для переноса можно временно задать **direct** URL:
-
-```bash
-$env:POSTGRES_DATABASE_URL="postgresql://USER:PASSWORD@DIRECT_HOST:5432/DB?sslmode=require"
-npm run db:migrate:sqlite-to-postgres
-```
-
-Скрипт переносит сущности, сохраняя `id` и связи, и использует `createMany(skipDuplicates)` — его можно безопасно запускать повторно.
 
 ## Навігація (MVP)
 

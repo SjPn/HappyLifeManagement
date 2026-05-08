@@ -62,7 +62,6 @@
 - Текущая БД в `web/` — **SQLite** для дев-режима. Для продакшена лучше перейти на **Postgres** (Render Postgres / Neon / Supabase и т.д.).
 - Render на недорогих тарифах может «усыплять» сервис → **cold start** (десятки секунд). Для MVP это ок; для UX — переход на always-on план или хостинг без сна.
 - Vercel часто быстрее для Next.js, но требует внешнюю БД; SQLite-файл на Vercel — нецелевой путь.
-  - На Vercel `next build` тайпчекает весь TS. Скрипт `scripts/migrate_sqlite_to_postgres.ts` зависит от sqlite-клиента и исключён из typecheck через `web/tsconfig.json`.
 
 #### Neon Postgres (заметка)
 

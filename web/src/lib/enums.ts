@@ -1,4 +1,4 @@
-/** Строковые коды, совпадающие с БД (SQLite без enum) */
+/** Строковые коды, совпадающие с БД (Postgres хранит как строки, без enum-типов) */
 
 export const Role = {
   RESIDENT: "RESIDENT",
@@ -25,12 +25,6 @@ export const TicketCategory = {
 export type TicketCategory =
   (typeof TicketCategory)[keyof typeof TicketCategory];
 
-export const TicketStatus = {
-  NEW: "NEW",
-  IN_PROGRESS: "IN_PROGRESS",
-  RESOLVED: "RESOLVED",
-} as const;
-
 export const VoteType = {
   YES_NO: "YES_NO",
   SINGLE_CHOICE: "SINGLE_CHOICE",
@@ -52,50 +46,3 @@ export const ReportKind = {
   IDEA: "IDEA",
 } as const;
 export type ReportKind = (typeof ReportKind)[keyof typeof ReportKind];
-
-export const ReportStatus = {
-  NEW: "NEW",
-  REVIEWING: "REVIEWING",
-  CLOSED: "CLOSED",
-} as const;
-
-export const ticketCategoryLabel: Record<string, string> = {
-  ROADS: "Дороги",
-  LIGHTING: "Освещение",
-  SECURITY: "Охрана",
-  WATER: "Вода",
-  TRASH: "Мусор",
-  OTHER: "Другое",
-};
-
-export const ticketStatusLabel: Record<string, string> = {
-  NEW: "Новая",
-  IN_PROGRESS: "В работе",
-  RESOLVED: "Решено",
-};
-
-export const boardCategoryLabel: Record<string, string> = {
-  SELL_GIVE: "Продам / отдам",
-  SERVICES: "Услуги",
-  RECOMMENDATIONS: "Рекомендации",
-  LOST_FOUND: "Потеряно / найдено",
-};
-
-export const reportKindLabel: Record<string, string> = {
-  COMPLAINT: "Жалоба",
-  SUGGESTION: "Предложение",
-  VIOLATION: "Нарушение",
-  IDEA: "Идея",
-};
-
-export const reportStatusLabel: Record<string, string> = {
-  NEW: "Новое",
-  REVIEWING: "На рассмотрении",
-  CLOSED: "Закрыто",
-};
-
-export const roleLabel: Record<string, string> = {
-  RESIDENT: "Житель",
-  MODERATOR: "Модератор",
-  CHAIR: "Председатель",
-};

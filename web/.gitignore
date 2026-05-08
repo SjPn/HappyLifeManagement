@@ -45,6 +45,3 @@ next-env.d.ts
 /dev.db
 /prisma/dev.db
 *.db
-
-/src/generated/prisma
-/src/generated/sqlite-client

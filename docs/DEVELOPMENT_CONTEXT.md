@@ -2,6 +2,66 @@
 
 Этот файл — **не пользовательская документация**, а рабочая память: решения, риски, расхождения с исходным DOC. Обновлять по мере изменений.
 
+## Старт следующей сессии (читать первым)
+
+> **Назначение:** срез состояния, который актуализируется в конце каждой сессии. Если что-то ниже устарело — сначала обнови этот блок и `TODO_ROADMAP.md`, потом продолжай.
+
+**Последняя дата апдейта:** 2026-05-09 · Ветка: `main` · Последние коммиты:
+
+- `56e9294 chore: drop one-off scripts and dead code` — удалены одноразовые скрипты, sqlite-схема, сгенерированный sqlite-клиент, неиспользуемые экспорты в `web/src/lib/enums.ts`.
+- `8147415 docs: refresh production context and remove duplicates` — обновили README/PROJECT_OVERVIEW/DEVELOPMENT_CONTEXT/TODO_ROADMAP под фактический MVP.
+
+**Где код:** `web/` (Next.js 16 App Router + Prisma 5 + Postgres + Auth.js v5 + next-intl). База — Postgres (Neon), на Vercel — единый деплой.
+
+**Что точно работает (проверено `npm run -s build` и `npm run -s lint`, оба зелёные на 2026-05-09):**
+
+- Локали с префиксом URL `/uk` (default) / `/ru` / `/en`; root `/` редиректит на `/uk` через `web/src/app/page.tsx` (фолбэк к `next-intl` middleware).
+- Auth.js v5: вход email/password, JWT-сессия, корректный sign-out (`SignOutButton` уходит через `signOut({ redirect: false })` + клиентский `window.location.assign('/${locale}')`).
+- Регистрация: владелец/арендатор + согласие с меморандумом (`memorandumAcceptedAt`/`memorandumVersion`).
+- Сообщество: дошка, форум (тема + ответы + первый пост), конфиденциальные обращения; авторы редактируют свои объявления и темы; персонал удаляет любой контент через `/{locale}/chair/moderation`.
+- Голосования: создаёт только `CHAIR`, аудитория `ALL`/`OWNERS_ONLY`/`TENANTS_ONLY`, удаление через панель модерации.
+- `MODERATOR` — служебная роль: видит автора конфиденциальных обращений, не голосует, не публикует, не правит балансы; для него `dashboard` упрощённый, а `requests`/`community`/`votes`/`meters` редиректят в `/chair`.
+- Публичные страницы до логина: `/{locale}/info/memorandum`, `/{locale}/info/tariffs`. Каталог жителей: `/{locale}/residents`.
+
+**Известные не-блокеры (на потом):**
+
+- Next.js 16 в `next build` пишет: `The "middleware" file convention is deprecated. Please use "proxy" instead.` — нужно будет переименовать `web/src/middleware.ts` → `web/src/proxy.ts` и проверить `next-intl` совместимость. Сейчас всё работает, но deprecation висит.
+- Загрузки изображений всё ещё в `web/public/uploads/` (на Vercel — эфемерное хранилище). Перенос в S3-совместимое — открытая задача в `TODO_ROADMAP.md`.
+- В `TODO_ROADMAP.md` голосования помечены как `[~]` — UX/архив можно ещё подтянуть, но базовый CRUD + участие работает.
+
+**Что недавно убрано (если возникнет искушение «вернуть» — не возвращать без явного запроса):**
+
+- `web/scripts/migrate_sqlite_to_postgres.ts` + `web/prisma/schema.sqlite.prisma` + `web/src/generated/sqlite-client/**` — миграция из SQLite в Postgres сделана давно, локальный SQLite-режим больше не поддерживается.
+- `web/scripts/cleanup_demo_news.ts` — разовая чистка демо-новости, в `seed.ts` её больше нет.
+- `web/scripts/fix-links.mjs` / `fix-link-named.mjs` — codemod-ы на `next/link` → `@/i18n/navigation`, проект давно мигрирован.
+- В `web/src/lib/enums.ts` удалены неиспользуемые `TicketStatus`, `ReportStatus` и все label-словари (`*Label`) — все подписи идут через `next-intl` (`messages/{uk,ru,en}.json`).
+
+**Открытые приоритеты (см. `TODO_ROADMAP.md` секция «Ближайшие шаги»):**
+
+1. UI-бейджи аудитории на карточках голосований и тем форума.
+2. Решить и отразить, нужна ли фильтрация доски объявлений по аудитории.
+3. Settings посёлка/ОСББ (название, валюта/локаль, политики доступа).
+4. Переезд с `prisma db push` на полноценные миграции (`prisma migrate dev` локально → `migrate deploy` на Vercel) и вынос загрузок в S3-совместимое хранилище.
+5. Миграция `middleware.ts` → `proxy.ts` под Next.js 16.
+
+**Быстрые команды для проверки состояния (Windows / PowerShell):**
+
+```powershell
+cd e:\MyPyPro\HappyLife\web
+npm run -s build    # должен пройти без ошибок (warning про middleware → proxy ожидаем)
+npm run -s lint     # должен быть пустым
+git -C .. log --oneline -5
+git -C .. status
+```
+
+**Источники истины:**
+
+- Продуктовое видение и роли — `docs/PROJECT_OVERVIEW.md`.
+- Дорожная карта — `docs/TODO_ROADMAP.md`.
+- Локальный запуск, Prisma/Auth трюки, заметки по деплою — `web/README.md`.
+- Транскрипт прошлых чатов — `C:\Users\intel\.cursor\projects\e-MyPyPro-HappyLife\agent-transcripts\` (по uuid сессии).
+
+
 ## Источник видения
 
 Файл `e:\MVP_happyLife.docx` (извлечён текстово). Ключевые модули: Dashboard, счётчики, заявки, голосования, анонимные обращения, доска, чат в стиле Threads; роли: житель, модератор, председатель; flow: регистрация → подтверждение адреса → главная.

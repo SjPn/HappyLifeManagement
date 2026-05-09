@@ -16,14 +16,16 @@
 cd web
 npm install
 cp .env.example .env
+# .env: DATABASE_URL → ваш Postgres (Neon/Render/Supabase),
+# AUTH_SECRET, AUTH_URL/NEXTAUTH_URL = http://localhost:3000 (або ваш порт)
 npx prisma db push
 npm run db:seed
 npm run dev
 ```
 
-Відкрийте [http://localhost:3000](http://localhost:3000) — буде перенаправлення на **`/uk`** (або одразу `/uk`, `/ru`, `/en`).
+Відкрийте [http://localhost:3000](http://localhost:3000) — буде перенаправлення на **`/uk`** (або одразу `/uk`, `/ru`, `/en`). На рівні фолбеку є й серверний редірект з `/` на `/uk` (`web/src/app/page.tsx`) — на випадок коли middleware не спрацював (актуально для деяких сценаріїв на Vercel).
 
-В `.env` задайте `AUTH_SECRET` (довипадковий рядок). Для автосхвалення реєстрації — `INVITE_CODE` (у прикладі `HAPPY2026`).
+В `.env` задайте `AUTH_SECRET` (довільний рядок). Для автосхвалення реєстрації — `INVITE_CODE` (у прикладі `HAPPY2026`). Локальний SQLite більше не підтримується: розробка йде проти **Postgres** (можна підняти локально в Docker або користуватися безкоштовним Neon dev branch).
 
 **Auth.js: `ClientFetchError` / `Failed to fetch` на дашборді** — зазвичай браузер на `http://localhost:ПОРТ` звертається до `/api/auth/session`, а в `.env` вказано **інший порт** (наприклад, додаток на **3300**, а `AUTH_URL` / `NEXTAUTH_URL` лишились на **3000**). Виправлення: у `.env` виставте **`AUTH_URL` і `NEXTAUTH_URL`** на той самий базовий URL, що в адресному рядку (включно з портом), перезапустіть `npm run dev`. Якщо після цього помилка лишається — відкрийте в новій вкладці `http://localhost:ПОРТ/api/auth/session`: при 500 див. лог сервера (часто Prisma після оновлення схеми).
 

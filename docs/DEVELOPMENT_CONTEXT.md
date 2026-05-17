@@ -6,14 +6,18 @@
 
 > **Назначение:** срез состояния, который актуализируется в конце каждой сессии. Если что-то ниже устарело — сначала обнови этот блок и `TODO_ROADMAP.md`, потом продолжай.
 
-**Последняя дата апдейта:** 2026-05-09 · Ветка: `main` · Последние коммиты (см. `git log -5`):
+**Последняя дата апдейта:** 2026-05-17 · Ветка: `main` · Репозиторий: `SjPn/HappyLifeManagement` · Прод: Vercel `hlm-nu.vercel.app` + Neon.
 
-- Раздел **«Мої платежі»** (`/{locale}/payments`): житель видит абонплату + електроенергію; голова вносить в `/{locale}/chair/users` (поля `User.subscriptionFeeUah`, `User.electricityUah`). Старий `/meters` — редірект. Модель `MeterReading` удалена.
-- `211f378 docs: capture session-resume snapshot` · `56e9294 chore: drop one-off scripts and dead code`
+**Последние коммиты (`git log -6`):** `66c3554` · `3e6ef4b` · `7e834ac` · `3def4e2` · `b9a4d67` · `325a9e7` (см. сообщения в git).
+
+- Раздел **«Мої платежі»** (`/{locale}/payments`): житель видит абонплату + електроенергію; голова вносить на `/{locale}/payments` по месяцам (`HouseholdBilling`). `/meters` — редирект.
+- **UX:** 4 таба; главная → платежи/голоса/заявки; мешканці в спільноті; «Ще» без дублей ссылок.
 
 **Где код:** `web/` (Next.js 16 App Router + Prisma 5 + Postgres + Auth.js v5 + next-intl). База — Postgres (Neon), на Vercel — единый деплой.
 
-**Что точно работает (проверено `npm run -s build` и `npm run -s lint`, оба зелёные на 2026-05-09):**
+**Схема платежей:** `HouseholdBilling` (месяц+адрес) + отдельно `User.balanceUah` в `/chair/users`. Код только `prisma.householdBilling` (P2021 если задеплоен старый билд).
+
+**Что работает (`npm run build`, 2026-05-17):**
 
 - Локали с префиксом URL `/uk` (default) / `/ru` / `/en`; root `/` редиректит на `/uk` через `web/src/app/page.tsx` (фолбэк к `next-intl` middleware).
 - Auth.js v5: вход email/password, JWT-сессия, корректный sign-out (`SignOutButton` уходит через `signOut({ redirect: false })` + клиентский `window.location.assign('/${locale}')`).
@@ -21,7 +25,8 @@
 - Сообщество: дошка, форум (тема + ответы + первый пост), конфиденциальные обращения; авторы редактируют свои объявления и темы; персонал удаляет любой контент через `/{locale}/chair/moderation`.
 - Голосования: создаёт только `CHAIR`, аудитория `ALL`/`OWNERS_ONLY`/`TENANTS_ONLY`, удаление через панель модерации.
 - `MODERATOR` — служебная роль: видит автора конфиденциальных обращений, не голосует, не публикует, не правит балансы; для него `dashboard` упрощённый, а `requests`/`community`/`votes`/`payments` редиректят в `/chair`.
-- Публичные страницы до логина: `/{locale}/info/memorandum`, `/{locale}/info/tariffs`. Каталог жителей: `/{locale}/residents`. **Мои платежи:** `/{locale}/payments` (абонплата + электроэнергия; вносит `CHAIR` в `chair/users`).
+- Публичные: memorandum, tariffs. Жители: `/residents` (из `/community`). Платежи: `/payments` (голова вносит суммы здесь, не в `chair/users`).
+- Деплой: после `db push` на Neon нужен коммит с `HouseholdBilling`. Скрипт: `web/scripts/migrate_household_billing.ts` (если осталась старая таблица).
 
 **Известные не-блокеры (на потом):**
 
@@ -31,18 +36,18 @@
 
 **Что недавно убрано (если возникнет искушение «вернуть» — не возвращать без явного запроса):**
 
-- `web/scripts/migrate_sqlite_to_postgres.ts` + `web/prisma/schema.sqlite.prisma` + `web/src/generated/sqlite-client/**` — миграция из SQLite в Postgres сделана давно, локальный SQLite-режим больше не поддерживается.
+- `web/scripts/migrate_sqlite_to_postgres.ts` + sqlite-client — миграция SQLite→Postgres завершена.
+- `HouseholdPayment` (одна строка на адрес без месяца) — заменена на `HouseholdBilling`.
 - `web/scripts/cleanup_demo_news.ts` — разовая чистка демо-новости, в `seed.ts` её больше нет.
 - `web/scripts/fix-links.mjs` / `fix-link-named.mjs` — codemod-ы на `next/link` → `@/i18n/navigation`, проект давно мигрирован.
 - В `web/src/lib/enums.ts` удалены неиспользуемые `TicketStatus`, `ReportStatus` и все label-словари (`*Label`) — все подписи идут через `next-intl` (`messages/{uk,ru,en}.json`).
 
-**Открытые приоритеты (см. `TODO_ROADMAP.md` секция «Ближайшие шаги»):**
+**Открытые приоритеты (см. `TODO_ROADMAP.md`):**
 
-1. UI-бейджи аудитории на карточках голосований и тем форума.
-2. Решить и отразить, нужна ли фильтрация доски объявлений по аудитории.
-3. Settings посёлка/ОСББ (название, валюта/локаль, политики доступа).
-4. Переезд с `prisma db push` на полноценные миграции (`prisma migrate dev` локально → `migrate deploy` на Vercel) и вынос загрузок в S3-совместимое хранилище.
-5. Миграция `middleware.ts` → `proxy.ts` под Next.js 16.
+1. Платежи: «скопировать начисления с прошлого месяца»; фильтр «только неоплаченные» для голови; привязка биллинга к `communityAddressId` вместо строк street/house (избежать дублей «Лісова» vs «Лесная»).
+2. UI-бейджи аудитории на голосованиях и темах форума.
+3. Редактируемый контент тарифов/меморандума (сейчас плейсхолдеры).
+4. `prisma migrate` вместо `db push`; S3 для uploads; `middleware.ts` → `proxy.ts` (Next.js 16).
 
 **Быстрые команды для проверки состояния (Windows / PowerShell):**
 
@@ -95,7 +100,7 @@ git -C .. status
 
 ## Реализованный MVP (код)
 
-- Каталог приложения: `web/` — Next.js + Prisma + SQLite + Auth.js.  
+- Каталог приложения: `web/` — Next.js + Prisma + **Postgres** + Auth.js.  
 - Запуск и демо-аккаунты: см. `web/README.md`.  
 - База: `web/prisma/schema.prisma`, сид `npm run db:seed`.
 
@@ -114,12 +119,14 @@ git -C .. status
 - **Sign out / редиректы:** в проде возможна ошибка, когда неверный `NEXTAUTH_URL` отправляет пользователя на `localhost` при выходе. Для устойчивости `SignOutButton` делает `signOut({ redirect: false })` и затем клиентский переход на `/${locale}`.
 - **Владелец / арендатор и аудитория:** у `User` поле `tenancyType` (`OWNER` | `TENANT`), задаётся при регистрации. У `Vote` и `ForumTopic` поле `audience` (`ALL` | `OWNERS_ONLY` | `TENANTS_ONLY`). Логика в `web/src/lib/audience.ts`; персонал (`CHAIR`, `MODERATOR`) обходит ограничения. Доска объявлений пока без аудитории.
 - **Меморандум/тарифы:** публичные страницы до логина: `/{locale}/info/memorandum`, `/{locale}/info/tariffs`. При регистрации требуется согласие с меморандумом; сохраняется `User.memorandumAcceptedAt` и `User.memorandumVersion`.
-- **Каталог жителей:** `/{locale}/residents` — список подтверждённых жителей (роль `RESIDENT`) с адресами и типом проживания.
-- **Редактирование/модерация:** автор может редактировать свои объявления и темы форума; модератор/председатель могут удалять объявления/темы/голосования через `/{locale}/chair/moderation`.
+- **Каталог жителей:** `/{locale}/residents` (вход с `/community`).
+- **Адреса КГ:** `CommunityAddress`, CRUD `/{locale}/chair/addresses`, выбор при регистрации (`AddressSelect`).
+- **Платежи:** `HouseholdBilling`, хелперы `web/src/lib/billing.ts`, UI `PaymentPeriodNav`, экшены в `web/src/actions/chair.ts`.
+- **Редактирование/модерация:** автор редактирует свои посты/темы; персонал удаляет контент в `/chair/moderation`.
 
 ### Деплой и эксплуатация (заметки)
 
-- Текущая БД в `web/` — **SQLite** для дев-режима. Для продакшена лучше перейти на **Postgres** (Render Postgres / Neon / Supabase и т.д.).
+- Прод и разработка — **Postgres** (Neon). SQLite не используется.
 - Render на недорогих тарифах может «усыплять» сервис → **cold start** (десятки секунд). Для MVP это ок; для UX — переход на always-on план или хостинг без сна.
 - Vercel часто быстрее для Next.js, но требует внешнюю БД; SQLite-файл на Vercel — нецелевой путь.
 
@@ -127,3 +134,4 @@ git -C .. status
 
 - Для операций Prisma уровня схемы (`prisma db push`, миграции) обычно лучше использовать **direct endpoint** (не `-pooler`).
 - Если используете pooler endpoint, иногда требуется `?pgbouncer=true` (см. документацию Neon по pooling).
+- Смена `HouseholdPayment` → `HouseholdBilling`: на проде уже применён `db push` (2026-05-17); при потере строк — голова заново вносит суммы за текущий месяц на `/payments`.

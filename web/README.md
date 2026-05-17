@@ -1,14 +1,14 @@
 # Happy Life — веб-MVP
 
-Платформа для жителів ОСББ/котеджних громад в **Україні**: головна з новинами та голосуваннями, заявки, спільнота (дошка, форум, конфіденційні звернення), лічильники, ролі мешканець / модератор / голова. Орієнтація продукту: **гривня (UAH)**, дати/формати — за обраною мовою.
+Платформа для жителів ОСББ/котеджних громад в **Україні**: головна з новинами та голосуваннями, заявки, спільнота (дошка, форум, конфіденційні звернення, каталог мешканців), **платежі за домом по місяцях**, ролі мешканець / модератор / голова. Орієнтація: **гривня (UAH)**.
 
 ## Стек
 
 - **Next.js 16** (App Router), React 19, TypeScript  
 - **Tailwind CSS 4**  
-- **Prisma 5** + **Postgres** (например Neon/Render Postgres)  
+- **Prisma 5** + **Postgres** (Neon у продакшені)  
 - **Auth.js (next-auth v5 beta)** — вхід за email/паролем  
-- **next-intl** — три мови з префіксом у URL: **`/uk`** (типово), **`/ru`**, **`/en`**. Російська в інтерфейсі позначається як **«Київський»** (не «російська»). У шапці — перемикач мов.  
+- **next-intl** — `/uk` (default), `/ru`, `/en`
 
 ## Запуск локально
 
@@ -16,90 +16,75 @@
 cd web
 npm install
 cp .env.example .env
-# .env: DATABASE_URL → ваш Postgres (Neon/Render/Supabase),
-# AUTH_SECRET, AUTH_URL/NEXTAUTH_URL = http://localhost:3000 (або ваш порт)
+# DATABASE_URL → Postgres (Neon direct endpoint для db push)
+# AUTH_SECRET, AUTH_URL / NEXTAUTH_URL = http://localhost:3000
 npx prisma db push
 npm run db:seed
 npm run dev
 ```
 
-Відкрийте [http://localhost:3000](http://localhost:3000) — буде перенаправлення на **`/uk`** (або одразу `/uk`, `/ru`, `/en`). На рівні фолбеку є й серверний редірект з `/` на `/uk` (`web/src/app/page.tsx`) — на випадок коли middleware не спрацював (актуально для деяких сценаріїв на Vercel).
+Відкрийте [http://localhost:3000](http://localhost:3000) → редірект на `/uk`.
 
-В `.env` задайте `AUTH_SECRET` (довільний рядок). Для автосхвалення реєстрації — `INVITE_CODE` (у прикладі `HAPPY2026`). Локальний SQLite більше не підтримується: розробка йде проти **Postgres** (можна підняти локально в Docker або користуватися безкоштовним Neon dev branch).
+## Схема платежей (важно)
 
-**Auth.js: `ClientFetchError` / `Failed to fetch` на дашборді** — зазвичай браузер на `http://localhost:ПОРТ` звертається до `/api/auth/session`, а в `.env` вказано **інший порт** (наприклад, додаток на **3300**, а `AUTH_URL` / `NEXTAUTH_URL` лишились на **3000**). Виправлення: у `.env` виставте **`AUTH_URL` і `NEXTAUTH_URL`** на той самий базовий URL, що в адресному рядку (включно з портом), перезапустіть `npm run dev`. Якщо після цього помилка лишається — відкрийте в новій вкладці `http://localhost:ПОРТ/api/auth/session`: при 500 див. лог сервера (часто Prisma після оновлення схеми).
+| Модель | Опис |
+|--------|------|
+| `HouseholdBilling` | Нарахування за **календарний місяць** на адресу (`street`, `houseNumber`, `periodYear`, `periodMonth`, суми, `paidAt`). Історія = окремий рядок на кожен місяць. |
+| `User.balanceUah` | Окрема «заборгованість» — голова редагує в `/chair/users`, не плутати з місячним рахунком. |
+| `CommunityAddress` | Довідник адрес КГ; голова в `/chair/addresses`; реєстрація через випадаючий список. |
 
-## Prisma і помилка `Unknown field balanceUah`
-
-- **`npm run dev`** автоматично виконує **`prisma generate`** (скрипт `predev`). Це зменшує шанс підняти Next із застарілим `@prisma/client` у пам’яті після зміни схеми.
-- Якщо в тексті помилки все ще фігурує **`balanceRub`** — процес `next dev` тримає **старий** згенерований клієнт: **зупиніть** сервер, за потреби видаліть **`web/.next`**, виконайте **`npx prisma generate`**, знову **`npm run dev`**.
-- Після зміни `prisma/schema.prisma` виконуйте **`npx prisma db push`** (і при потребі **`prisma generate`** — уже входить у `npm run dev`).
-- У Windows якщо `prisma generate` падає з **EPERM** (не вдається перейменувати `query_engine-*.dll`), **зупиніть** `npm run dev` / інші процеси Node, повторіть `generate`.  
-- Стара БД з колонкою **`balanceRub`**: перейменуйте колонку (дані збережуться), потім `db push`:
-
-  ```bash
-  echo 'ALTER TABLE "User" RENAME COLUMN "balanceRub" TO "balanceUah";' | npx prisma db execute --stdin --schema prisma/schema.prisma
-  npx prisma db push
-  ```
-
-  Або `npx prisma db push --accept-data-loss` і знову **`npm run db:seed`** (баланси скинуться).
-
-## Демо (лише для локальної розробки)
-
-Після `npm run db:seed` у локальній БД будуть тестові записи (для dev). **У продакшені UI не показує демо-підказок**, а реальні обліковки/дані має створювати громада.
-
-## Важливо для продакшена: оновлення схеми БД
-
-Після змін у `prisma/schema.prisma` (наприклад, додали поле згоди з меморандумом) потрібно синхронізувати **Postgres**:
+Старі моделі **`HouseholdPayment`**, **`MeterReading`** видалені. Після оновлення схеми на Neon:
 
 ```bash
-cd web
 npx prisma db push
 ```
 
-## Сборка
+Якщо на Neon ще була таблиця `HouseholdPayment` **до** push — один раз (поки таблиця існує):
+
+```bash
+npx tsx scripts/migrate_household_billing.ts
+```
+
+Код на Vercel має бути з комітом, де використовується `householdBilling` (інакше P2021: table HouseholdPayment does not exist).
+
+## Prisma / Auth (типові помилки)
+
+- **`balanceUah` / `balanceRub`:** `npx prisma generate`, перезапуск dev, при потребі `db push`.
+- **Auth `Failed to fetch`:** `AUTH_URL` і `NEXTAUTH_URL` = той самий origin, що в браузері (з портом).
+- **Sign out:** `SignOutButton` → `signOut({ redirect: false })` + `window.location.assign('/${locale}')`.
+
+## Збірка
 
 ```bash
 npm run build
 npm start
 ```
 
-## Деплой (Render / Vercel) — заметки
+## Деплой (Vercel + Neon)
 
-- Для продакшена используйте внешний **Postgres** (Render Postgres / Neon / Supabase и т.д.).
-- **Render**:
-  - На бесплатных/cheap инстансах часто есть **cold start** (пауза после простоя). Это нормально для MVP/пилота.
-  - Лечится: платный план без сна, keep-alive пинг (cron), либо перенос SSR в более «always-on» окружение.
-- **Vercel**:
-  - Отлично подходит для Next.js и обычно даёт более быстрые старты, но приложение всё равно должно ходить в **внешнюю БД** (Postgres). SQLite-файл на Vercel — плохая идея.
-  - Для Prisma на Vercel обычно делают `prisma migrate deploy` на этапе build/deploy и используют пулер/accelerate при необходимости.
+1. `DATABASE_URL` у Vercel (runtime може бути pooler; для `db push` локально — **direct** endpoint).
+2. Після зміни `schema.prisma` — локально `npx prisma db push`, потім git push → Vercel deploy.
+3. Завантаження фото: `public/uploads/` (на Vercel ефемерно — винести в S3 згодом).
 
-### Neon (важно)
+## Навігація (4 таби)
 
-- Для Prisma **миграций/`db push`** чаще надёжнее использовать **direct endpoint** (не `-pooler`), а `-pooler` оставлять для runtime-коннектов приложения.
-- Если указываете `-pooler`, может понадобиться параметр `pgbouncer=true` (зависит от конфигурации Neon).
+| Таб | Маршрути |
+|-----|----------|
+| **Головна** | `/dashboard` — новини, карточка нарахувань (поточний місяць) → `/payments`, превʼю голосувань → `/votes`, заявок → `/requests` |
+| **Заявки** | `/requests`, `/requests/new` |
+| **Спільнота** | `/community` → дошка, форум, звернення, **мешканці** (`/residents`) |
+| **Ще** | `/profile` — профіль, меморандум, панель голови; без дублів платежів/тарифів |
 
-Минимальный план миграции на Postgres:
-1) Заменить `DATABASE_URL` на Postgres.
-2) Перейти с `db push` на `prisma migrate dev` (локально) → `prisma migrate deploy` (в проде).
-3) Загрузки изображений вынести из `public/uploads` в S3-совместимое хранилище.
+**Голова:** платежі мешканців — `/payments` (перемикач місяця `?y=2026&m=5`). Користувачі та баланс — `/chair/users`. Адреси — `/chair/addresses`.
 
-## Навігація (MVP)
+**Модератор:** таби заявки/спільнота приховані; `/payments` → `/chair`; каталог жителів — з панелі `/chair`.
 
-Усі сторінки додатку — під `[locale]`, наприклад `/uk/dashboard`, `/en/community/board`.
-
-- Якщо відкрити сторінку без префікса (наприклад `/register`), middleware автоматично перенаправить на локалізований маршрут (`/uk/register`, `/ru/register`, `/en/register`).
-
-- **Головна** — дашборд, новини, активні голосування, заявки, нагадування.  
-- **Заявки** — service desk; фото до заявки; голова/модератор змінюють статус.  
-- **Спільнота** — дошка оголошень (текст + фото), форум (тема та відповіді з фото), конфіденційні звернення.  
-- **Ще** — профіль, голосування, лічильники, вихід; для модераторів — панель `/chair`.  
-
-Приклади маршрутів: `/uk/votes`, `/uk/payments`, `/uk/chair/users`. Старий `/uk/meters` перенаправляє на `/uk/payments`. Завантажені зображення зберігаються в **`web/public/uploads/`** (у продакшені варто винести в об’єктне сховище).
-
-Реєстрація: **власник чи орендар** (`tenancyType`). Голосування та теми форуму мають поле **аудиторії** (усі / лише власники / лише орендарі); голова бачить усе. При реєстрації потрібна згода з **меморандумом** (сторінка меморандуму публічна: `/{locale}/info/memorandum`). Окремої ролі «адмін платформи» поки немає — панель `/chair` для голови та модератора (модератор: користувачі + конфіденційні звернення + модерація контенту).
+**Публічно:** `/info/memorandum`, `/info/tariffs`. Старий `/meters` → `/payments`.
 
 ## Документація репозиторію
 
-- Огляд продукту: `docs/PROJECT_OVERVIEW.md`  
-- Контекст розробки: `docs/DEVELOPMENT_CONTEXT.md`
+- `docs/PROJECT_OVERVIEW.md` — продукт  
+- `docs/DEVELOPMENT_CONTEXT.md` — **старт наступної сесії (ІІ)**  
+- `docs/TODO_ROADMAP.md` — дорожня карта  
+
+Транскрипти чатів: `agent-transcripts/` у workspace Cursor.

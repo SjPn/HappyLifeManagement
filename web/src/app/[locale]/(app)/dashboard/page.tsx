@@ -82,6 +82,7 @@ export default async function DashboardPage() {
     (user?.subscriptionFeeUah ?? 0) > 0 || (user?.electricityUah ?? 0) > 0;
 
   const firstName = user?.name?.split(" ")[0] ?? t("neighbor");
+  const isChair = session!.user!.role === "CHAIR";
 
   return (
     <>
@@ -104,7 +105,7 @@ export default async function DashboardPage() {
             {t("quickVotes")}
           </ButtonLink>
           <ButtonLink href="/payments" variant="secondary">
-            {t("quickPayments")}
+            {isChair ? t("quickPaymentsManage") : t("quickPayments")}
           </ButtonLink>
         </div>
       </section>

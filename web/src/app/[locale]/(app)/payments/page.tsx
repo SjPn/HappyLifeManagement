@@ -1,19 +1,19 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PageTitle, Card } from "@/components/Ui";
+import { PaymentEditForm } from "@/components/PaymentEditForm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { formatUah } from "@/lib/money";
 import { redirect } from "next/navigation";
+import { Role } from "@/lib/enums";
 
-export default async function PaymentsPage() {
-  const session = await auth();
-  if (session!.user!.role === "MODERATOR") {
-    const locale = await getLocale();
-    redirect(`/${locale}/chair`);
-  }
-
-  const userId = session!.user!.id;
-  const locale = await getLocale();
+async function ResidentPaymentsView({
+  userId,
+  locale,
+}: {
+  userId: string;
+  locale: string;
+}) {
   const t = await getTranslations("payments");
 
   const user = await prisma.user.findUnique({
@@ -94,4 +94,93 @@ export default async function PaymentsPage() {
       </p>
     </>
   );
+}
+
+async function ChairPaymentsManageView() {
+  const locale = await getLocale();
+  const t = await getTranslations("payments");
+  const tc = await getTranslations("chair");
+  const tt = await getTranslations("categories.tenancy");
+
+  const residents = await prisma.user.findMany({
+    where: { role: Role.RESIDENT },
+    orderBy: [{ street: "asc" }, { houseNumber: "asc" }, { name: "asc" }],
+    select: {
+      id: true,
+      name: true,
+      street: true,
+      houseNumber: true,
+      tenancyType: true,
+      status: true,
+      subscriptionFeeUah: true,
+      electricityUah: true,
+    },
+  });
+
+  return (
+    <>
+      <PageTitle title={t("chairTitle")} subtitle={t("chairSubtitle")} />
+
+      <div className="flex flex-col gap-3">
+        {residents.map((u) => {
+          const total = u.subscriptionFeeUah + u.electricityUah;
+          return (
+            <Card key={u.id}>
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <p className="font-medium">{u.name}</p>
+                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                    {u.street} {u.houseNumber}
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {tt(u.tenancyType as "OWNER" | "TENANT")}
+                    {u.status !== "APPROVED" && (
+                      <span className="ml-2 text-amber-700 dark:text-amber-300">
+                        · {tc("addressStatus")}: {u.status}
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <p className="text-right text-sm font-semibold tabular-nums">
+                  {formatUah(total, locale)}
+                </p>
+              </div>
+              <div className="mt-4 border-t border-zinc-100 pt-3 dark:border-zinc-800">
+                <PaymentEditForm
+                  userId={u.id}
+                  subscriptionFeeUah={u.subscriptionFeeUah}
+                  electricityUah={u.electricityUah}
+                />
+              </div>
+            </Card>
+          );
+        })}
+        {residents.length === 0 && (
+          <Card>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              {t("chairEmpty")}
+            </p>
+          </Card>
+        )}
+      </div>
+    </>
+  );
+}
+
+export default async function PaymentsPage() {
+  const session = await auth();
+  if (session!.user!.role === "MODERATOR") {
+    const locale = await getLocale();
+    redirect(`/${locale}/chair`);
+  }
+
+  const locale = await getLocale();
+  const userId = session!.user!.id;
+  const isChair = session!.user!.role === "CHAIR";
+
+  if (isChair) {
+    return <ChairPaymentsManageView />;
+  }
+
+  return <ResidentPaymentsView userId={userId} locale={locale} />;
 }

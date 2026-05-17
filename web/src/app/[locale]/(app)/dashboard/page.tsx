@@ -33,7 +33,7 @@ export default async function DashboardPage() {
   if (session!.user!.role === "MODERATOR") {
     return (
       <>
-        <PageTitle eyebrow={t("eyebrow")} title={t("greeting", { name: "MODERATOR" })} subtitle={t("addressLine", { street: "", house: "" })} />
+        <PageTitle title={t("greeting", { name: "MODERATOR" })} subtitle={t("addressLine", { street: "", house: "" })} />
         <section className="grid gap-3">
           <Card>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -124,7 +124,6 @@ export default async function DashboardPage() {
     <>
       {!isChair && <MarkNotificationsSeen scopes={["news"]} />}
       <PageTitle
-        eyebrow={t("eyebrow")}
         title={
           <DashboardGreeting hello={t("greetingHello")} name={displayName} />
         }

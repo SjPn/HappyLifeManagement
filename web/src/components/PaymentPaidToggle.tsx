@@ -8,10 +8,14 @@ import { useState } from "react";
 export function PaymentPaidToggle({
   street,
   houseNumber,
+  periodYear,
+  periodMonth,
   paid,
 }: {
   street: string;
   houseNumber: string;
+  periodYear: number;
+  periodMonth: number;
   paid: boolean;
 }) {
   const router = useRouter();
@@ -23,6 +27,8 @@ export function PaymentPaidToggle({
     const fd = new FormData();
     fd.set("street", street);
     fd.set("houseNumber", houseNumber);
+    fd.set("periodYear", String(periodYear));
+    fd.set("periodMonth", String(periodMonth));
     fd.set("paid", next ? "true" : "false");
     await setHouseholdPaid(fd);
     setLoading(false);

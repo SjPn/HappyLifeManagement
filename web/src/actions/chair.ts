@@ -6,6 +6,11 @@ import { UserStatus } from "@/lib/enums";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
 import { TenancyType } from "@/lib/audience";
 import { resolveCommunityAddress } from "@/lib/communityAddresses";
+import {
+  billingUniqueWhere,
+  type BillingPeriod,
+} from "@/lib/billing";
+import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
 
 function staff(session: { user?: { role?: string } } | null) {
   const r = session?.user?.role;
@@ -65,33 +70,67 @@ function parseUah(raw: string) {
   return Number.isFinite(n) && n >= 0 ? n : null;
 }
 
+function parseBillingPeriodFromForm(
+  formData: FormData,
+): BillingPeriod | null {
+  const year = Number(formData.get("periodYear"));
+  const month = Number(formData.get("periodMonth"));
+  if (
+    !Number.isInteger(year) ||
+    year < 2020 ||
+    year > 2100 ||
+    !Number.isInteger(month) ||
+    month < 1 ||
+    month > 12
+  ) {
+    return null;
+  }
+  return { year, month };
+}
+
 export async function setHouseholdPayments(formData: FormData) {
   const session = await auth();
   if (session?.user?.role !== "CHAIR") {
     return { error: "forbidden" as const };
   }
 
-  const street = String(formData.get("street") || "").trim();
-  const houseNumber = String(formData.get("houseNumber") || "").trim();
+  const period = parseBillingPeriodFromForm(formData);
+  const street = normalizeStreet(String(formData.get("street") || ""));
+  const houseNumber = normalizeHouseNumber(
+    String(formData.get("houseNumber") || ""),
+  );
   const subscriptionFeeUah = parseUah(
     String(formData.get("subscriptionFeeUah") || ""),
   );
   const electricityUah = parseUah(String(formData.get("electricityUah") || ""));
-  if (!street || !houseNumber || subscriptionFeeUah === null || electricityUah === null) {
+  if (
+    !period ||
+    !street ||
+    !houseNumber ||
+    subscriptionFeeUah === null ||
+    electricityUah === null
+  ) {
     return { error: "badData" as const };
   }
 
-  const existing = await prisma.householdPayment.findUnique({
-    where: { street_houseNumber: { street, houseNumber } },
+  const existing = await prisma.householdBilling.findUnique({
+    where: billingUniqueWhere(street, houseNumber, period),
   });
   const amountsChanged =
     existing != null &&
     (existing.subscriptionFeeUah !== subscriptionFeeUah ||
       existing.electricityUah !== electricityUah);
 
-  await prisma.householdPayment.upsert({
-    where: { street_houseNumber: { street, houseNumber } },
-    create: { street, houseNumber, subscriptionFeeUah, electricityUah },
+  await prisma.householdBilling.upsert({
+    where: billingUniqueWhere(street, houseNumber, period),
+    create: {
+      street,
+      houseNumber,
+      periodYear: period.year,
+      periodMonth: period.month,
+      subscriptionFeeUah,
+      electricityUah,
+    },
     update: {
       subscriptionFeeUah,
       electricityUah,
@@ -112,18 +151,23 @@ export async function setHouseholdPaid(formData: FormData) {
     return { error: "forbidden" as const };
   }
 
-  const street = String(formData.get("street") || "").trim();
-  const houseNumber = String(formData.get("houseNumber") || "").trim();
+  const period = parseBillingPeriodFromForm(formData);
+  const street = normalizeStreet(String(formData.get("street") || ""));
+  const houseNumber = normalizeHouseNumber(
+    String(formData.get("houseNumber") || ""),
+  );
   const paid = formData.get("paid") === "true";
-  if (!street || !houseNumber) {
+  if (!period || !street || !houseNumber) {
     return { error: "badData" as const };
   }
 
-  await prisma.householdPayment.upsert({
-    where: { street_houseNumber: { street, houseNumber } },
+  await prisma.householdBilling.upsert({
+    where: billingUniqueWhere(street, houseNumber, period),
     create: {
       street,
       houseNumber,
+      periodYear: period.year,
+      periodMonth: period.month,
       paidAt: paid ? new Date() : null,
     },
     update: {

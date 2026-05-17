@@ -8,11 +8,15 @@ import { useState } from "react";
 export function PaymentEditForm({
   street,
   houseNumber,
+  periodYear,
+  periodMonth,
   subscriptionFeeUah,
   electricityUah,
 }: {
   street: string;
   houseNumber: string;
+  periodYear: number;
+  periodMonth: number;
   subscriptionFeeUah: number;
   electricityUah: number;
 }) {
@@ -33,6 +37,8 @@ export function PaymentEditForm({
     <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-3">
       <input type="hidden" name="street" value={street} />
       <input type="hidden" name="houseNumber" value={houseNumber} />
+      <input type="hidden" name="periodYear" value={periodYear} />
+      <input type="hidden" name="periodMonth" value={periodMonth} />
       <label className="flex flex-col gap-1 text-xs">
         {t("subscriptionFee")}
         <input

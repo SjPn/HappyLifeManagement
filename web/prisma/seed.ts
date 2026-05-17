@@ -149,16 +149,21 @@ async function main() {
     },
   });
 
-  await prisma.householdPayment.upsert({
+  const now = new Date();
+  await prisma.householdBilling.upsert({
     where: {
-      street_houseNumber: {
+      street_houseNumber_periodYear_periodMonth: {
         street: residentAddr.street,
         houseNumber: residentAddr.houseNumber,
+        periodYear: now.getFullYear(),
+        periodMonth: now.getMonth() + 1,
       },
     },
     create: {
       street: residentAddr.street,
       houseNumber: residentAddr.houseNumber,
+      periodYear: now.getFullYear(),
+      periodMonth: now.getMonth() + 1,
       subscriptionFeeUah: 850,
       electricityUah: 420.5,
     },

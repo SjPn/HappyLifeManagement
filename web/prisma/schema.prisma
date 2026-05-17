@@ -148,19 +148,22 @@ model CommunityAddress {
   @@unique([street, houseNumber])
 }
 
-/// Платежі за домоволодінням (вулиця + будинок); бачать усі мешканці з цією адресою
-model HouseholdPayment {
-  id                 String   @id @default(cuid())
+/// Нарахування за домоволодінням за календарний місяць (історія зберігається)
+model HouseholdBilling {
+  id                 String    @id @default(cuid())
   street             String
   houseNumber        String
-  subscriptionFeeUah Float    @default(0)
-  electricityUah     Float    @default(0)
-  /// Голова відмічає оплату за період — бачать усі мешканці за цією адресою
+  periodYear         Int
+  periodMonth        Int
+  subscriptionFeeUah Float     @default(0)
+  electricityUah     Float     @default(0)
+  /// Голова відмічає оплату за цей місяць
   paidAt             DateTime?
-  updatedAt          DateTime @updatedAt
-  createdAt          DateTime @default(now())
+  updatedAt          DateTime  @updatedAt
+  createdAt          DateTime  @default(now())
 
-  @@unique([street, houseNumber])
+  @@unique([street, houseNumber, periodYear, periodMonth])
+  @@index([street, houseNumber, periodYear, periodMonth])
 }
 
 model ConfidentialReport {

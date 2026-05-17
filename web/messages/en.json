@@ -233,11 +233,21 @@
     "balanceNote": "Approximate dues balance: {amount}.",
     "disclaimer": "Amounts are informational; confirm details with the chair.",
     "chairTitle": "Resident payments",
-    "chairSubtitle": "Enter amounts per address (household). When paid, check Paid — residents will see the status under My payments.",
+    "chairSubtitle": "Charges for {period}. When paid, check Paid.",
     "registeredResidents": "Registered",
     "chairEmpty": "No resident accounts yet.",
     "paidCheckbox": "Paid",
-    "paidStatus": "Payment for the current period was confirmed by the chair."
+    "paidStatus": "Payment for {period} was confirmed by the chair.",
+    "paidBadge": "Paid",
+    "billingPeriod": "Billing month",
+    "periodPrev": "Previous month",
+    "periodNext": "Next month",
+    "periodCurrent": "current month",
+    "periodCharges": "Charges for {period}",
+    "chairPeriodSummary": "Paid: {paid} of {total} addresses ({withCharges} with charges).",
+    "historyTitle": "Payment history",
+    "historyPaid": "Paid on {date}",
+    "historyUnpaid": "Not paid"
   },
   "profile": {
     "title": "More",

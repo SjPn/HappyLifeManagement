@@ -6,6 +6,12 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { formatUah } from "@/lib/money";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { voteAudienceWhere } from "@/lib/audience";
+import {
+  billingPeriodWhere,
+  currentBillingPeriod,
+  formatBillingPeriodLabel,
+} from "@/lib/billing";
+import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -76,22 +82,25 @@ export default async function DashboardPage() {
     }),
   ]);
 
-  const householdPayment =
+  const billingPeriod = currentBillingPeriod();
+  const householdBilling =
     user?.street && user?.houseNumber
-      ? await prisma.householdPayment.findUnique({
+      ? await prisma.householdBilling.findUnique({
           where: {
-            street_houseNumber: {
-              street: user.street.trim(),
-              houseNumber: user.houseNumber.trim(),
+            street_houseNumber_periodYear_periodMonth: {
+              street: normalizeStreet(user.street),
+              houseNumber: normalizeHouseNumber(user.houseNumber),
+              ...billingPeriodWhere(billingPeriod),
             },
           },
         })
       : null;
 
   const paymentTotal =
-    (householdPayment?.subscriptionFeeUah ?? 0) +
-    (householdPayment?.electricityUah ?? 0);
-  const paymentPaid = householdPayment?.paidAt != null;
+    (householdBilling?.subscriptionFeeUah ?? 0) +
+    (householdBilling?.electricityUah ?? 0);
+  const paymentPaid = householdBilling?.paidAt != null;
+  const paymentPeriodLabel = formatBillingPeriodLabel(locale, billingPeriod);
   const showPaymentsCard = Boolean(user?.street && user?.houseNumber);
 
   const firstName = user?.name?.split(" ")[0] ?? t("neighbor");
@@ -126,6 +135,9 @@ export default async function DashboardPage() {
         <Link href="/payments" className="mt-3 block">
           <Card className="transition hover:border-emerald-300 hover:bg-emerald-50/30 dark:hover:border-emerald-800 dark:hover:bg-emerald-950/20">
             <p className="text-sm font-medium">{t("paymentsReminderTitle")}</p>
+            <p className="mt-0.5 text-xs text-zinc-500 capitalize">
+              {paymentPeriodLabel}
+            </p>
             {paymentPaid ? (
               <p className="mt-1 text-sm font-medium text-emerald-700 dark:text-emerald-300">
                 {t("paymentsPaidOnHome")}

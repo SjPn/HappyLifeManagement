@@ -3,10 +3,19 @@ import { prisma } from "@/lib/prisma";
 import { PageTitle, Card, ButtonLink } from "@/components/Ui";
 import { PaymentEditForm } from "@/components/PaymentEditForm";
 import { PaymentPaidToggle } from "@/components/PaymentPaidToggle";
+import { PaymentPeriodNav } from "@/components/PaymentPeriodNav";
 import { getLocale, getTranslations } from "next-intl/server";
 import { formatUah } from "@/lib/money";
+import { dateLocaleForUi } from "@/lib/dateLocale";
 import { redirect } from "next/navigation";
 import { Role } from "@/lib/enums";
+import {
+  billingPeriodKey,
+  billingPeriodWhere,
+  formatBillingPeriodLabel,
+  parseBillingPeriod,
+  type BillingPeriod,
+} from "@/lib/billing";
 import {
   formatAddressLine,
   householdAddressKey,
@@ -14,20 +23,33 @@ import {
   normalizeStreet,
 } from "@/lib/household";
 
-async function getPaymentForAddress(street: string, houseNumber: string) {
+async function getBillingForAddress(
+  street: string,
+  houseNumber: string,
+  period: BillingPeriod,
+) {
   const s = normalizeStreet(street);
   const h = normalizeHouseNumber(houseNumber);
-  return prisma.householdPayment.findUnique({
-    where: { street_houseNumber: { street: s, houseNumber: h } },
+  return prisma.householdBilling.findUnique({
+    where: {
+      street_houseNumber_periodYear_periodMonth: {
+        street: s,
+        houseNumber: h,
+        periodYear: period.year,
+        periodMonth: period.month,
+      },
+    },
   });
 }
 
 async function ResidentPaymentsView({
   userId,
   locale,
+  period,
 }: {
   userId: string;
   locale: string;
+  period: BillingPeriod;
 }) {
   const t = await getTranslations("payments");
   const tp = await getTranslations("profile");
@@ -41,35 +63,53 @@ async function ResidentPaymentsView({
     },
   });
 
-  const payment = user
-    ? await getPaymentForAddress(user.street, user.houseNumber)
-    : null;
+  const street = user ? normalizeStreet(user.street) : "";
+  const houseNumber = user ? normalizeHouseNumber(user.houseNumber) : "";
 
-  const subscription = payment?.subscriptionFeeUah ?? 0;
-  const electricity = payment?.electricityUah ?? 0;
+  const [billing, history] = user
+    ? await Promise.all([
+        getBillingForAddress(user.street, user.houseNumber, period),
+        prisma.householdBilling.findMany({
+          where: { street, houseNumber },
+          orderBy: [{ periodYear: "desc" }, { periodMonth: "desc" }],
+          take: 24,
+        }),
+      ])
+    : [null, []];
+
+  const historyRows = history.filter(
+    (h) => billingPeriodKey({ year: h.periodYear, month: h.periodMonth }) !== billingPeriodKey(period),
+  );
+
+  const subscription = billing?.subscriptionFeeUah ?? 0;
+  const electricity = billing?.electricityUah ?? 0;
   const total = subscription + electricity;
-  const isPaid = payment?.paidAt != null;
+  const isPaid = billing?.paidAt != null;
+  const periodLabel = formatBillingPeriodLabel(locale, period);
 
   return (
     <>
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
 
-      {isPaid && (
-        <Card className="mb-4 border-emerald-300 bg-emerald-100/80 dark:border-emerald-700 dark:bg-emerald-950/50">
-          <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
-            {t("paidStatus")}
-          </p>
-        </Card>
-      )}
+      <PaymentPeriodNav period={period} />
 
       <Card className="mb-4 border-emerald-100 bg-emerald-50/50 dark:border-emerald-900 dark:bg-emerald-950/30">
         <p className="text-xs text-zinc-600 dark:text-zinc-400">{t("address")}</p>
         <p className="mt-1 text-sm font-medium">
-          {user
-            ? formatAddressLine(user.street, user.houseNumber)
-            : "—"}
+          {user ? formatAddressLine(user.street, user.houseNumber) : "—"}
+        </p>
+        <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-emerald-800 dark:text-emerald-200">
+          {t("periodCharges", { period: periodLabel })}
         </p>
       </Card>
+
+      {isPaid && (
+        <Card className="mb-4 border-emerald-300 bg-emerald-100/80 dark:border-emerald-700 dark:bg-emerald-950/50">
+          <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+            {t("paidStatus", { period: periodLabel })}
+          </p>
+        </Card>
+      )}
 
       <div className="flex flex-col gap-3">
         <Card>
@@ -100,7 +140,7 @@ async function ResidentPaymentsView({
         </Card>
       </div>
 
-      {total === 0 && (
+      {total === 0 && !isPaid && (
         <Card className="mt-4">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             {t("empty")}
@@ -116,6 +156,47 @@ async function ResidentPaymentsView({
             })}
           </p>
         </Card>
+      )}
+
+      {historyRows.length > 0 && (
+        <>
+          <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            {t("historyTitle")}
+          </h2>
+          <div className="flex flex-col gap-2">
+            {historyRows.map((row) => {
+              const rowTotal =
+                row.subscriptionFeeUah + row.electricityUah;
+              const rowPeriod = {
+                year: row.periodYear,
+                month: row.periodMonth,
+              };
+              return (
+                <Card key={row.id} className="text-sm">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <p className="font-medium capitalize">
+                      {formatBillingPeriodLabel(locale, rowPeriod)}
+                    </p>
+                    <p className="font-semibold tabular-nums">
+                      {formatUah(rowTotal, locale)}
+                    </p>
+                  </div>
+                  <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
+                    {row.paidAt
+                      ? t("historyPaid", {
+                          date: row.paidAt.toLocaleDateString(dateLocaleForUi(locale), {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          }),
+                        })
+                      : t("historyUnpaid")}
+                  </p>
+                </Card>
+              );
+            })}
+          </div>
+        </>
       )}
 
       <div className="mt-6">
@@ -140,11 +221,12 @@ type HouseholdRow = {
   paidAt: Date | null;
 };
 
-async function ChairPaymentsManageView() {
+async function ChairPaymentsManageView({ period }: { period: BillingPeriod }) {
   const locale = await getLocale();
   const t = await getTranslations("payments");
+  const periodLabel = formatBillingPeriodLabel(locale, period);
 
-  const [residents, payments] = await Promise.all([
+  const [residents, billings] = await Promise.all([
     prisma.user.findMany({
       where: { role: Role.RESIDENT },
       orderBy: [{ street: "asc" }, { houseNumber: "asc" }, { name: "asc" }],
@@ -156,11 +238,13 @@ async function ChairPaymentsManageView() {
         status: true,
       },
     }),
-    prisma.householdPayment.findMany(),
+    prisma.householdBilling.findMany({
+      where: billingPeriodWhere(period),
+    }),
   ]);
 
-  const paymentByKey = new Map(
-    payments.map((p) => [
+  const billingByKey = new Map(
+    billings.map((p) => [
       householdAddressKey(p.street, p.houseNumber),
       p,
     ]),
@@ -173,7 +257,7 @@ async function ChairPaymentsManageView() {
     const houseNumber = normalizeHouseNumber(u.houseNumber);
     const key = householdAddressKey(street, houseNumber);
     const existing = households.get(key);
-    const pay = paymentByKey.get(key);
+    const bill = billingByKey.get(key);
 
     if (!existing) {
       households.set(key, {
@@ -182,9 +266,9 @@ async function ChairPaymentsManageView() {
         residents: [
           { name: u.name, tenancyType: u.tenancyType, status: u.status },
         ],
-        subscriptionFeeUah: pay?.subscriptionFeeUah ?? 0,
-        electricityUah: pay?.electricityUah ?? 0,
-        paidAt: pay?.paidAt ?? null,
+        subscriptionFeeUah: bill?.subscriptionFeeUah ?? 0,
+        electricityUah: bill?.electricityUah ?? 0,
+        paidAt: bill?.paidAt ?? null,
       });
     } else {
       existing.residents.push({
@@ -195,16 +279,16 @@ async function ChairPaymentsManageView() {
     }
   }
 
-  for (const p of payments) {
-    const key = householdAddressKey(p.street, p.houseNumber);
+  for (const b of billings) {
+    const key = householdAddressKey(b.street, b.houseNumber);
     if (!households.has(key)) {
       households.set(key, {
-        street: normalizeStreet(p.street),
-        houseNumber: normalizeHouseNumber(p.houseNumber),
+        street: normalizeStreet(b.street),
+        houseNumber: normalizeHouseNumber(b.houseNumber),
         residents: [],
-        subscriptionFeeUah: p.subscriptionFeeUah,
-        electricityUah: p.electricityUah,
-        paidAt: p.paidAt,
+        subscriptionFeeUah: b.subscriptionFeeUah,
+        electricityUah: b.electricityUah,
+        paidAt: b.paidAt,
       });
     }
   }
@@ -216,24 +300,56 @@ async function ChairPaymentsManageView() {
     ),
   );
 
+  const paidCount = list.filter((h) => h.paidAt != null).length;
+  const withCharges = list.filter(
+    (h) => h.subscriptionFeeUah + h.electricityUah > 0,
+  ).length;
+
   return (
     <>
-      <PageTitle title={t("chairTitle")} subtitle={t("chairSubtitle")} />
+      <PageTitle
+        title={t("chairTitle")}
+        subtitle={t("chairSubtitle", { period: periodLabel })}
+      />
+
+      <PaymentPeriodNav period={period} />
+
+      <Card className="mb-4 border-zinc-200 bg-zinc-50/80 dark:border-zinc-700 dark:bg-zinc-900/40">
+        <p className="text-sm text-zinc-700 dark:text-zinc-300">
+          {t("chairPeriodSummary", {
+            paid: paidCount,
+            total: list.length,
+            withCharges,
+          })}
+        </p>
+      </Card>
 
       <div className="flex flex-col gap-3">
         {list.map((h) => {
           const total = h.subscriptionFeeUah + h.electricityUah;
           const residentNames = h.residents.map((r) => r.name).join(", ");
           return (
-            <Card key={householdAddressKey(h.street, h.houseNumber)}>
+            <Card
+              key={householdAddressKey(h.street, h.houseNumber)}
+              className={
+                h.paidAt
+                  ? "border-emerald-200 dark:border-emerald-800"
+                  : undefined
+              }
+            >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <p className="text-lg font-semibold">
                     {formatAddressLine(h.street, h.houseNumber)}
                   </p>
                   <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
-                    {t("registeredResidents")}: {residentNames}
+                    {t("registeredResidents")}: {residentNames || "—"}
                   </p>
+                  {h.paidAt && (
+                    <p className="mt-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                      {t("paidBadge")}
+                    </p>
+                  )}
                 </div>
                 <p className="text-right text-sm font-semibold tabular-nums">
                   {formatUah(total, locale)}
@@ -243,11 +359,15 @@ async function ChairPaymentsManageView() {
                 <PaymentPaidToggle
                   street={h.street}
                   houseNumber={h.houseNumber}
+                  periodYear={period.year}
+                  periodMonth={period.month}
                   paid={h.paidAt != null}
                 />
                 <PaymentEditForm
                   street={h.street}
                   houseNumber={h.houseNumber}
+                  periodYear={period.year}
+                  periodMonth={period.month}
                   subscriptionFeeUah={h.subscriptionFeeUah}
                   electricityUah={h.electricityUah}
                 />
@@ -267,20 +387,28 @@ async function ChairPaymentsManageView() {
   );
 }
 
-export default async function PaymentsPage() {
+export default async function PaymentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ y?: string; m?: string }>;
+}) {
   const session = await auth();
   if (session!.user!.role === "MODERATOR") {
     const locale = await getLocale();
     redirect(`/${locale}/chair`);
   }
 
+  const sp = await searchParams;
+  const period = parseBillingPeriod(sp.y, sp.m);
   const locale = await getLocale();
   const userId = session!.user!.id;
   const isChair = session!.user!.role === "CHAIR";
 
   if (isChair) {
-    return <ChairPaymentsManageView />;
+    return <ChairPaymentsManageView period={period} />;
   }
 
-  return <ResidentPaymentsView userId={userId} locale={locale} />;
+  return (
+    <ResidentPaymentsView userId={userId} locale={locale} period={period} />
+  );
 }

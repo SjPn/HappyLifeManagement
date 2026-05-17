@@ -105,15 +105,28 @@ async function ResidentPaymentsView({
         </p>
       </Card>
 
-      {isPaid && (
+      {isPaid ? (
         <Card className="mb-4 border-emerald-300 bg-emerald-100/80 dark:border-emerald-700 dark:bg-emerald-950/50">
-          <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+          <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">
+            {t("paidBadge")}
+          </p>
+          <p className="mt-2 text-sm text-emerald-800 dark:text-emerald-200">
             {t("paidStatus", { period: periodLabel })}
           </p>
+          {billing?.paidAt && (
+            <p className="mt-1 text-xs text-emerald-700/90 dark:text-emerald-300/90">
+              {t("historyPaid", {
+                date: billing.paidAt.toLocaleDateString(dateLocaleForUi(locale), {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                }),
+              })}
+            </p>
+          )}
         </Card>
-      )}
-
-      <div className="flex flex-col gap-3">
+      ) : (
+        <div className="flex flex-col gap-3">
         <Card>
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
             {t("subscription")}
@@ -140,7 +153,8 @@ async function ResidentPaymentsView({
             {formatUah(total, locale)}
           </p>
         </Card>
-      </div>
+        </div>
+      )}
 
       {total === 0 && !isPaid && (
         <Card className="mt-4">

@@ -70,16 +70,27 @@ export default async function DashboardPage() {
       select: {
         name: true,
         balanceUah: true,
-        subscriptionFeeUah: true,
-        electricityUah: true,
         street: true,
         houseNumber: true,
       },
     }),
   ]);
 
+  const householdPayment =
+    user?.street && user?.houseNumber
+      ? await prisma.householdPayment.findUnique({
+          where: {
+            street_houseNumber: {
+              street: user.street.trim(),
+              houseNumber: user.houseNumber.trim(),
+            },
+          },
+        })
+      : null;
+
   const hasPayments =
-    (user?.subscriptionFeeUah ?? 0) > 0 || (user?.electricityUah ?? 0) > 0;
+    (householdPayment?.subscriptionFeeUah ?? 0) > 0 ||
+    (householdPayment?.electricityUah ?? 0) > 0;
 
   const firstName = user?.name?.split(" ")[0] ?? t("neighbor");
   const isChair = session!.user!.role === "CHAIR";
@@ -129,7 +140,8 @@ export default async function DashboardPage() {
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
             {t("paymentsReminderText", {
               amount: formatUah(
-                (user?.subscriptionFeeUah ?? 0) + (user?.electricityUah ?? 0),
+                (householdPayment?.subscriptionFeeUah ?? 0) +
+                  (householdPayment?.electricityUah ?? 0),
                 locale,
               ),
             })}

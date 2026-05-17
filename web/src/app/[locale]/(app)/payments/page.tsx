@@ -6,6 +6,20 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { formatUah } from "@/lib/money";
 import { redirect } from "next/navigation";
 import { Role } from "@/lib/enums";
+import {
+  formatAddressLine,
+  householdAddressKey,
+  normalizeHouseNumber,
+  normalizeStreet,
+} from "@/lib/household";
+
+async function getPaymentForAddress(street: string, houseNumber: string) {
+  const s = normalizeStreet(street);
+  const h = normalizeHouseNumber(houseNumber);
+  return prisma.householdPayment.findUnique({
+    where: { street_houseNumber: { street: s, houseNumber: h } },
+  });
+}
 
 async function ResidentPaymentsView({
   userId,
@@ -19,16 +33,18 @@ async function ResidentPaymentsView({
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
-      subscriptionFeeUah: true,
-      electricityUah: true,
       balanceUah: true,
       street: true,
       houseNumber: true,
     },
   });
 
-  const subscription = user?.subscriptionFeeUah ?? 0;
-  const electricity = user?.electricityUah ?? 0;
+  const payment = user
+    ? await getPaymentForAddress(user.street, user.houseNumber)
+    : null;
+
+  const subscription = payment?.subscriptionFeeUah ?? 0;
+  const electricity = payment?.electricityUah ?? 0;
   const total = subscription + electricity;
 
   return (
@@ -38,7 +54,9 @@ async function ResidentPaymentsView({
       <Card className="mb-4 border-emerald-100 bg-emerald-50/50 dark:border-emerald-900 dark:bg-emerald-950/30">
         <p className="text-xs text-zinc-600 dark:text-zinc-400">{t("address")}</p>
         <p className="mt-1 text-sm font-medium">
-          {user?.street} {user?.houseNumber}
+          {user
+            ? formatAddressLine(user.street, user.houseNumber)
+            : "—"}
         </p>
       </Card>
 
@@ -96,49 +114,105 @@ async function ResidentPaymentsView({
   );
 }
 
+type HouseholdRow = {
+  street: string;
+  houseNumber: string;
+  residents: { name: string; tenancyType: string; status: string }[];
+  subscriptionFeeUah: number;
+  electricityUah: number;
+};
+
 async function ChairPaymentsManageView() {
   const locale = await getLocale();
   const t = await getTranslations("payments");
-  const tc = await getTranslations("chair");
-  const tt = await getTranslations("categories.tenancy");
 
-  const residents = await prisma.user.findMany({
-    where: { role: Role.RESIDENT },
-    orderBy: [{ street: "asc" }, { houseNumber: "asc" }, { name: "asc" }],
-    select: {
-      id: true,
-      name: true,
-      street: true,
-      houseNumber: true,
-      tenancyType: true,
-      status: true,
-      subscriptionFeeUah: true,
-      electricityUah: true,
-    },
-  });
+  const [residents, payments] = await Promise.all([
+    prisma.user.findMany({
+      where: { role: Role.RESIDENT },
+      orderBy: [{ street: "asc" }, { houseNumber: "asc" }, { name: "asc" }],
+      select: {
+        name: true,
+        street: true,
+        houseNumber: true,
+        tenancyType: true,
+        status: true,
+      },
+    }),
+    prisma.householdPayment.findMany(),
+  ]);
+
+  const paymentByKey = new Map(
+    payments.map((p) => [
+      householdAddressKey(p.street, p.houseNumber),
+      p,
+    ]),
+  );
+
+  const households = new Map<string, HouseholdRow>();
+
+  for (const u of residents) {
+    const street = normalizeStreet(u.street);
+    const houseNumber = normalizeHouseNumber(u.houseNumber);
+    const key = householdAddressKey(street, houseNumber);
+    const existing = households.get(key);
+    const pay = paymentByKey.get(key);
+
+    if (!existing) {
+      households.set(key, {
+        street,
+        houseNumber,
+        residents: [
+          { name: u.name, tenancyType: u.tenancyType, status: u.status },
+        ],
+        subscriptionFeeUah: pay?.subscriptionFeeUah ?? 0,
+        electricityUah: pay?.electricityUah ?? 0,
+      });
+    } else {
+      existing.residents.push({
+        name: u.name,
+        tenancyType: u.tenancyType,
+        status: u.status,
+      });
+    }
+  }
+
+  for (const p of payments) {
+    const key = householdAddressKey(p.street, p.houseNumber);
+    if (!households.has(key)) {
+      households.set(key, {
+        street: normalizeStreet(p.street),
+        houseNumber: normalizeHouseNumber(p.houseNumber),
+        residents: [],
+        subscriptionFeeUah: p.subscriptionFeeUah,
+        electricityUah: p.electricityUah,
+      });
+    }
+  }
+
+  const list = [...households.values()].sort((a, b) =>
+    formatAddressLine(a.street, a.houseNumber).localeCompare(
+      formatAddressLine(b.street, b.houseNumber),
+      locale,
+    ),
+  );
 
   return (
     <>
       <PageTitle title={t("chairTitle")} subtitle={t("chairSubtitle")} />
 
       <div className="flex flex-col gap-3">
-        {residents.map((u) => {
-          const total = u.subscriptionFeeUah + u.electricityUah;
+        {list.map((h) => {
+          const total = h.subscriptionFeeUah + h.electricityUah;
+          const residentNames = h.residents.map((r) => r.name).join(", ");
           return (
-            <Card key={u.id}>
+            <Card key={householdAddressKey(h.street, h.houseNumber)}>
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <p className="font-medium">{u.name}</p>
-                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                    {u.street} {u.houseNumber}
+                  <p className="text-lg font-semibold">
+                    {formatAddressLine(h.street, h.houseNumber)}
                   </p>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    {tt(u.tenancyType as "OWNER" | "TENANT")}
-                    {u.status !== "APPROVED" && (
-                      <span className="ml-2 text-amber-700 dark:text-amber-300">
-                        · {tc("addressStatus")}: {u.status}
-                      </span>
-                    )}
+                  <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
+                    {t("registeredResidents")}: {residentNames}
                   </p>
                 </div>
                 <p className="text-right text-sm font-semibold tabular-nums">
@@ -147,15 +221,16 @@ async function ChairPaymentsManageView() {
               </div>
               <div className="mt-4 border-t border-zinc-100 pt-3 dark:border-zinc-800">
                 <PaymentEditForm
-                  userId={u.id}
-                  subscriptionFeeUah={u.subscriptionFeeUah}
-                  electricityUah={u.electricityUah}
+                  street={h.street}
+                  houseNumber={h.houseNumber}
+                  subscriptionFeeUah={h.subscriptionFeeUah}
+                  electricityUah={h.electricityUah}
                 />
               </div>
             </Card>
           );
         })}
-        {residents.length === 0 && (
+        {list.length === 0 && (
           <Card>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
               {t("chairEmpty")}

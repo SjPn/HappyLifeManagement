@@ -31,11 +31,6 @@ model User {
 
   balanceUah Float @default(0)
 
-  /// Абонплата за поточний період (задає голова)
-  subscriptionFeeUah Float @default(0)
-  /// Сума за електроенергію за поточний період (задає голова)
-  electricityUah Float @default(0)
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -136,6 +131,19 @@ model ForumPost {
   userId    String
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime   @default(now())
+}
+
+/// Платежі за домоволодінням (вулиця + будинок); бачать усі мешканці з цією адресою
+model HouseholdPayment {
+  id                 String   @id @default(cuid())
+  street             String
+  houseNumber        String
+  subscriptionFeeUah Float    @default(0)
+  electricityUah     Float    @default(0)
+  updatedAt          DateTime @updatedAt
+  createdAt          DateTime @default(now())
+
+  @@unique([street, houseNumber])
 }
 
 model ConfidentialReport {

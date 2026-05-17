@@ -223,7 +223,8 @@
     "balanceNote": "Approximate dues balance: {amount}.",
     "disclaimer": "Amounts are informational; confirm details with the chair.",
     "chairTitle": "Resident payments",
-    "chairSubtitle": "Enter subscription and electricity for each home — residents see amounts under My payments.",
+    "chairSubtitle": "Enter amounts per address (household). Everyone registered at that address sees them under My payments.",
+    "registeredResidents": "Registered",
     "chairEmpty": "No resident accounts yet."
   },
   "profile": {
@@ -286,6 +287,7 @@
     "addressStatus": "Address status",
     "balance": "Balance (UAH)",
     "paymentsSection": "Home charges",
+    "paymentsManageLink": "Payments by address →",
     "subscriptionFee": "Subscription (UAH)",
     "electricityFee": "Electricity (UAH)",
     "reportsModTitle": "Moderate reports",

@@ -113,9 +113,20 @@ async function main() {
     },
   });
 
-  await prisma.user.update({
-    where: { id: resident.id },
-    data: {
+  await prisma.householdPayment.upsert({
+    where: {
+      street_houseNumber: {
+        street: resident.street.trim(),
+        houseNumber: resident.houseNumber.trim(),
+      },
+    },
+    create: {
+      street: resident.street.trim(),
+      houseNumber: resident.houseNumber.trim(),
+      subscriptionFeeUah: 850,
+      electricityUah: 420.5,
+    },
+    update: {
       subscriptionFeeUah: 850,
       electricityUah: 420.5,
     },

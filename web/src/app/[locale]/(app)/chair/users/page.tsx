@@ -5,9 +5,9 @@ import { redirect } from "next/navigation";
 import { PageTitle, Card } from "@/components/Ui";
 import { UserApproveSelect } from "@/components/UserApproveSelect";
 import { BalanceEditForm } from "@/components/BalanceEditForm";
-import { PaymentEditForm } from "@/components/PaymentEditForm";
 import { UserEditForm } from "@/components/UserEditForm";
 import { getLocale, getTranslations } from "next-intl/server";
+import { Role } from "@/lib/enums";
 
 export default async function ChairUsersPage() {
   const session = await auth();
@@ -30,6 +30,13 @@ export default async function ChairUsersPage() {
   return (
     <>
       <PageTitle title={t("usersTitle")} subtitle={t("usersSubtitle")} />
+      {isChair && (
+        <p className="mb-4 text-sm">
+          <Link href="/payments" className="font-semibold text-emerald-700 hover:underline">
+            {t("paymentsManageLink")}
+          </Link>
+        </p>
+      )}
       <div className="flex flex-col gap-3">
         {users.map((u) => (
           <Card key={u.id}>
@@ -58,19 +65,9 @@ export default async function ChairUsersPage() {
                 </div>
               </div>
             </div>
-            {isChair && (
+            {isChair && u.role === Role.RESIDENT && (
               <div className="mt-4 border-t border-zinc-100 pt-3 dark:border-zinc-800">
-                <p className="mb-2 text-xs font-semibold text-zinc-500">
-                  {t("paymentsSection")}
-                </p>
-                <PaymentEditForm
-                  userId={u.id}
-                  subscriptionFeeUah={u.subscriptionFeeUah}
-                  electricityUah={u.electricityUah}
-                />
-                <div className="mt-4 border-t border-zinc-100 pt-3 dark:border-zinc-800">
-                  <BalanceEditForm userId={u.id} balanceUah={u.balanceUah} />
-                </div>
+                <BalanceEditForm userId={u.id} balanceUah={u.balanceUah} />
               </div>
             )}
             {(session!.user!.role === "CHAIR" ||

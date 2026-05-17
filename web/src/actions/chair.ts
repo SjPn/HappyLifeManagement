@@ -64,24 +64,26 @@ function parseUah(raw: string) {
   return Number.isFinite(n) && n >= 0 ? n : null;
 }
 
-export async function setUserPayments(formData: FormData) {
+export async function setHouseholdPayments(formData: FormData) {
   const session = await auth();
   if (session?.user?.role !== "CHAIR") {
     return { error: "forbidden" as const };
   }
 
-  const userId = String(formData.get("userId") || "");
+  const street = String(formData.get("street") || "").trim();
+  const houseNumber = String(formData.get("houseNumber") || "").trim();
   const subscriptionFeeUah = parseUah(
     String(formData.get("subscriptionFeeUah") || ""),
   );
   const electricityUah = parseUah(String(formData.get("electricityUah") || ""));
-  if (!userId || subscriptionFeeUah === null || electricityUah === null) {
+  if (!street || !houseNumber || subscriptionFeeUah === null || electricityUah === null) {
     return { error: "badData" as const };
   }
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: { subscriptionFeeUah, electricityUah },
+  await prisma.householdPayment.upsert({
+    where: { street_houseNumber: { street, houseNumber } },
+    create: { street, houseNumber, subscriptionFeeUah, electricityUah },
+    update: { subscriptionFeeUah, electricityUah },
   });
 
   revalidateAllLocales("/chair");

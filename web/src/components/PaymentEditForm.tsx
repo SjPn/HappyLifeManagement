@@ -1,16 +1,18 @@
 "use client";
 
-import { setUserPayments } from "@/actions/chair";
+import { setHouseholdPayments } from "@/actions/chair";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export function PaymentEditForm({
-  userId,
+  street,
+  houseNumber,
   subscriptionFeeUah,
   electricityUah,
 }: {
-  userId: string;
+  street: string;
+  houseNumber: string;
   subscriptionFeeUah: number;
   electricityUah: number;
 }) {
@@ -22,16 +24,15 @@ export function PaymentEditForm({
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    const fd = new FormData(e.currentTarget);
-    fd.set("userId", userId);
-    await setUserPayments(fd);
+    await setHouseholdPayments(new FormData(e.currentTarget));
     setLoading(false);
     router.refresh();
   }
 
   return (
     <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-3">
-      <input type="hidden" name="userId" value={userId} />
+      <input type="hidden" name="street" value={street} />
+      <input type="hidden" name="houseNumber" value={houseNumber} />
       <label className="flex flex-col gap-1 text-xs">
         {t("subscriptionFee")}
         <input

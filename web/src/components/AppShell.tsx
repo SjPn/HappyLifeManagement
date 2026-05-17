@@ -53,7 +53,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))]">
-      <main className="relative z-0 mx-auto w-full max-w-lg flex-1 px-4 pb-2 pt-5 sm:px-5">
+      <main className="relative z-0 mx-auto w-full min-w-0 max-w-lg flex-1 px-4 pb-2 pt-5 sm:px-5">
         {children}
       </main>
 

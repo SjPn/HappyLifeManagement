@@ -1,7 +1,7 @@
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { PageTitle, Card, ButtonLink } from "@/components/Ui";
+import { PageTitle, Card, ButtonLink, DashboardGreeting } from "@/components/Ui";
 import { getLocale, getTranslations } from "next-intl/server";
 import { formatUah } from "@/lib/money";
 import { dateLocaleForUi } from "@/lib/dateLocale";
@@ -107,7 +107,7 @@ export default async function DashboardPage() {
   const paymentPeriodLabel = formatBillingPeriodLabel(locale, billingPeriod);
   const showPaymentsCard = Boolean(user?.street && user?.houseNumber);
 
-  const firstName = user?.name?.split(" ")[0] ?? t("neighbor");
+  const displayName = user?.name?.trim() || t("neighbor");
   const sectionLinkClass =
     "mb-3 mt-8 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 transition hover:text-emerald-700 dark:hover:text-emerald-300";
 
@@ -116,7 +116,9 @@ export default async function DashboardPage() {
       <MarkNotificationsSeen scopes={["news"]} />
       <PageTitle
         eyebrow={t("eyebrow")}
-        title={t("greeting", { name: firstName })}
+        title={
+          <DashboardGreeting hello={t("greetingHello")} name={displayName} />
+        }
         subtitle={t("addressLine", {
           street: user?.street ?? "",
           house: user?.houseNumber ?? "",

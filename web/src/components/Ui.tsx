@@ -5,26 +5,46 @@ export function PageTitle({
   subtitle,
   eyebrow,
 }: {
-  title: string;
+  title: React.ReactNode;
   subtitle?: string;
   eyebrow?: string;
 }) {
   return (
-    <header className="mb-7">
+    <header className="mb-7 min-w-0 max-w-full">
       {eyebrow && (
         <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-emerald-600/90 dark:text-emerald-400/90">
           {eyebrow}
         </p>
       )}
-      <h1 className="mt-2 text-[1.65rem] font-bold leading-tight tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+      <h1 className="mt-2 min-w-0 max-w-full text-2xl font-bold leading-snug tracking-tight break-words text-slate-900 [overflow-wrap:anywhere] sm:text-3xl dark:text-white">
         {title}
       </h1>
       {subtitle && (
-        <p className="mt-3 max-w-prose text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+        <p className="mt-3 max-w-full text-sm leading-relaxed break-words text-slate-600 dark:text-slate-400">
           {subtitle}
         </p>
       )}
     </header>
+  );
+}
+
+/** Привітання на головній: рядок «Вітаємо,» + ім’я на окремому рядку (мобільна вёрстка). */
+export function DashboardGreeting({
+  hello,
+  name,
+}: {
+  hello: string;
+  name: string;
+}) {
+  return (
+    <>
+      <span className="block text-lg font-semibold text-slate-600 sm:text-xl dark:text-slate-400">
+        {hello}
+      </span>
+      <span className="mt-0.5 block break-words font-bold text-slate-900 dark:text-white">
+        {name}
+      </span>
+    </>
   );
 }
 

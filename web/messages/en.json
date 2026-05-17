@@ -86,6 +86,7 @@
   "dashboard": {
     "eyebrow": "Home",
     "greeting": "Hello, {name}",
+    "greetingHello": "Hello,",
     "addressLine": "{street}, {house}",
     "neighbor": "neighbor",
     "quickTicket": "New request",

@@ -102,6 +102,7 @@
   "dashboard": {
     "eyebrow": "Головна",
     "greeting": "Вітаємо, {name}",
+    "greetingHello": "Вітаємо,",
     "addressLine": "{street}, {house}",
     "neighbor": "сусід",
     "quickTicket": "Заявка",

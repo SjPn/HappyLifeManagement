@@ -17,6 +17,7 @@ import { NewsSectionHeader } from "@/components/NewsSectionHeader";
 import { DashboardSectionLink } from "@/components/DashboardSectionLink";
 import { PaymentsReminderCard } from "@/components/PaymentsReminderCard";
 import { ChairDashboardActions } from "@/components/ChairDashboardActions";
+import { ChairPublishBlocks } from "@/components/ChairPublishBlocks";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -51,28 +52,32 @@ export default async function DashboardPage() {
   }
 
   const [news, votes, myTickets, user] = await Promise.all([
-    prisma.newsPost.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 4,
-      include: { author: { select: { name: true } } },
-    }),
-    prisma.vote.findMany({
-      where: {
-        AND: [
-          { OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }] },
-          voteAudienceWhere({
-            role: session!.user!.role,
-            tenancyType: session!.user!.tenancyType,
-          }),
-        ],
-      },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-      include: {
-        options: { orderBy: { sortOrder: "asc" } },
-        responses: { where: { userId } },
-      },
-    }),
+    isChair
+      ? Promise.resolve([])
+      : prisma.newsPost.findMany({
+          orderBy: { createdAt: "desc" },
+          take: 4,
+          include: { author: { select: { name: true } } },
+        }),
+    isChair
+      ? Promise.resolve([])
+      : prisma.vote.findMany({
+          where: {
+            AND: [
+              { OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }] },
+              voteAudienceWhere({
+                role: session!.user!.role,
+                tenancyType: session!.user!.tenancyType,
+              }),
+            ],
+          },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+          include: {
+            options: { orderBy: { sortOrder: "asc" } },
+            responses: { where: { userId } },
+          },
+        }),
     prisma.ticket.findMany({
       where: { userId, status: { not: "RESOLVED" } },
       orderBy: { createdAt: "desc" },
@@ -91,7 +96,7 @@ export default async function DashboardPage() {
 
   const billingPeriod = currentBillingPeriod();
   const householdBilling =
-    user?.street && user?.houseNumber
+    !isChair && user?.street && user?.houseNumber
       ? await prisma.householdBilling.findUnique({
           where: {
             street_houseNumber_periodYear_periodMonth: {
@@ -108,9 +113,8 @@ export default async function DashboardPage() {
     (householdBilling?.electricityUah ?? 0);
   const paymentPaid = householdBilling?.paidAt != null;
   const paymentPeriodLabel = formatBillingPeriodLabel(locale, billingPeriod);
-  const showResidentPaymentsCard = Boolean(
-    user?.street && user?.houseNumber,
-  );
+  const showResidentPaymentsCard =
+    !isChair && Boolean(user?.street && user?.houseNumber);
 
   const displayName = user?.name?.trim() || t("neighbor");
   const sectionLinkClass =
@@ -118,7 +122,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <MarkNotificationsSeen scopes={["news"]} />
+      {!isChair && <MarkNotificationsSeen scopes={["news"]} />}
       <PageTitle
         eyebrow={t("eyebrow")}
         title={
@@ -175,76 +179,85 @@ export default async function DashboardPage() {
         </PaymentsReminderCard>
       )}
 
-      <NewsSectionHeader
-        title={t("newsSection")}
-        className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-zinc-500"
-      />
-      <div className="flex flex-col gap-3">
-        {news.length === 0 && (
-          <Card>
-            <p className="text-sm text-zinc-600">{t("noNews")}</p>
-          </Card>
-        )}
-        {news.map((n) => (
-          <Card key={n.id}>
-            <p className="font-medium">{n.title}</p>
-            <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
-              {n.body}
-            </p>
-            <p className="mt-3 text-xs text-zinc-500">
-              {n.author.name} ·{" "}
-              {n.createdAt.toLocaleDateString(dateLocale, {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
-            </p>
-          </Card>
-        ))}
-      </div>
-
-      <DashboardSectionLink
-        href="/votes"
-        countKey="votes"
-        className={sectionLinkClass}
-      >
-        {t("votesSection")} →
-      </DashboardSectionLink>
-      <div className="flex flex-col gap-3">
-        {votes.length === 0 && (
-          <Card>
-            <p className="text-sm text-zinc-600">{t("noVotes")}</p>
-          </Card>
-        )}
-        {votes.map((v) => {
-          const voted = v.responses.length > 0;
-          return (
-            <Card key={v.id}>
-              <p className="font-medium">{v.title}</p>
-              {v.description && (
-                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                  {v.description}
+      {isChair ? (
+        <ChairPublishBlocks
+          newsEyebrow={tChair("newsEyebrow")}
+          voteEyebrow={tChair("voteEyebrow")}
+        />
+      ) : (
+        <>
+          <NewsSectionHeader
+            title={t("newsSection")}
+            className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-zinc-500"
+          />
+          <div className="flex flex-col gap-3">
+            {news.length === 0 && (
+              <Card>
+                <p className="text-sm text-zinc-600">{t("noNews")}</p>
+              </Card>
+            )}
+            {news.map((n) => (
+              <Card key={n.id}>
+                <p className="font-medium">{n.title}</p>
+                <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
+                  {n.body}
                 </p>
-              )}
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <ButtonLink href={`/votes/${v.id}`}>
-                  {voted ? t("voteChange") : t("voteAction")}
-                </ButtonLink>
-                {v.endsAt && (
-                  <span className="text-xs text-zinc-500">
-                    {t("voteUntil", {
-                      date: v.endsAt.toLocaleDateString(dateLocale, {
-                        day: "numeric",
-                        month: "long",
-                      }),
-                    })}
-                  </span>
-                )}
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+                <p className="mt-3 text-xs text-zinc-500">
+                  {n.author.name} ·{" "}
+                  {n.createdAt.toLocaleDateString(dateLocale, {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </p>
+              </Card>
+            ))}
+          </div>
+
+          <DashboardSectionLink
+            href="/votes"
+            countKey="votes"
+            className={sectionLinkClass}
+          >
+            {t("votesSection")} →
+          </DashboardSectionLink>
+          <div className="flex flex-col gap-3">
+            {votes.length === 0 && (
+              <Card>
+                <p className="text-sm text-zinc-600">{t("noVotes")}</p>
+              </Card>
+            )}
+            {votes.map((v) => {
+              const voted = v.responses.length > 0;
+              return (
+                <Card key={v.id}>
+                  <p className="font-medium">{v.title}</p>
+                  {v.description && (
+                    <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                      {v.description}
+                    </p>
+                  )}
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <ButtonLink href={`/votes/${v.id}`}>
+                      {voted ? t("voteChange") : t("voteAction")}
+                    </ButtonLink>
+                    {v.endsAt && (
+                      <span className="text-xs text-zinc-500">
+                        {t("voteUntil", {
+                          date: v.endsAt.toLocaleDateString(dateLocale, {
+                            day: "numeric",
+                            month: "long",
+                          }),
+                        })}
+                      </span>
+                    )}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       <DashboardSectionLink
         href="/requests"

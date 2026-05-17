@@ -1,9 +1,7 @@
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { PageTitle, Card } from "@/components/Ui";
-import { NewsCreateForm } from "@/components/NewsCreateForm";
-import { VoteCreateForm } from "@/components/VoteCreateForm";
+import { PageTitle } from "@/components/Ui";
 import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function ChairHomePage() {
@@ -57,24 +55,6 @@ export default async function ChairHomePage() {
           {t("moderation")}
         </Link>
       </div>
-
-      {isChair && (
-        <>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-            {t("newsEyebrow")}
-          </h2>
-          <Card className="mb-8">
-            <NewsCreateForm />
-          </Card>
-
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-            {t("voteEyebrow")}
-          </h2>
-          <Card className="mb-8">
-            <VoteCreateForm />
-          </Card>
-        </>
-      )}
 
       <p className="text-center text-sm">
         <Link href="/profile" className="text-emerald-700 hover:underline">

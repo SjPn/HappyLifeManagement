@@ -6,6 +6,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { forumTopicAudienceWhere } from "@/lib/audience";
 import { redirect } from "next/navigation";
+import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 
 export default async function ForumListPage() {
   const session = await auth();
@@ -32,6 +33,7 @@ export default async function ForumListPage() {
 
   return (
     <>
+      <MarkNotificationsSeen scopes={["forum"]} />
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
       <div className="mb-4">
         <ButtonLink href="/community/forum/new">{t("newTopic")}</ButtonLink>

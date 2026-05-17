@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
+import { NotificationProvider } from "@/components/NotificationProvider";
 
 export default async function AppGroupLayout({
   children,
@@ -18,5 +19,9 @@ export default async function AppGroupLayout({
     redirect(`/${locale}/pending`);
   }
 
-  return <AppShell>{children}</AppShell>;
+  return (
+    <NotificationProvider>
+      <AppShell>{children}</AppShell>
+    </NotificationProvider>
+  );
 }

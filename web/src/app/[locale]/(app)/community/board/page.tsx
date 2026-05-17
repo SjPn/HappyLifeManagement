@@ -5,6 +5,7 @@ import { PageTitle, Card, ButtonLink } from "@/components/Ui";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { redirect } from "next/navigation";
+import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 
 export default async function BoardPage() {
   const session = await auth();
@@ -26,6 +27,7 @@ export default async function BoardPage() {
 
   return (
     <>
+      <MarkNotificationsSeen scopes={["board"]} />
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
       <div className="mb-4">
         <ButtonLink href="/community/board/new">{t("new")}</ButtonLink>

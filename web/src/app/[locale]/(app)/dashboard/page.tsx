@@ -12,6 +12,10 @@ import {
   formatBillingPeriodLabel,
 } from "@/lib/billing";
 import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
+import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
+import { NewsSectionHeader } from "@/components/NewsSectionHeader";
+import { DashboardSectionLink } from "@/components/DashboardSectionLink";
+import { PaymentsReminderCard } from "@/components/PaymentsReminderCard";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -109,6 +113,7 @@ export default async function DashboardPage() {
 
   return (
     <>
+      <MarkNotificationsSeen scopes={["news"]} />
       <PageTitle
         eyebrow={t("eyebrow")}
         title={t("greeting", { name: firstName })}
@@ -132,35 +137,34 @@ export default async function DashboardPage() {
       )}
 
       {showPaymentsCard && (
-        <Link href="/payments" className="mt-3 block">
-          <Card className="transition hover:border-emerald-300 hover:bg-emerald-50/30 dark:hover:border-emerald-800 dark:hover:bg-emerald-950/20">
-            <p className="text-sm font-medium">{t("paymentsReminderTitle")}</p>
-            <p className="mt-0.5 text-xs text-zinc-500 capitalize">
-              {paymentPeriodLabel}
+        <PaymentsReminderCard>
+          <p className="text-sm font-medium">{t("paymentsReminderTitle")}</p>
+          <p className="mt-0.5 text-xs text-zinc-500 capitalize">
+            {paymentPeriodLabel}
+          </p>
+          {paymentPaid ? (
+            <p className="mt-1 text-sm font-medium text-emerald-700 dark:text-emerald-300">
+              {t("paymentsPaidOnHome")}
             </p>
-            {paymentPaid ? (
-              <p className="mt-1 text-sm font-medium text-emerald-700 dark:text-emerald-300">
-                {t("paymentsPaidOnHome")}
-              </p>
-            ) : (
-              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                {paymentTotal > 0
-                  ? t("paymentsReminderText", {
-                      amount: formatUah(paymentTotal, locale),
-                    })
-                  : t("paymentsReminderZero")}
-              </p>
-            )}
-            <p className="mt-3 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
-              {t("paymentsLink")}
+          ) : (
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+              {paymentTotal > 0
+                ? t("paymentsReminderText", {
+                    amount: formatUah(paymentTotal, locale),
+                  })
+                : t("paymentsReminderZero")}
             </p>
-          </Card>
-        </Link>
+          )}
+          <p className="mt-3 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+            {t("paymentsLink")}
+          </p>
+        </PaymentsReminderCard>
       )}
 
-      <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-        {t("newsSection")}
-      </h2>
+      <NewsSectionHeader
+        title={t("newsSection")}
+        className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-zinc-500"
+      />
       <div className="flex flex-col gap-3">
         {news.length === 0 && (
           <Card>
@@ -185,9 +189,13 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      <Link href="/votes" className={sectionLinkClass}>
+      <DashboardSectionLink
+        href="/votes"
+        countKey="votes"
+        className={sectionLinkClass}
+      >
         {t("votesSection")} →
-      </Link>
+      </DashboardSectionLink>
       <div className="flex flex-col gap-3">
         {votes.length === 0 && (
           <Card>
@@ -224,9 +232,13 @@ export default async function DashboardPage() {
         })}
       </div>
 
-      <Link href="/requests" className={sectionLinkClass}>
+      <DashboardSectionLink
+        href="/requests"
+        countKey="tickets"
+        className={sectionLinkClass}
+      >
         {t("ticketsSection")} →
-      </Link>
+      </DashboardSectionLink>
       <div className="flex flex-col gap-2">
         {myTickets.length === 0 && (
           <Card>

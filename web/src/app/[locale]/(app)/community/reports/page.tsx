@@ -6,6 +6,7 @@ import { ConfidentialNewForm } from "@/components/ConfidentialNewForm";
 import { getTranslations } from "next-intl/server";
 import { getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 
 export default async function ReportsPage() {
   const session = await auth();
@@ -28,6 +29,7 @@ export default async function ReportsPage() {
 
   return (
     <>
+      <MarkNotificationsSeen scopes={["reports"]} />
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
 
       <Card className="mb-6">

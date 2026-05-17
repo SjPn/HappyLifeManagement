@@ -6,6 +6,7 @@ import { TicketStatusForm } from "@/components/TicketStatusForm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { redirect } from "next/navigation";
+import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 
 export default async function RequestsPage() {
   const session = await auth();
@@ -33,6 +34,7 @@ export default async function RequestsPage() {
 
   return (
     <>
+      <MarkNotificationsSeen scopes={["tickets"]} />
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
       <div className="mb-4 flex gap-2">
         <ButtonLink href="/requests/new">{t("new")}</ButtonLink>

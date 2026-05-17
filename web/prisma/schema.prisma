@@ -44,6 +44,20 @@ model User {
   forumPosts      ForumPost[]
   reportsAuthored ConfidentialReport[] @relation("ReportAuthor")
   newsAuthored    NewsPost[]           @relation("NewsAuthor")
+  seenState       UserSeenState?
+}
+
+/// Коли користувач останній раз відкривав розділ (для червоних лічильників «нове»)
+model UserSeenState {
+  userId     String   @id
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  newsAt     DateTime @default(now())
+  votesAt    DateTime @default(now())
+  ticketsAt  DateTime @default(now())
+  paymentsAt DateTime @default(now())
+  boardAt    DateTime @default(now())
+  forumAt    DateTime @default(now())
+  reportsAt  DateTime @default(now())
 }
 
 model NewsPost {

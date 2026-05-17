@@ -11,12 +11,33 @@ import {
   UsersRound,
   LayoutGrid,
 } from "lucide-react";
+import { NotificationBadge } from "@/components/NotificationBadge";
+import { useNotifications } from "@/components/NotificationProvider";
+import type { NotificationCounts } from "@/lib/notifications";
 
-const tabs = [
-  { href: "/dashboard", navKey: "home" as const, Icon: Home },
-  { href: "/requests", navKey: "requests" as const, Icon: ClipboardList },
-  { href: "/community", navKey: "community" as const, Icon: UsersRound },
-  { href: "/profile", navKey: "more" as const, Icon: LayoutGrid },
+const tabs: {
+  href: string;
+  navKey: "home" | "requests" | "community" | "more";
+  Icon: typeof Home;
+  countKey?: keyof Pick<
+    NotificationCounts,
+    "home" | "requests" | "community"
+  >;
+}[] = [
+  { href: "/dashboard", navKey: "home", Icon: Home, countKey: "home" },
+  {
+    href: "/requests",
+    navKey: "requests",
+    Icon: ClipboardList,
+    countKey: "requests",
+  },
+  {
+    href: "/community",
+    navKey: "community",
+    Icon: UsersRound,
+    countKey: "community",
+  },
+  { href: "/profile", navKey: "more", Icon: LayoutGrid },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -25,6 +46,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { data } = useSession();
   const role = (data?.user as { role?: string } | undefined)?.role;
   const isModerator = role === "MODERATOR";
+  const { counts } = useNotifications();
   const visibleTabs = isModerator
     ? tabs.filter((x) => x.href !== "/requests" && x.href !== "/community")
     : tabs;
@@ -43,6 +65,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 ? pathname === "/dashboard"
                 : pathname.startsWith(tab.href);
             const Icon = tab.Icon;
+            const badgeCount = tab.countKey ? counts[tab.countKey] : 0;
             return (
               <Link
                 key={tab.href}
@@ -54,13 +77,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 }`}
               >
                 <span
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-200 group-active:scale-95 ${
+                  className={`relative flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-200 group-active:scale-95 ${
                     active
                       ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/25 dark:bg-emerald-500 dark:shadow-emerald-500/20"
                       : "bg-slate-100/90 text-slate-600 dark:bg-slate-800/90 dark:text-slate-300"
                   }`}
                 >
                   <Icon className="h-[1.35rem] w-[1.35rem]" strokeWidth={2} />
+                  <NotificationBadge count={badgeCount} />
                 </span>
                 <span className="max-w-full truncate px-0.5 text-[0.65rem] font-semibold leading-none tracking-tight">
                   {t(tab.navKey)}

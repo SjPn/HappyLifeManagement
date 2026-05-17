@@ -6,6 +6,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { voteAudienceWhere } from "@/lib/audience";
 import { redirect } from "next/navigation";
+import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 
 export default async function VotesListPage() {
   const session = await auth();
@@ -34,6 +35,7 @@ export default async function VotesListPage() {
 
   return (
     <>
+      <MarkNotificationsSeen scopes={["votes"]} />
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
       <div className="flex flex-col gap-3">
         {votes.map((v) => {

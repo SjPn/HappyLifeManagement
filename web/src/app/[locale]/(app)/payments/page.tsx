@@ -16,6 +16,7 @@ import {
   parseBillingPeriod,
   type BillingPeriod,
 } from "@/lib/billing";
+import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 import {
   formatAddressLine,
   householdAddressKey,
@@ -89,6 +90,7 @@ async function ResidentPaymentsView({
 
   return (
     <>
+      <MarkNotificationsSeen scopes={["payments"]} />
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
 
       <PaymentPeriodNav period={period} />
@@ -205,9 +207,6 @@ async function ResidentPaymentsView({
         </ButtonLink>
       </div>
 
-      <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400">
-        {t("disclaimer")}
-      </p>
     </>
   );
 }
@@ -307,6 +306,7 @@ async function ChairPaymentsManageView({ period }: { period: BillingPeriod }) {
 
   return (
     <>
+      <MarkNotificationsSeen scopes={["payments"]} />
       <PageTitle
         title={t("chairTitle")}
         subtitle={t("chairSubtitle", { period: periodLabel })}

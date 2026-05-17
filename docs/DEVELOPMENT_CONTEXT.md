@@ -6,10 +6,10 @@
 
 > **Назначение:** срез состояния, который актуализируется в конце каждой сессии. Если что-то ниже устарело — сначала обнови этот блок и `TODO_ROADMAP.md`, потом продолжай.
 
-**Последняя дата апдейта:** 2026-05-09 · Ветка: `main` · Последние коммиты:
+**Последняя дата апдейта:** 2026-05-09 · Ветка: `main` · Последние коммиты (см. `git log -5`):
 
-- `56e9294 chore: drop one-off scripts and dead code` — удалены одноразовые скрипты, sqlite-схема, сгенерированный sqlite-клиент, неиспользуемые экспорты в `web/src/lib/enums.ts`.
-- `8147415 docs: refresh production context and remove duplicates` — обновили README/PROJECT_OVERVIEW/DEVELOPMENT_CONTEXT/TODO_ROADMAP под фактический MVP.
+- Раздел **«Мої платежі»** (`/{locale}/payments`): житель видит абонплату + електроенергію; голова вносить в `/{locale}/chair/users` (поля `User.subscriptionFeeUah`, `User.electricityUah`). Старий `/meters` — редірект. Модель `MeterReading` удалена.
+- `211f378 docs: capture session-resume snapshot` · `56e9294 chore: drop one-off scripts and dead code`
 
 **Где код:** `web/` (Next.js 16 App Router + Prisma 5 + Postgres + Auth.js v5 + next-intl). База — Postgres (Neon), на Vercel — единый деплой.
 
@@ -20,8 +20,8 @@
 - Регистрация: владелец/арендатор + согласие с меморандумом (`memorandumAcceptedAt`/`memorandumVersion`).
 - Сообщество: дошка, форум (тема + ответы + первый пост), конфиденциальные обращения; авторы редактируют свои объявления и темы; персонал удаляет любой контент через `/{locale}/chair/moderation`.
 - Голосования: создаёт только `CHAIR`, аудитория `ALL`/`OWNERS_ONLY`/`TENANTS_ONLY`, удаление через панель модерации.
-- `MODERATOR` — служебная роль: видит автора конфиденциальных обращений, не голосует, не публикует, не правит балансы; для него `dashboard` упрощённый, а `requests`/`community`/`votes`/`meters` редиректят в `/chair`.
-- Публичные страницы до логина: `/{locale}/info/memorandum`, `/{locale}/info/tariffs`. Каталог жителей: `/{locale}/residents`.
+- `MODERATOR` — служебная роль: видит автора конфиденциальных обращений, не голосует, не публикует, не правит балансы; для него `dashboard` упрощённый, а `requests`/`community`/`votes`/`payments` редиректят в `/chair`.
+- Публичные страницы до логина: `/{locale}/info/memorandum`, `/{locale}/info/tariffs`. Каталог жителей: `/{locale}/residents`. **Мои платежи:** `/{locale}/payments` (абонплата + электроэнергия; вносит `CHAIR` в `chair/users`).
 
 **Известные не-блокеры (на потом):**
 

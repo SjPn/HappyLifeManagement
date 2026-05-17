@@ -113,11 +113,11 @@ async function main() {
     },
   });
 
-  await prisma.meterReading.create({
+  await prisma.user.update({
+    where: { id: resident.id },
     data: {
-      userId: resident.id,
-      value: 42.5,
-      note: "Холодная вода, апрель",
+      subscriptionFeeUah: 850,
+      electricityUah: 420.5,
     },
   });
 

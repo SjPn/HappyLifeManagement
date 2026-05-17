@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { PageTitle, Card } from "@/components/Ui";
 import { UserApproveSelect } from "@/components/UserApproveSelect";
 import { BalanceEditForm } from "@/components/BalanceEditForm";
+import { PaymentEditForm } from "@/components/PaymentEditForm";
 import { UserEditForm } from "@/components/UserEditForm";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -59,7 +60,17 @@ export default async function ChairUsersPage() {
             </div>
             {isChair && (
               <div className="mt-4 border-t border-zinc-100 pt-3 dark:border-zinc-800">
-                <BalanceEditForm userId={u.id} balanceUah={u.balanceUah} />
+                <p className="mb-2 text-xs font-semibold text-zinc-500">
+                  {t("paymentsSection")}
+                </p>
+                <PaymentEditForm
+                  userId={u.id}
+                  subscriptionFeeUah={u.subscriptionFeeUah}
+                  electricityUah={u.electricityUah}
+                />
+                <div className="mt-4 border-t border-zinc-100 pt-3 dark:border-zinc-800">
+                  <BalanceEditForm userId={u.id} balanceUah={u.balanceUah} />
+                </div>
               </div>
             )}
             {(session!.user!.role === "CHAIR" ||

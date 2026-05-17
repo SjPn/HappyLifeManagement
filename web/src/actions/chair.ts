@@ -53,8 +53,42 @@ export async function setUserBalance(formData: FormData) {
   });
 
   revalidateAllLocales("/chair");
+  revalidateAllLocales("/chair/users");
+  revalidateAllLocales("/payments");
   revalidateAllLocales("/profile");
   return { ok: true };
+}
+
+function parseUah(raw: string) {
+  const n = Number(raw.replace(",", "."));
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
+export async function setUserPayments(formData: FormData) {
+  const session = await auth();
+  if (session?.user?.role !== "CHAIR") {
+    return { error: "forbidden" as const };
+  }
+
+  const userId = String(formData.get("userId") || "");
+  const subscriptionFeeUah = parseUah(
+    String(formData.get("subscriptionFeeUah") || ""),
+  );
+  const electricityUah = parseUah(String(formData.get("electricityUah") || ""));
+  if (!userId || subscriptionFeeUah === null || electricityUah === null) {
+    return { error: "badData" as const };
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { subscriptionFeeUah, electricityUah },
+  });
+
+  revalidateAllLocales("/chair");
+  revalidateAllLocales("/chair/users");
+  revalidateAllLocales("/payments");
+  revalidateAllLocales("/dashboard");
+  return { ok: true as const };
 }
 
 export async function updateUserProfile(formData: FormData) {

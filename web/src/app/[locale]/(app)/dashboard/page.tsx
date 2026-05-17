@@ -37,7 +37,7 @@ export default async function DashboardPage() {
     );
   }
 
-  const [news, votes, myTickets, lastReading, user] = await Promise.all([
+  const [news, votes, myTickets, user] = await Promise.all([
     prisma.newsPost.findMany({
       orderBy: { createdAt: "desc" },
       take: 4,
@@ -65,26 +65,21 @@ export default async function DashboardPage() {
       orderBy: { createdAt: "desc" },
       take: 5,
     }),
-    prisma.meterReading.findFirst({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-    }),
     prisma.user.findUnique({
       where: { id: userId },
       select: {
         name: true,
         balanceUah: true,
+        subscriptionFeeUah: true,
+        electricityUah: true,
         street: true,
         houseNumber: true,
       },
     }),
   ]);
 
-  const now = new Date();
-  const remindMeter =
-    !lastReading ||
-    now.getTime() - lastReading.createdAt.getTime() >
-      25 * 24 * 60 * 60 * 1000;
+  const hasPayments =
+    (user?.subscriptionFeeUah ?? 0) > 0 || (user?.electricityUah ?? 0) > 0;
 
   const firstName = user?.name?.split(" ")[0] ?? t("neighbor");
 
@@ -108,8 +103,8 @@ export default async function DashboardPage() {
           <ButtonLink href="/votes" variant="secondary">
             {t("quickVotes")}
           </ButtonLink>
-          <ButtonLink href="/meters" variant="secondary">
-            {t("quickMeters")}
+          <ButtonLink href="/payments" variant="secondary">
+            {t("quickPayments")}
           </ButtonLink>
         </div>
       </section>
@@ -127,17 +122,22 @@ export default async function DashboardPage() {
         </Card>
       )}
 
-      {remindMeter && (
+      {hasPayments && (
         <Card className="mt-3">
-          <p className="text-sm font-medium">{t("metersReminderTitle")}</p>
+          <p className="text-sm font-medium">{t("paymentsReminderTitle")}</p>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            {t("metersReminderText")}
+            {t("paymentsReminderText", {
+              amount: formatUah(
+                (user?.subscriptionFeeUah ?? 0) + (user?.electricityUah ?? 0),
+                locale,
+              ),
+            })}
           </p>
           <Link
-            href="/meters"
+            href="/payments"
             className="mt-3 inline-block text-sm font-semibold text-emerald-700 hover:underline"
           >
-            {t("metersLink")}
+            {t("paymentsLink")}
           </Link>
         </Card>
       )}

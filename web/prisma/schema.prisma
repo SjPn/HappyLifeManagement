@@ -31,6 +31,11 @@ model User {
 
   balanceUah Float @default(0)
 
+  /// Абонплата за поточний період (задає голова)
+  subscriptionFeeUah Float @default(0)
+  /// Сума за електроенергію за поточний період (задає голова)
+  electricityUah Float @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -40,7 +45,6 @@ model User {
   forumTopics     ForumTopic[]
   forumPosts      ForumPost[]
   reportsAuthored ConfidentialReport[] @relation("ReportAuthor")
-  meterReadings   MeterReading[]
   newsAuthored    NewsPost[]           @relation("NewsAuthor")
 }
 
@@ -147,11 +151,3 @@ model ConfidentialReport {
   createdAt DateTime @default(now())
 }
 
-model MeterReading {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  value     Float
-  note      String?
-  createdAt DateTime @default(now())
-}

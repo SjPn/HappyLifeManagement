@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { PageTitle, Card } from "@/components/Ui";
+import { PageTitle, Card, ButtonLink } from "@/components/Ui";
 import { PaymentEditForm } from "@/components/PaymentEditForm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { formatUah } from "@/lib/money";
@@ -29,6 +29,7 @@ async function ResidentPaymentsView({
   locale: string;
 }) {
   const t = await getTranslations("payments");
+  const tp = await getTranslations("profile");
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -107,7 +108,13 @@ async function ResidentPaymentsView({
         </Card>
       )}
 
-      <p className="mt-6 text-xs text-zinc-500 dark:text-zinc-400">
+      <div className="mt-6">
+        <ButtonLink href="/info/tariffs" variant="secondary">
+          {tp("tariffsLink")}
+        </ButtonLink>
+      </div>
+
+      <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400">
         {t("disclaimer")}
       </p>
     </>

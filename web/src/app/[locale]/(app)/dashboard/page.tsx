@@ -93,7 +93,8 @@ export default async function DashboardPage() {
     (householdPayment?.electricityUah ?? 0) > 0;
 
   const firstName = user?.name?.split(" ")[0] ?? t("neighbor");
-  const isChair = session!.user!.role === "CHAIR";
+  const sectionLinkClass =
+    "mb-3 mt-8 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 transition hover:text-emerald-700 dark:hover:text-emerald-300";
 
   return (
     <>
@@ -105,21 +106,6 @@ export default async function DashboardPage() {
           house: user?.houseNumber ?? "",
         })}
       />
-
-      <section className="grid gap-3">
-        <div className="grid grid-cols-2 gap-2">
-          <ButtonLink href="/requests/new">{t("quickTicket")}</ButtonLink>
-          <ButtonLink href="/community/reports" variant="secondary">
-            {t("quickReport")}
-          </ButtonLink>
-          <ButtonLink href="/votes" variant="secondary">
-            {t("quickVotes")}
-          </ButtonLink>
-          <ButtonLink href="/payments" variant="secondary">
-            {isChair ? t("quickPaymentsManage") : t("quickPayments")}
-          </ButtonLink>
-        </div>
-      </section>
 
       {(user?.balanceUah ?? 0) > 0 && (
         <Card className="mt-6 border-amber-200 bg-amber-50/80 dark:border-amber-900 dark:bg-amber-950/40">
@@ -135,24 +121,23 @@ export default async function DashboardPage() {
       )}
 
       {hasPayments && (
-        <Card className="mt-3">
-          <p className="text-sm font-medium">{t("paymentsReminderTitle")}</p>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            {t("paymentsReminderText", {
-              amount: formatUah(
-                (householdPayment?.subscriptionFeeUah ?? 0) +
-                  (householdPayment?.electricityUah ?? 0),
-                locale,
-              ),
-            })}
-          </p>
-          <Link
-            href="/payments"
-            className="mt-3 inline-block text-sm font-semibold text-emerald-700 hover:underline"
-          >
-            {t("paymentsLink")}
-          </Link>
-        </Card>
+        <Link href="/payments" className="mt-3 block">
+          <Card className="transition hover:border-emerald-300 hover:bg-emerald-50/30 dark:hover:border-emerald-800 dark:hover:bg-emerald-950/20">
+            <p className="text-sm font-medium">{t("paymentsReminderTitle")}</p>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+              {t("paymentsReminderText", {
+                amount: formatUah(
+                  (householdPayment?.subscriptionFeeUah ?? 0) +
+                    (householdPayment?.electricityUah ?? 0),
+                  locale,
+                ),
+              })}
+            </p>
+            <p className="mt-3 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+              {t("paymentsLink")} →
+            </p>
+          </Card>
+        </Link>
       )}
 
       <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-zinc-500">
@@ -182,9 +167,9 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-        {t("votesSection")}
-      </h2>
+      <Link href="/votes" className={sectionLinkClass}>
+        {t("votesSection")} →
+      </Link>
       <div className="flex flex-col gap-3">
         {votes.length === 0 && (
           <Card>
@@ -221,9 +206,9 @@ export default async function DashboardPage() {
         })}
       </div>
 
-      <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-        {t("ticketsSection")}
-      </h2>
+      <Link href="/requests" className={sectionLinkClass}>
+        {t("ticketsSection")} →
+      </Link>
       <div className="flex flex-col gap-2">
         {myTickets.length === 0 && (
           <Card>

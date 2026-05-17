@@ -28,6 +28,11 @@ export default async function CommunityHubPage() {
       title: t("reportsTitle"),
       desc: t("reportsDesc"),
     },
+    {
+      href: "/residents" as const,
+      title: t("residentsTitle"),
+      desc: t("residentsDesc"),
+    },
   ];
 
   return (

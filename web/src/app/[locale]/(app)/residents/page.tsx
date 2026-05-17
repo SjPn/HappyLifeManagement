@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PageTitle, Card } from "@/components/Ui";
@@ -8,6 +9,12 @@ export default async function ResidentsPage() {
   const session = await auth();
   const t = await getTranslations("residents");
   const tt = await getTranslations("categories.tenancy");
+  const isStaff =
+    session?.user?.role === "MODERATOR" || session?.user?.role === "CHAIR";
+  const backHref = isStaff ? "/chair" : "/community";
+  const backLabel = isStaff
+    ? (await getTranslations("chair"))("backPanel")
+    : (await getTranslations("board"))("back");
 
   const users = await prisma.user.findMany({
     where: { status: "APPROVED", role: "RESIDENT" },
@@ -67,6 +74,12 @@ export default async function ResidentsPage() {
           </p>
         </Card>
       )}
+
+      <p className="mt-6 text-center text-sm">
+        <Link href={backHref} className="text-emerald-700 hover:underline">
+          {backLabel}
+        </Link>
+      </p>
     </>
   );
 }

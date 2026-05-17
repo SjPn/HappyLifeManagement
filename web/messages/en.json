@@ -156,7 +156,9 @@
     "forumTitle": "Forum",
     "forumDesc": "Topics and replies with neighbors",
     "reportsTitle": "Confidential reports",
-    "reportsDesc": "Processing rules apply; moderators see the author"
+    "reportsDesc": "Processing rules apply; moderators see the author",
+    "residentsTitle": "Residents",
+    "residentsDesc": "Approved owners and tenants with addresses"
   },
   "board": {
     "title": "Community board",
@@ -303,6 +305,7 @@
     "subtitleModerator": "Your tools: confidential reports and user management. No publishing or finances.",
     "addresses": "Community home addresses",
     "users": "Residents & address status",
+    "residentsDirectory": "Resident directory (addresses)",
     "reports": "Confidential reports",
     "moderation": "Content moderation",
     "newsEyebrow": "News post",

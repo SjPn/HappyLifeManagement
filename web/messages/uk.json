@@ -123,6 +123,9 @@
     "reminderDues": "Нагадування",
     "duesText": "За даними ради, орієнтовна заборгованість: {amount}. Деталі — у голови.",
     "paymentsReminderTitle": "Мої платежі",
+    "paymentsManageTitle": "Керування платежами",
+    "paymentsManageHint": "Нарахування та позначки про оплату по будинках.",
+    "paymentsManageLink": "Перейти до керування платежами →",
     "paymentsReminderText": "Сума до сплати за поточний період: {amount}.",
     "paymentsReminderZero": "Нарахування за поточний період ще не внесені або дорівнюють нулю.",
     "paymentsPaidOnHome": "За поточний період відмічено як оплачено.",
@@ -275,7 +278,7 @@
     "paymentsManageLink": "Платежі мешканців",
     "tariffsLink": "Тарифи містечка",
     "memorandumLink": "Меморандум взаємодії",
-    "chairPanel": "Панель голови / модерації",
+    "chairPanel": "Управління",
     "signOut": "Вийти",
     "tenancyTitle": "Проживання",
     "editProfile": "Редагувати профіль"
@@ -314,7 +317,7 @@
     "deleteConfirm": "Видалити цю адресу зі списку?",
     "empty": "Адрес поки немає. Додайте перший будинок.",
     "residentsCount": "Зареєстровано: {count}",
-    "backPanel": "← Панель"
+    "backPanel": "← Управління"
   },
   "profileEdit": {
     "name": "ПІБ",
@@ -349,7 +352,7 @@
     "reportsModTitle": "Модерація звернень",
     "reportsModSubtitle": "Автор видно лише тут. Публікація в стрічку — окремою дією.",
     "authorOnly": "Автор (лише для модерації):",
-    "backPanel": "← Панель",
+    "backPanel": "← Управління",
     "reportsEmpty": "Звернень немає.",
     "modStatus": "Статус:",
     "modInFeed": "у стрічці",

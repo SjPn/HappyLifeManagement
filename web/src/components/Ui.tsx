@@ -66,15 +66,18 @@ export function ButtonLink({
   href,
   children,
   variant = "primary",
+  className = "",
 }: {
   href: string;
   children: React.ReactNode;
   variant?: "primary" | "secondary";
+  className?: string;
 }) {
-  const cls =
+  const base =
     variant === "primary"
       ? "inline-flex h-11 min-h-[2.75rem] items-center justify-center rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition hover:from-emerald-500 hover:to-teal-500 hover:shadow-emerald-500/30 active:scale-[0.98] dark:from-emerald-500 dark:to-teal-500 dark:shadow-emerald-900/40"
       : "inline-flex h-11 min-h-[2.75rem] items-center justify-center rounded-xl border border-slate-200/90 bg-white/90 px-4 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-emerald-200 hover:bg-emerald-50/80 active:scale-[0.98] dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:border-emerald-800 dark:hover:bg-emerald-950/30";
+  const cls = className ? `${base} ${className}` : base;
   return (
     <Link href={href} className={cls}>
       {children}

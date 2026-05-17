@@ -107,6 +107,9 @@
     "reminderDues": "Reminder",
     "duesText": "Per board records, approximate balance due: {amount}. Details from the chair.",
     "paymentsReminderTitle": "My payments",
+    "paymentsManageTitle": "Payment management",
+    "paymentsManageHint": "Charges and paid flags by home address.",
+    "paymentsManageLink": "Go to payment management →",
     "paymentsReminderText": "Amount due for the current period: {amount}.",
     "paymentsReminderZero": "No charges for this period yet, or the total is zero.",
     "paymentsPaidOnHome": "Marked as paid for the current period.",
@@ -259,7 +262,7 @@
     "paymentsManageLink": "Resident payments",
     "tariffsLink": "Community tariffs",
     "memorandumLink": "Resident memorandum",
-    "chairPanel": "Chair / moderation panel",
+    "chairPanel": "Management",
     "signOut": "Sign out",
     "tenancyTitle": "Residency",
     "editProfile": "Edit profile"
@@ -298,7 +301,7 @@
     "deleteConfirm": "Remove this address from the list?",
     "empty": "No addresses yet. Add the first home.",
     "residentsCount": "Registered: {count}",
-    "backPanel": "← Panel"
+    "backPanel": "← Management"
   },
   "profileEdit": {
     "name": "Full name",
@@ -333,7 +336,7 @@
     "reportsModTitle": "Moderate reports",
     "reportsModSubtitle": "Author visible here only. Publish to feed separately.",
     "authorOnly": "Author (moderators only):",
-    "backPanel": "← Panel",
+    "backPanel": "← Management",
     "reportsEmpty": "No reports.",
     "modStatus": "Status:",
     "modInFeed": "in feed",

@@ -16,6 +16,7 @@ import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 import { NewsSectionHeader } from "@/components/NewsSectionHeader";
 import { DashboardSectionLink } from "@/components/DashboardSectionLink";
 import { PaymentsReminderCard } from "@/components/PaymentsReminderCard";
+import { ChairDashboardActions } from "@/components/ChairDashboardActions";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -107,8 +108,9 @@ export default async function DashboardPage() {
     (householdBilling?.electricityUah ?? 0);
   const paymentPaid = householdBilling?.paidAt != null;
   const paymentPeriodLabel = formatBillingPeriodLabel(locale, billingPeriod);
-  const showPaymentsCard =
-    isChair || Boolean(user?.street && user?.houseNumber);
+  const showResidentPaymentsCard = Boolean(
+    user?.street && user?.houseNumber,
+  );
 
   const displayName = user?.name?.trim() || t("neighbor");
   const sectionLinkClass =
@@ -141,46 +143,36 @@ export default async function DashboardPage() {
         </Card>
       )}
 
-      {showPaymentsCard && (
-        <>
-          <PaymentsReminderCard>
-            <p className="text-sm font-medium">
-              {isChair
-                ? t("paymentsManageTitle")
-                : t("paymentsReminderTitle")}
+      {isChair && (
+        <ChairDashboardActions
+          paymentsLabel={t("chairPaymentsButton")}
+          managementLabel={tChair("title")}
+        />
+      )}
+
+      {!isChair && showResidentPaymentsCard && (
+        <PaymentsReminderCard>
+          <p className="text-sm font-medium">{t("paymentsReminderTitle")}</p>
+          <p className="mt-0.5 text-xs text-zinc-500 capitalize">
+            {paymentPeriodLabel}
+          </p>
+          {paymentPaid ? (
+            <p className="mt-1 text-sm font-medium text-emerald-700 dark:text-emerald-300">
+              {t("paymentsPaidOnHome")}
             </p>
-            <p className="mt-0.5 text-xs text-zinc-500 capitalize">
-              {paymentPeriodLabel}
+          ) : (
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+              {paymentTotal > 0
+                ? t("paymentsReminderText", {
+                    amount: formatUah(paymentTotal, locale),
+                  })
+                : t("paymentsReminderZero")}
             </p>
-            {isChair ? (
-              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                {t("paymentsManageHint")}
-              </p>
-            ) : paymentPaid ? (
-              <p className="mt-1 text-sm font-medium text-emerald-700 dark:text-emerald-300">
-                {t("paymentsPaidOnHome")}
-              </p>
-            ) : (
-              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                {paymentTotal > 0
-                  ? t("paymentsReminderText", {
-                      amount: formatUah(paymentTotal, locale),
-                    })
-                  : t("paymentsReminderZero")}
-              </p>
-            )}
-            <p className="mt-3 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
-              {isChair ? t("paymentsManageLink") : t("paymentsLink")}
-            </p>
-          </PaymentsReminderCard>
-          {isChair && (
-            <div className="mt-3">
-              <ButtonLink href="/chair" className="w-full justify-center">
-                {tChair("title")}
-              </ButtonLink>
-            </div>
           )}
-        </>
+          <p className="mt-3 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+            {t("paymentsLink")}
+          </p>
+        </PaymentsReminderCard>
       )}
 
       <NewsSectionHeader

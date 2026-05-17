@@ -49,7 +49,7 @@ export default async function RequestsPage() {
           <Card key={tk.id}>
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium uppercase text-emerald-700">
+                <p className="text-xs font-medium uppercase text-blue-700">
                   {tc(tk.category)}
                 </p>
                 <p className="mt-2 whitespace-pre-wrap text-sm">{tk.description}</p>
@@ -91,7 +91,7 @@ export default async function RequestsPage() {
         ))}
       </div>
       <p className="mt-6 text-center text-sm text-zinc-500">
-        <Link href="/dashboard" className="text-emerald-700 hover:underline">
+        <Link href="/dashboard" className="text-blue-700 hover:underline">
           ← {tn("home")}
         </Link>
       </p>

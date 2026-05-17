@@ -95,26 +95,26 @@ async function ResidentPaymentsView({
 
       <PaymentPeriodNav period={period} />
 
-      <Card className="mb-4 border-emerald-100 bg-emerald-50/50 dark:border-emerald-900 dark:bg-emerald-950/30">
+      <Card className="mb-4 border-blue-100 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/30">
         <p className="text-xs text-zinc-600 dark:text-zinc-400">{t("address")}</p>
         <p className="mt-1 text-sm font-medium">
           {user ? formatAddressLine(user.street, user.houseNumber) : "—"}
         </p>
-        <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-emerald-800 dark:text-emerald-200">
+        <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-blue-800 dark:text-blue-200">
           {t("periodCharges", { period: periodLabel })}
         </p>
       </Card>
 
       {isPaid ? (
-        <Card className="mb-4 border-emerald-300 bg-emerald-100/80 dark:border-emerald-700 dark:bg-emerald-950/50">
-          <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">
+        <Card className="mb-4 border-blue-300 bg-blue-100/80 dark:border-blue-700 dark:bg-blue-950/50">
+          <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
             {t("paidBadge")}
           </p>
-          <p className="mt-2 text-sm text-emerald-800 dark:text-emerald-200">
+          <p className="mt-2 text-sm text-blue-800 dark:text-blue-200">
             {t("paidStatus", { period: periodLabel })}
           </p>
           {billing?.paidAt && (
-            <p className="mt-1 text-xs text-emerald-700/90 dark:text-emerald-300/90">
+            <p className="mt-1 text-xs text-blue-700/90 dark:text-blue-300/90">
               {t("historyPaid", {
                 date: billing.paidAt.toLocaleDateString(dateLocaleForUi(locale), {
                   day: "numeric",
@@ -145,11 +145,11 @@ async function ResidentPaymentsView({
           </p>
         </Card>
 
-        <Card className="border-emerald-200 bg-emerald-50/40 dark:border-emerald-900 dark:bg-emerald-950/20">
-          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800 dark:text-emerald-200">
+        <Card className="border-blue-200 bg-blue-50/40 dark:border-blue-900 dark:bg-blue-950/20">
+          <p className="text-xs font-semibold uppercase tracking-wide text-blue-800 dark:text-blue-200">
             {t("total")}
           </p>
-          <p className="mt-2 text-2xl font-bold tabular-nums text-emerald-900 dark:text-emerald-100">
+          <p className="mt-2 text-2xl font-bold tabular-nums text-blue-900 dark:text-blue-100">
             {formatUah(total, locale)}
           </p>
         </Card>
@@ -347,7 +347,7 @@ async function ChairPaymentsManageView({ period }: { period: BillingPeriod }) {
               key={householdAddressKey(h.street, h.houseNumber)}
               className={
                 h.paidAt
-                  ? "border-emerald-200 dark:border-emerald-800"
+                  ? "border-blue-200 dark:border-blue-800"
                   : undefined
               }
             >
@@ -360,7 +360,7 @@ async function ChairPaymentsManageView({ period }: { period: BillingPeriod }) {
                     {t("registeredResidents")}: {residentNames || "—"}
                   </p>
                   {h.paidAt && (
-                    <p className="mt-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                    <p className="mt-1 text-xs font-medium text-blue-700 dark:text-blue-300">
                       {t("paidBadge")}
                     </p>
                   )}

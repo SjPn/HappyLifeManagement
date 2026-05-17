@@ -41,7 +41,7 @@ export default async function ForumListPage() {
       <div className="flex flex-col gap-2">
         {topics.map((topic) => (
           <Link key={topic.id} href={`/community/forum/${topic.id}`}>
-            <Card className="transition hover:border-emerald-300">
+            <Card className="transition hover:border-blue-300">
               <p className="font-medium">{topic.title}</p>
               <p className="mt-2 text-xs text-zinc-500">
                 {topic.user.name} · {t("postCount", { count: topic.posts.length })}{" "}
@@ -61,7 +61,7 @@ export default async function ForumListPage() {
         )}
       </div>
       <p className="mt-6 text-center text-sm">
-        <Link href="/community" className="text-emerald-700 hover:underline">
+        <Link href="/community" className="text-blue-700 hover:underline">
           {t("back")}
         </Link>
       </p>

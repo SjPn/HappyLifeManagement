@@ -57,7 +57,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-emerald-900/10 bg-[color-mix(in_oklab,var(--hl-bg-elevated)_88%,transparent)] px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_32px_-12px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-emerald-400/10 dark:shadow-[0_-12px_40px_-16px_rgba(0,0,0,0.55)]">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-blue-900/10 bg-[color-mix(in_oklab,var(--hl-bg-elevated)_88%,transparent)] px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_32px_-12px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-blue-400/10 dark:shadow-[0_-12px_40px_-16px_rgba(0,0,0,0.55)]">
         <div className="mx-auto flex max-w-lg items-end justify-between gap-1">
           {visibleTabs.map((tab) => {
             const active =
@@ -72,14 +72,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href={tab.href}
                 className={`group flex min-w-0 flex-1 flex-col items-center gap-1 rounded-2xl px-1 py-2 transition-all duration-200 ${
                   active
-                    ? "bg-gradient-to-b from-emerald-500/15 to-teal-500/5 text-emerald-800 shadow-inner shadow-emerald-500/10 dark:from-emerald-400/15 dark:to-teal-400/5 dark:text-emerald-100"
+                    ? "bg-gradient-to-b from-blue-500/15 to-sky-500/5 text-blue-800 shadow-inner shadow-blue-500/10 dark:from-blue-400/15 dark:to-sky-400/5 dark:text-blue-100"
                     : "text-slate-500 hover:bg-white/60 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-slate-100"
                 }`}
               >
                 <span
                   className={`relative flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-200 group-active:scale-95 ${
                     active
-                      ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/25 dark:bg-emerald-500 dark:shadow-emerald-500/20"
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25 dark:bg-blue-500 dark:shadow-blue-500/20"
                       : "bg-slate-100/90 text-slate-600 dark:bg-slate-800/90 dark:text-slate-300"
                   }`}
                 >

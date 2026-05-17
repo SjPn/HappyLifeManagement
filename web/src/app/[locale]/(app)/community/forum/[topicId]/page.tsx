@@ -56,7 +56,7 @@ export default async function ForumTopicPage({
         <p className="mb-4">
           <Link
             href={`/community/forum/${topic.id}/edit`}
-            className="text-xs font-semibold text-emerald-700 hover:underline"
+            className="text-xs font-semibold text-blue-700 hover:underline"
           >
             {t("edit")}
           </Link>
@@ -89,7 +89,7 @@ export default async function ForumTopicPage({
       </Card>
 
       <p className="mt-8 text-center text-sm">
-        <Link href="/community/forum" className="text-emerald-700 hover:underline">
+        <Link href="/community/forum" className="text-blue-700 hover:underline">
           {t("backList")}
         </Link>
       </p>

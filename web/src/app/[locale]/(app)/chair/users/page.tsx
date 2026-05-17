@@ -36,7 +36,7 @@ export default async function ChairUsersPage() {
       <PageTitle title={t("usersTitle")} subtitle={t("usersSubtitle")} />
       {isChair && (
         <p className="mb-4 text-sm">
-          <Link href="/payments" className="font-semibold text-emerald-700 hover:underline">
+          <Link href="/payments" className="font-semibold text-blue-700 hover:underline">
             {t("paymentsManageLink")}
           </Link>
         </p>
@@ -89,7 +89,7 @@ export default async function ChairUsersPage() {
         ))}
       </div>
       <p className="mt-8 text-center text-sm">
-        <Link href="/chair" className="text-emerald-700 hover:underline">
+        <Link href="/chair" className="text-blue-700 hover:underline">
           {t("backPanel")}
         </Link>
       </p>

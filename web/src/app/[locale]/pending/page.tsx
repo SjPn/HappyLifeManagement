@@ -38,7 +38,7 @@ export default async function PendingPage({
         <SignOutButton />
         <Link
           href="/"
-          className="text-center text-sm font-medium text-emerald-700 hover:underline"
+          className="text-center text-sm font-medium text-blue-700 hover:underline"
         >
           {t("homeLink")}
         </Link>

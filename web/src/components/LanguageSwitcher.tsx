@@ -32,7 +32,7 @@ export function LanguageSwitcher({ compact }: { compact?: boolean }) {
             onClick={() => router.replace(pathname, { locale: loc })}
             className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
               active
-                ? "bg-emerald-600 text-white shadow-sm"
+                ? "bg-blue-600 text-white shadow-sm"
                 : "bg-white/70 text-slate-600 hover:bg-white dark:bg-slate-800/80 dark:text-slate-300"
             }`}
             title={

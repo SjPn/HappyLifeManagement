@@ -26,7 +26,7 @@ export default async function LoginPage({
       </div>
       <div className="pointer-events-none absolute inset-0 hl-grid opacity-50" />
       <div className="relative z-10 mx-auto max-w-md">
-        <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">
+        <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
           {t("eyebrow")}
         </p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
@@ -38,7 +38,7 @@ export default async function LoginPage({
         <p className="mt-8 text-center text-sm text-slate-500">
           {t("noAccount")}{" "}
           <Link
-            className="font-semibold text-emerald-700 hover:underline dark:text-emerald-400"
+            className="font-semibold text-blue-700 hover:underline dark:text-blue-400"
             href="/register"
           >
             {t("toRegister")}

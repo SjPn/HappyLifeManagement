@@ -57,7 +57,7 @@ export default async function ChairHomePage() {
       </div>
 
       <p className="text-center text-sm">
-        <Link href="/profile" className="text-emerald-700 hover:underline">
+        <Link href="/profile" className="text-blue-700 hover:underline">
           {t("backProfile")}
         </Link>
       </p>

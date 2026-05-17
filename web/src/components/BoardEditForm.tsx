@@ -82,7 +82,7 @@ export function BoardEditForm(props: {
           name="image"
           type="file"
           accept="image/jpeg,image/png,image/webp,image/gif"
-          className="text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-emerald-800 hover:file:bg-emerald-100 dark:file:bg-emerald-950/50 dark:file:text-emerald-200"
+          className="text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-blue-800 hover:file:bg-blue-100 dark:file:bg-blue-950/50 dark:file:text-blue-200"
         />
         <span className="text-xs text-zinc-500">{t("photoHint")}</span>
       </label>

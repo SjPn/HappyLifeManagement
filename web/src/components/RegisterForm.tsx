@@ -147,7 +147,7 @@ export function RegisterForm({ addresses }: { addresses: AddressOption[] }) {
           <Link
             href="/info/memorandum"
             target="_blank"
-            className="font-semibold text-emerald-700 hover:underline dark:text-emerald-300"
+            className="font-semibold text-blue-700 hover:underline dark:text-blue-300"
           >
             {t("memorandumLinkText")}
           </Link>

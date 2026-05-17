@@ -76,7 +76,7 @@ export default async function ProfilePage() {
         {staff && (
           <Link
             href="/chair"
-            className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900 hover:bg-emerald-100 dark:border-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-100 dark:hover:bg-emerald-900/40"
+            className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-900 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/60 dark:text-blue-100 dark:hover:bg-blue-900/40"
           >
             {t("chairPanel")}
           </Link>

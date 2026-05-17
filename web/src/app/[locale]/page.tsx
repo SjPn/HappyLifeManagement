@@ -41,11 +41,11 @@ export default async function HomePage({
         <LanguageSwitcher />
       </div>
       <div className="pointer-events-none absolute inset-0 hl-grid opacity-80" />
-      <div className="pointer-events-none absolute -left-32 top-24 h-72 w-72 rounded-full bg-teal-400/25 blur-3xl dark:bg-emerald-500/15" />
-      <div className="pointer-events-none absolute -right-24 bottom-40 h-80 w-80 rounded-full bg-emerald-400/20 blur-3xl dark:bg-teal-600/10" />
+      <div className="pointer-events-none absolute -left-32 top-24 h-72 w-72 rounded-full bg-sky-400/25 blur-3xl dark:bg-blue-500/15" />
+      <div className="pointer-events-none absolute -right-24 bottom-40 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl dark:bg-sky-600/10" />
 
       <div className="relative z-10 mx-auto flex min-h-screen max-w-lg flex-col justify-center px-6 py-16 sm:px-8">
-        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-500/20 bg-white/70 px-3 py-1 text-xs font-semibold text-emerald-800 shadow-sm backdrop-blur dark:border-emerald-400/20 dark:bg-slate-900/70 dark:text-emerald-200">
+        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-blue-500/20 bg-white/70 px-3 py-1 text-xs font-semibold text-blue-800 shadow-sm backdrop-blur dark:border-blue-400/20 dark:bg-slate-900/70 dark:text-blue-200">
           <Leaf className="h-3.5 w-3.5" />
           {t("badge")}
         </div>
@@ -60,13 +60,13 @@ export default async function HomePage({
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
           <Link
             href="/login"
-            className="inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-8 text-sm font-semibold text-white shadow-xl shadow-emerald-600/30 transition hover:from-emerald-500 hover:to-teal-500 active:scale-[0.98] dark:shadow-emerald-900/40"
+            className="inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-sky-600 px-8 text-sm font-semibold text-white shadow-xl shadow-blue-600/30 transition hover:from-blue-500 hover:to-sky-500 active:scale-[0.98] dark:shadow-blue-900/40"
           >
             {t("login")}
           </Link>
           <Link
             href="/register"
-            className="inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200/90 bg-white/80 px-8 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur transition hover:border-emerald-200 hover:bg-white active:scale-[0.98] dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:border-emerald-800"
+            className="inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200/90 bg-white/80 px-8 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur transition hover:border-blue-200 hover:bg-white active:scale-[0.98] dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:border-blue-800"
           >
             {t("register")}
           </Link>
@@ -76,9 +76,9 @@ export default async function HomePage({
           {feats.map(({ Icon, t: tit, d }) => (
             <li
               key={tit}
-              className="flex gap-4 rounded-2xl border border-emerald-500/10 bg-white/60 p-4 shadow-sm backdrop-blur-md dark:border-emerald-400/10 dark:bg-slate-900/50"
+              className="flex gap-4 rounded-2xl border border-blue-500/10 bg-white/60 p-4 shadow-sm backdrop-blur-md dark:border-blue-400/10 dark:bg-slate-900/50"
             >
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-600/25">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-sky-600 text-white shadow-lg shadow-blue-600/25">
                 <Icon className="h-6 w-6" strokeWidth={2} />
               </span>
               <div>

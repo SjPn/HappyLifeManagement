@@ -55,7 +55,7 @@ export default async function VotesListPage() {
                 <span
                   className={`shrink-0 rounded-full px-2 py-1 text-xs font-medium ${
                     active
-                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200"
+                      ? "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200"
                       : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800"
                   }`}
                 >
@@ -65,7 +65,7 @@ export default async function VotesListPage() {
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 <Link
                   href={`/votes/${v.id}`}
-                  className="inline-flex h-10 items-center rounded-xl bg-emerald-600 px-4 text-sm font-semibold text-white hover:bg-emerald-700"
+                  className="inline-flex h-10 items-center rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700"
                 >
                   {active
                     ? voted

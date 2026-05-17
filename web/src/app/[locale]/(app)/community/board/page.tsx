@@ -35,7 +35,7 @@ export default async function BoardPage() {
       <div className="flex flex-col gap-3">
         {posts.map((p) => (
           <Card key={p.id}>
-            <p className="text-xs font-medium uppercase text-emerald-700">
+            <p className="text-xs font-medium uppercase text-blue-700">
               {tCat(p.category)}
             </p>
             <p className="mt-2 font-medium">{p.title}</p>
@@ -46,7 +46,7 @@ export default async function BoardPage() {
               <div className="mt-3">
                 <Link
                   href={`/community/board/${p.id}/edit`}
-                  className="text-xs font-semibold text-emerald-700 hover:underline"
+                  className="text-xs font-semibold text-blue-700 hover:underline"
                 >
                   {t("edit")}
                 </Link>
@@ -76,7 +76,7 @@ export default async function BoardPage() {
         )}
       </div>
       <p className="mt-6 text-center text-sm">
-        <Link href="/community" className="text-emerald-700 hover:underline">
+        <Link href="/community" className="text-blue-700 hover:underline">
           {t("back")}
         </Link>
       </p>

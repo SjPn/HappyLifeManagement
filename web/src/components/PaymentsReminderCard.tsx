@@ -14,7 +14,7 @@ export function PaymentsReminderCard({
 
   return (
     <Link href="/payments" className="mt-3 block">
-      <Card className="relative transition hover:border-emerald-300 hover:bg-emerald-50/30 dark:hover:border-emerald-800 dark:hover:bg-emerald-950/20">
+      <Card className="relative transition hover:border-blue-300 hover:bg-blue-50/30 dark:hover:border-blue-800 dark:hover:bg-blue-950/20">
         {counts.payments > 0 && (
           <span className="absolute right-3 top-3">
             <NotificationBadge count={counts.payments} />

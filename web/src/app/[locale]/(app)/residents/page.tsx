@@ -68,15 +68,15 @@ export default async function ResidentsPage() {
       </div>
 
       {session?.user?.role === "MODERATOR" && (
-        <Card className="mt-8 border-emerald-200 bg-emerald-50/60 dark:border-emerald-900 dark:bg-emerald-950/30">
-          <p className="text-sm text-emerald-900 dark:text-emerald-100">
+        <Card className="mt-8 border-blue-200 bg-blue-50/60 dark:border-blue-900 dark:bg-blue-950/30">
+          <p className="text-sm text-blue-900 dark:text-blue-100">
             {t("moderatorHint")}
           </p>
         </Card>
       )}
 
       <p className="mt-6 text-center text-sm">
-        <Link href={backHref} className="text-emerald-700 hover:underline">
+        <Link href={backHref} className="text-blue-700 hover:underline">
           {backLabel}
         </Link>
       </p>

@@ -42,7 +42,7 @@ export function PaymentPaidToggle({
         checked={paid}
         disabled={loading}
         onChange={(e) => onChange(e.target.checked)}
-        className="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500"
+        className="h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
       />
       {t("paidCheckbox")}
     </label>

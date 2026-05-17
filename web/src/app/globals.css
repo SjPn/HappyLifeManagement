@@ -1,45 +1,45 @@
 @import "tailwindcss";
 
-/* Design tokens — Happy Life */
+/* Design tokens — Happy Life (blue: trust & calm, most preferred in surveys) */
 :root {
-  --hl-bg: #f4fbf7;
+  --hl-bg: #f5f9ff;
   --hl-bg-elevated: #ffffff;
-  --hl-surface: rgba(255, 255, 255, 0.82);
-  --hl-border: rgba(16, 185, 129, 0.12);
-  --hl-border-strong: rgba(16, 185, 129, 0.22);
-  --hl-primary: #059669;
-  --hl-primary-hover: #047857;
-  --hl-accent: #14b8a6;
+  --hl-surface: rgba(255, 255, 255, 0.88);
+  --hl-border: rgba(37, 99, 235, 0.12);
+  --hl-border-strong: rgba(37, 99, 235, 0.22);
+  --hl-primary: #2563eb;
+  --hl-primary-hover: #1d4ed8;
+  --hl-accent: #0ea5e9;
   --hl-muted: #64748b;
   --hl-text: #0f172a;
-  --hl-ring: rgba(5, 150, 105, 0.35);
+  --hl-ring: rgba(37, 99, 235, 0.35);
   --hl-shadow: 0 1px 2px rgba(15, 23, 42, 0.06),
     0 12px 40px -12px rgba(15, 23, 42, 0.12);
   --hl-glow: radial-gradient(
     ellipse 120% 80% at 50% -20%,
-    rgba(45, 212, 191, 0.35),
+    rgba(56, 189, 248, 0.28),
     transparent 55%
   );
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --hl-bg: #0c1110;
-    --hl-bg-elevated: #121a18;
-    --hl-surface: rgba(18, 26, 24, 0.88);
-    --hl-border: rgba(52, 211, 153, 0.12);
-    --hl-border-strong: rgba(52, 211, 153, 0.22);
-    --hl-primary: #34d399;
-    --hl-primary-hover: #6ee7b7;
-    --hl-accent: #2dd4bf;
+    --hl-bg: #0c1222;
+    --hl-bg-elevated: #141c2e;
+    --hl-surface: rgba(20, 28, 46, 0.9);
+    --hl-border: rgba(96, 165, 250, 0.14);
+    --hl-border-strong: rgba(96, 165, 250, 0.24);
+    --hl-primary: #60a5fa;
+    --hl-primary-hover: #93c5fd;
+    --hl-accent: #38bdf8;
     --hl-muted: #94a3b8;
     --hl-text: #f1f5f9;
-    --hl-ring: rgba(52, 211, 153, 0.45);
+    --hl-ring: rgba(96, 165, 250, 0.45);
     --hl-shadow: 0 1px 2px rgba(0, 0, 0, 0.35),
       0 24px 48px -20px rgba(0, 0, 0, 0.55);
     --hl-glow: radial-gradient(
       ellipse 120% 80% at 50% -20%,
-      rgba(45, 212, 191, 0.15),
+      rgba(37, 99, 235, 0.18),
       transparent 55%
     );
   }
@@ -48,6 +48,8 @@
 @theme inline {
   --color-background: var(--hl-bg);
   --color-foreground: var(--hl-text);
+  --color-hl-primary: var(--hl-primary);
+  --color-hl-accent: var(--hl-accent);
   --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -62,28 +64,26 @@ body {
   background-image: var(--hl-glow),
     radial-gradient(
       circle at 100% 0%,
-      rgba(20, 184, 166, 0.08) 0%,
+      rgba(14, 165, 233, 0.1) 0%,
       transparent 42%
     ),
     radial-gradient(
       circle at 0% 100%,
-      rgba(5, 150, 105, 0.06) 0%,
+      rgba(37, 99, 235, 0.07) 0%,
       transparent 45%
     );
   background-attachment: fixed;
 }
 
 ::selection {
-  background: rgba(16, 185, 129, 0.25);
+  background: rgba(37, 99, 235, 0.22);
 }
 
-/* Focus visible — keyboard UX */
 :focus-visible {
   outline: 2px solid var(--hl-primary);
   outline-offset: 2px;
 }
 
-/* Утилита: стеклянная панель */
 .hl-glass {
   background: var(--hl-surface);
   backdrop-filter: blur(16px);
@@ -92,7 +92,6 @@ body {
   box-shadow: var(--hl-shadow);
 }
 
-/* Сетка на фоне лендинга */
 .hl-grid {
   background-image: linear-gradient(
       rgba(15, 23, 42, 0.04) 1px,

@@ -45,7 +45,7 @@ export function ReportModerationRow({
           </strong>
         </p>
       ) : null}
-      <p className="mt-2 text-xs font-medium uppercase text-emerald-800 dark:text-emerald-200">
+      <p className="mt-2 text-xs font-medium uppercase text-blue-800 dark:text-blue-200">
         {tKind(
           kind as "COMPLAINT" | "SUGGESTION" | "VIOLATION" | "IDEA"
         )}
@@ -69,7 +69,7 @@ export function ReportModerationRow({
           type="button"
           disabled={loading}
           onClick={() => apply("CLOSED", true)}
-          className="rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-medium text-emerald-900 dark:bg-emerald-950 dark:text-emerald-100"
+          className="rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-900 dark:bg-blue-950 dark:text-blue-100"
         >
           {t("modBtnCloseFeed")}
         </button>

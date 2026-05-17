@@ -98,7 +98,7 @@ export default async function VoteDetailPage({
                 </div>
                 <div className="mt-1 h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
                   <div
-                    className="h-full rounded-full bg-emerald-500 transition-all"
+                    className="h-full rounded-full bg-blue-500 transition-all"
                     style={{ width: `${pct}%` }}
                   />
                 </div>
@@ -111,7 +111,7 @@ export default async function VoteDetailPage({
       <p className="mt-8 text-center">
         <Link
           href="/votes"
-          className="text-sm font-medium text-emerald-700 hover:underline"
+          className="text-sm font-medium text-blue-700 hover:underline"
         >
           {t("detailBack")}
         </Link>

@@ -46,7 +46,7 @@ export function PaymentPeriodNav({ period }: { period: BillingPeriod }) {
             {label}
           </p>
           {isCurrent && (
-            <p className="mt-0.5 text-xs text-emerald-700 dark:text-emerald-300">
+            <p className="mt-0.5 text-xs text-blue-700 dark:text-blue-300">
               {t("periodCurrent")}
             </p>
           )}

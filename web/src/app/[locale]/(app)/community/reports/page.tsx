@@ -48,7 +48,7 @@ export default async function ReportsPage() {
           const showBody = r.published || mine;
           return (
             <Card key={r.id}>
-              <p className="text-xs font-medium uppercase text-emerald-800 dark:text-emerald-200">
+              <p className="text-xs font-medium uppercase text-blue-800 dark:text-blue-200">
                 {tKind(r.kind as "COMPLAINT" | "SUGGESTION" | "VIOLATION" | "IDEA")} · {r.category}
               </p>
               {showBody ? (
@@ -76,7 +76,7 @@ export default async function ReportsPage() {
       </div>
 
       <p className="mt-6 text-center text-sm">
-        <Link href="/community" className="text-emerald-700 hover:underline">
+        <Link href="/community" className="text-blue-700 hover:underline">
           {t("back")}
         </Link>
       </p>

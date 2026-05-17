@@ -73,7 +73,7 @@ export function TicketNewForm() {
           name="photo"
           type="file"
           accept="image/jpeg,image/png,image/webp,image/gif"
-          className="text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-emerald-800 dark:text-slate-300 dark:file:bg-emerald-950 dark:file:text-emerald-200"
+          className="text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-blue-800 dark:text-slate-300 dark:file:bg-blue-950 dark:file:text-blue-200"
         />
         <span className="text-xs text-slate-500">{t("photoHint")}</span>
       </label>

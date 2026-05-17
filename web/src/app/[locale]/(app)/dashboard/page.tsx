@@ -118,7 +118,7 @@ export default async function DashboardPage() {
 
   const displayName = user?.name?.trim() || t("neighbor");
   const sectionLinkClass =
-    "mb-3 mt-8 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 transition hover:text-emerald-700 dark:hover:text-emerald-300";
+    "mb-3 mt-8 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 transition hover:text-blue-700 dark:hover:text-blue-300";
 
   return (
     <>
@@ -160,7 +160,7 @@ export default async function DashboardPage() {
             {paymentPeriodLabel}
           </p>
           {paymentPaid ? (
-            <p className="mt-1 text-sm font-medium text-emerald-700 dark:text-emerald-300">
+            <p className="mt-1 text-sm font-medium text-blue-700 dark:text-blue-300">
               {t("paymentsPaidOnHome")}
             </p>
           ) : (
@@ -172,7 +172,7 @@ export default async function DashboardPage() {
                 : t("paymentsReminderZero")}
             </p>
           )}
-          <p className="mt-3 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+          <p className="mt-3 text-sm font-semibold text-blue-700 dark:text-blue-300">
             {t("paymentsLink")}
           </p>
         </PaymentsReminderCard>
@@ -276,7 +276,7 @@ export default async function DashboardPage() {
         )}
         {myTickets.map((tk) => (
           <Link key={tk.id} href="/requests">
-            <Card className="transition hover:border-emerald-300">
+            <Card className="transition hover:border-blue-300">
               <p className="text-sm font-medium">
                 {tk.description.slice(0, 80)}
                 {tk.description.length > 80 ? "…" : ""}

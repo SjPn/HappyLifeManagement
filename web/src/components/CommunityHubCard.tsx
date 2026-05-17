@@ -16,13 +16,13 @@ export function CommunityHubCard({
 }) {
   return (
     <Link href={href}>
-      <Card className="relative transition hover:border-emerald-300">
+      <Card className="relative transition hover:border-blue-300">
         {count > 0 && (
           <span className="absolute right-3 top-3">
             <NotificationBadge count={count} />
           </span>
         )}
-        <p className="font-semibold text-emerald-800 dark:text-emerald-200">
+        <p className="font-semibold text-blue-800 dark:text-blue-200">
           {title}
         </p>
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{desc}</p>

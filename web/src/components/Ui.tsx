@@ -12,7 +12,7 @@ export function PageTitle({
   return (
     <header className="mb-7 min-w-0 max-w-full">
       {eyebrow && (
-        <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-emerald-600/90 dark:text-emerald-400/90">
+        <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-blue-600/90 dark:text-blue-400/90">
           {eyebrow}
         </p>
       )}
@@ -75,8 +75,8 @@ export function ButtonLink({
 }) {
   const base =
     variant === "primary"
-      ? "inline-flex h-11 min-h-[2.75rem] items-center justify-center rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition hover:from-emerald-500 hover:to-teal-500 hover:shadow-emerald-500/30 active:scale-[0.98] dark:from-emerald-500 dark:to-teal-500 dark:shadow-emerald-900/40"
-      : "inline-flex h-11 min-h-[2.75rem] items-center justify-center rounded-xl border border-slate-200/90 bg-white/90 px-4 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-emerald-200 hover:bg-emerald-50/80 active:scale-[0.98] dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:border-emerald-800 dark:hover:bg-emerald-950/30";
+      ? "inline-flex h-11 min-h-[2.75rem] items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-sky-600 px-4 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:from-blue-500 hover:to-sky-500 hover:shadow-blue-500/30 active:scale-[0.98] dark:from-blue-500 dark:to-sky-500 dark:shadow-blue-900/40"
+      : "inline-flex h-11 min-h-[2.75rem] items-center justify-center rounded-xl border border-slate-200/90 bg-white/90 px-4 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-blue-200 hover:bg-blue-50/80 active:scale-[0.98] dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:border-blue-800 dark:hover:bg-blue-950/30";
   const cls = className ? `${base} ${className}` : base;
   return (
     <Link href={href} className={cls}>

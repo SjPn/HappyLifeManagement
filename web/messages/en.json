@@ -107,6 +107,8 @@
     "duesText": "Per board records, approximate balance due: {amount}. Details from the chair.",
     "paymentsReminderTitle": "Charges for your home",
     "paymentsReminderText": "Amount due for the current period: {amount}.",
+    "paymentsReminderZero": "No charges for this period yet, or the total is zero.",
+    "paymentsPaidOnHome": "Marked as paid for the current period.",
     "paymentsLink": "Go to my payments →"
   },
   "requests": {
@@ -229,9 +231,11 @@
     "balanceNote": "Approximate dues balance: {amount}.",
     "disclaimer": "Amounts are informational; confirm details with the chair.",
     "chairTitle": "Resident payments",
-    "chairSubtitle": "Enter amounts per address (household). Everyone registered at that address sees them under My payments.",
+    "chairSubtitle": "Enter amounts per address (household). When paid, check Paid — residents will see the status under My payments.",
     "registeredResidents": "Registered",
-    "chairEmpty": "No resident accounts yet."
+    "chairEmpty": "No resident accounts yet.",
+    "paidCheckbox": "Paid",
+    "paidStatus": "Payment for the current period was confirmed by the chair."
   },
   "profile": {
     "title": "More",

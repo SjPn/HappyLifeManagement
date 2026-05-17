@@ -88,9 +88,11 @@ export default async function DashboardPage() {
         })
       : null;
 
-  const hasPayments =
-    (householdPayment?.subscriptionFeeUah ?? 0) > 0 ||
-    (householdPayment?.electricityUah ?? 0) > 0;
+  const paymentTotal =
+    (householdPayment?.subscriptionFeeUah ?? 0) +
+    (householdPayment?.electricityUah ?? 0);
+  const paymentPaid = householdPayment?.paidAt != null;
+  const showPaymentsCard = Boolean(user?.street && user?.houseNumber);
 
   const firstName = user?.name?.split(" ")[0] ?? t("neighbor");
   const sectionLinkClass =
@@ -120,21 +122,25 @@ export default async function DashboardPage() {
         </Card>
       )}
 
-      {hasPayments && (
+      {showPaymentsCard && (
         <Link href="/payments" className="mt-3 block">
           <Card className="transition hover:border-emerald-300 hover:bg-emerald-50/30 dark:hover:border-emerald-800 dark:hover:bg-emerald-950/20">
             <p className="text-sm font-medium">{t("paymentsReminderTitle")}</p>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              {t("paymentsReminderText", {
-                amount: formatUah(
-                  (householdPayment?.subscriptionFeeUah ?? 0) +
-                    (householdPayment?.electricityUah ?? 0),
-                  locale,
-                ),
-              })}
-            </p>
+            {paymentPaid ? (
+              <p className="mt-1 text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                {t("paymentsPaidOnHome")}
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                {paymentTotal > 0
+                  ? t("paymentsReminderText", {
+                      amount: formatUah(paymentTotal, locale),
+                    })
+                  : t("paymentsReminderZero")}
+              </p>
+            )}
             <p className="mt-3 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
-              {t("paymentsLink")} →
+              {t("paymentsLink")}
             </p>
           </Card>
         </Link>

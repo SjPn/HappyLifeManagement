@@ -21,9 +21,9 @@ export default async function ProfilePage() {
     listCommunityAddresses(),
   ]);
 
-  const isChair = user?.role === "CHAIR";
   const isModerator = user?.role === "MODERATOR";
-  const staff = isChair || isModerator;
+  const staff =
+    user?.role === "CHAIR" || isModerator;
 
   return (
     <>
@@ -72,26 +72,6 @@ export default async function ProfilePage() {
           className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
         >
           {t("residentsLink")}
-        </Link>
-        <Link
-          href="/votes"
-          className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-        >
-          {t("votesLink")}
-        </Link>
-        {(isChair || user?.role === "RESIDENT") && (
-          <Link
-            href="/payments"
-            className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-          >
-            {isChair ? t("paymentsManageLink") : t("paymentsLink")}
-          </Link>
-        )}
-        <Link
-          href="/info/tariffs"
-          className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-        >
-          {t("tariffsLink")}
         </Link>
         <Link
           href="/info/memorandum"

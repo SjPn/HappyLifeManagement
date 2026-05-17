@@ -81,14 +81,56 @@ export async function setHouseholdPayments(formData: FormData) {
     return { error: "badData" as const };
   }
 
+  const existing = await prisma.householdPayment.findUnique({
+    where: { street_houseNumber: { street, houseNumber } },
+  });
+  const amountsChanged =
+    existing != null &&
+    (existing.subscriptionFeeUah !== subscriptionFeeUah ||
+      existing.electricityUah !== electricityUah);
+
   await prisma.householdPayment.upsert({
     where: { street_houseNumber: { street, houseNumber } },
     create: { street, houseNumber, subscriptionFeeUah, electricityUah },
-    update: { subscriptionFeeUah, electricityUah },
+    update: {
+      subscriptionFeeUah,
+      electricityUah,
+      ...(amountsChanged ? { paidAt: null } : {}),
+    },
   });
 
   revalidateAllLocales("/chair");
   revalidateAllLocales("/chair/users");
+  revalidateAllLocales("/payments");
+  revalidateAllLocales("/dashboard");
+  return { ok: true as const };
+}
+
+export async function setHouseholdPaid(formData: FormData) {
+  const session = await auth();
+  if (session?.user?.role !== "CHAIR") {
+    return { error: "forbidden" as const };
+  }
+
+  const street = String(formData.get("street") || "").trim();
+  const houseNumber = String(formData.get("houseNumber") || "").trim();
+  const paid = formData.get("paid") === "true";
+  if (!street || !houseNumber) {
+    return { error: "badData" as const };
+  }
+
+  await prisma.householdPayment.upsert({
+    where: { street_houseNumber: { street, houseNumber } },
+    create: {
+      street,
+      houseNumber,
+      paidAt: paid ? new Date() : null,
+    },
+    update: {
+      paidAt: paid ? new Date() : null,
+    },
+  });
+
   revalidateAllLocales("/payments");
   revalidateAllLocales("/dashboard");
   return { ok: true as const };

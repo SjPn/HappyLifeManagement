@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PageTitle, Card, ButtonLink } from "@/components/Ui";
 import { PaymentEditForm } from "@/components/PaymentEditForm";
+import { PaymentPaidToggle } from "@/components/PaymentPaidToggle";
 import { getLocale, getTranslations } from "next-intl/server";
 import { formatUah } from "@/lib/money";
 import { redirect } from "next/navigation";
@@ -47,10 +48,19 @@ async function ResidentPaymentsView({
   const subscription = payment?.subscriptionFeeUah ?? 0;
   const electricity = payment?.electricityUah ?? 0;
   const total = subscription + electricity;
+  const isPaid = payment?.paidAt != null;
 
   return (
     <>
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
+
+      {isPaid && (
+        <Card className="mb-4 border-emerald-300 bg-emerald-100/80 dark:border-emerald-700 dark:bg-emerald-950/50">
+          <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+            {t("paidStatus")}
+          </p>
+        </Card>
+      )}
 
       <Card className="mb-4 border-emerald-100 bg-emerald-50/50 dark:border-emerald-900 dark:bg-emerald-950/30">
         <p className="text-xs text-zinc-600 dark:text-zinc-400">{t("address")}</p>
@@ -127,6 +137,7 @@ type HouseholdRow = {
   residents: { name: string; tenancyType: string; status: string }[];
   subscriptionFeeUah: number;
   electricityUah: number;
+  paidAt: Date | null;
 };
 
 async function ChairPaymentsManageView() {
@@ -173,6 +184,7 @@ async function ChairPaymentsManageView() {
         ],
         subscriptionFeeUah: pay?.subscriptionFeeUah ?? 0,
         electricityUah: pay?.electricityUah ?? 0,
+        paidAt: pay?.paidAt ?? null,
       });
     } else {
       existing.residents.push({
@@ -192,6 +204,7 @@ async function ChairPaymentsManageView() {
         residents: [],
         subscriptionFeeUah: p.subscriptionFeeUah,
         electricityUah: p.electricityUah,
+        paidAt: p.paidAt,
       });
     }
   }
@@ -226,7 +239,12 @@ async function ChairPaymentsManageView() {
                   {formatUah(total, locale)}
                 </p>
               </div>
-              <div className="mt-4 border-t border-zinc-100 pt-3 dark:border-zinc-800">
+              <div className="mt-4 space-y-3 border-t border-zinc-100 pt-3 dark:border-zinc-800">
+                <PaymentPaidToggle
+                  street={h.street}
+                  houseNumber={h.houseNumber}
+                  paid={h.paidAt != null}
+                />
                 <PaymentEditForm
                   street={h.street}
                   houseNumber={h.houseNumber}

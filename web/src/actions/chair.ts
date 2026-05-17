@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { UserStatus } from "@/lib/enums";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
 import { TenancyType } from "@/lib/audience";
+import { resolveCommunityAddress } from "@/lib/communityAddresses";
 
 function staff(session: { user?: { role?: string } } | null) {
   const r = session?.user?.role;
@@ -99,23 +100,28 @@ export async function updateUserProfile(formData: FormData) {
 
   const userId = String(formData.get("userId") || "");
   const name = String(formData.get("name") || "").trim();
-  const street = String(formData.get("street") || "").trim();
-  const houseNumber = String(formData.get("houseNumber") || "").trim();
+  const communityAddressId = String(
+    formData.get("communityAddressId") || "",
+  ).trim();
   const phoneRaw = String(formData.get("phone") || "").trim();
   const tenancyRaw = String(formData.get("tenancyType") || "").trim();
   const tenancyType =
     tenancyRaw === TenancyType.TENANT ? TenancyType.TENANT : TenancyType.OWNER;
 
-  if (!userId || !name || !street || !houseNumber) {
+  if (!userId || !name || !communityAddressId) {
     return { error: "requiredFields" as const };
   }
+
+  const address = await resolveCommunityAddress(communityAddressId);
+  if (!address) return { error: "invalidAddress" as const };
 
   await prisma.user.update({
     where: { id: userId },
     data: {
       name,
-      street,
-      houseNumber,
+      street: address.street,
+      houseNumber: address.houseNumber,
+      communityAddressId: address.id,
       phone: phoneRaw || null,
       tenancyType,
     },
@@ -124,5 +130,6 @@ export async function updateUserProfile(formData: FormData) {
   revalidateAllLocales("/chair/users");
   revalidateAllLocales("/profile");
   revalidateAllLocales("/dashboard");
+  revalidateAllLocales("/payments");
   return { ok: true as const };
 }

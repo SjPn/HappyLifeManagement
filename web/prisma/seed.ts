@@ -9,8 +9,36 @@ import {
   VoteType,
 } from "../src/lib/enums";
 import { AudienceScope, TenancyType } from "../src/lib/audience";
+import { normalizeHouseNumber, normalizeStreet } from "../src/lib/household";
 
 const prisma = new PrismaClient();
+
+async function ensureAddress(street: string, houseNumber: string) {
+  const s = normalizeStreet(street);
+  const h = normalizeHouseNumber(houseNumber);
+  return prisma.communityAddress.upsert({
+    where: { street_houseNumber: { street: s, houseNumber: h } },
+    create: { street: s, houseNumber: h },
+    update: {},
+  });
+}
+
+async function linkUserAddress(
+  userId: string,
+  street: string,
+  houseNumber: string,
+) {
+  const addr = await ensureAddress(street, houseNumber);
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      communityAddressId: addr.id,
+      street: addr.street,
+      houseNumber: addr.houseNumber,
+    },
+  });
+  return addr;
+}
 
 async function main() {
   const hash = (p: string) => bcrypt.hashSync(p, 10);
@@ -62,6 +90,14 @@ async function main() {
       balanceUah: 3500,
     },
   });
+
+  await linkUserAddress(chair.id, chair.street, chair.houseNumber);
+  await linkUserAddress(mod.id, mod.street, mod.houseNumber);
+  const residentAddr = await linkUserAddress(
+    resident.id,
+    resident.street,
+    resident.houseNumber,
+  );
 
   const vote = await prisma.vote.create({
     data: {
@@ -116,13 +152,13 @@ async function main() {
   await prisma.householdPayment.upsert({
     where: {
       street_houseNumber: {
-        street: resident.street.trim(),
-        houseNumber: resident.houseNumber.trim(),
+        street: residentAddr.street,
+        houseNumber: residentAddr.houseNumber,
       },
     },
     create: {
-      street: resident.street.trim(),
-      houseNumber: resident.houseNumber.trim(),
+      street: residentAddr.street,
+      houseNumber: residentAddr.houseNumber,
       subscriptionFeeUah: 850,
       electricityUah: 420.5,
     },
@@ -141,7 +177,13 @@ async function main() {
     },
   });
 
-  console.log("Seed OK:", { chair: chair.email, mod: mod.email, resident: resident.email, vote: vote.id, topic: topic.id });
+  console.log("Seed OK:", {
+    chair: chair.email,
+    mod: mod.email,
+    resident: resident.email,
+    vote: vote.id,
+    topic: topic.id,
+  });
 }
 
 main()

@@ -1,7 +1,9 @@
 "use client";
 
 import { updateUserProfile } from "@/actions/chair";
+import { AddressSelect } from "@/components/AddressSelect";
 import { TenancyType } from "@/lib/audience";
+import type { AddressOption } from "@/lib/communityAddresses";
 import { inputClass, labelClass } from "@/lib/formStyles";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -10,10 +12,10 @@ import { useState } from "react";
 export function UserEditForm(props: {
   userId: string;
   name: string;
-  street: string;
-  houseNumber: string;
+  communityAddressId: string | null;
   phone: string | null;
   tenancyType: string;
+  addresses: AddressOption[];
 }) {
   const router = useRouter();
   const t = useTranslations("profileEdit");
@@ -41,7 +43,7 @@ export function UserEditForm(props: {
   return (
     <form onSubmit={onSubmit} className="mt-3 grid gap-2 md:grid-cols-2">
       <input type="hidden" name="userId" value={props.userId} />
-      <label className="flex flex-col gap-1 text-xs">
+      <label className="flex flex-col gap-1 text-xs md:col-span-2">
         <span className={labelClass}>{t("name")}</span>
         <input name="name" required defaultValue={props.name} className={inputClass} />
       </label>
@@ -49,19 +51,13 @@ export function UserEditForm(props: {
         <span className={labelClass}>{t("phone")}</span>
         <input name="phone" type="tel" defaultValue={props.phone ?? ""} className={inputClass} />
       </label>
-      <label className="flex flex-col gap-1 text-xs">
-        <span className={labelClass}>{t("street")}</span>
-        <input name="street" required defaultValue={props.street} className={inputClass} />
-      </label>
-      <label className="flex flex-col gap-1 text-xs">
-        <span className={labelClass}>{t("house")}</span>
-        <input
-          name="houseNumber"
-          required
-          defaultValue={props.houseNumber}
-          className={inputClass}
+      <div className="md:col-span-2">
+        <AddressSelect
+          addresses={props.addresses}
+          defaultValue={props.communityAddressId ?? undefined}
+          labelNs="profileEdit"
         />
-      </label>
+      </div>
       <label className="flex flex-col gap-1 text-xs md:col-span-2">
         <span className={labelClass}>{t("tenancy")}</span>
         <select
@@ -94,4 +90,3 @@ export function UserEditForm(props: {
     </form>
   );
 }
-

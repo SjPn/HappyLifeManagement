@@ -7,8 +7,10 @@ import { signIn } from "next-auth/react";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
 import { TenancyType } from "@/lib/audience";
 import { Link } from "@/i18n/navigation";
+import { AddressSelect } from "@/components/AddressSelect";
+import type { AddressOption } from "@/lib/communityAddresses";
 
-export function RegisterForm() {
+export function RegisterForm({ addresses }: { addresses: AddressOption[] }) {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations("auth");
@@ -26,9 +28,9 @@ export function RegisterForm() {
       password: (form.elements.namedItem("password") as HTMLInputElement)
         .value,
       name: (form.elements.namedItem("name") as HTMLInputElement).value,
-      street: (form.elements.namedItem("street") as HTMLInputElement).value,
-      houseNumber: (form.elements.namedItem("houseNumber") as HTMLInputElement)
-        .value,
+      communityAddressId: (
+        form.elements.namedItem("communityAddressId") as HTMLSelectElement
+      ).value,
       phone: (form.elements.namedItem("phone") as HTMLInputElement).value,
       inviteCode: (form.elements.namedItem("inviteCode") as HTMLInputElement)
         .value,
@@ -47,7 +49,8 @@ export function RegisterForm() {
     const data = await res.json().catch(() => ({}));
     setLoading(false);
     if (!res.ok) {
-      setError(typeof data.error === "string" ? data.error : te("generic"));
+      const code = typeof data.error === "string" ? data.error : "generic";
+      setError(te(code as "generic"));
       return;
     }
     const sign = await signIn("credentials", {
@@ -65,6 +68,14 @@ export function RegisterForm() {
         : `/${locale}/pending`,
     );
     router.refresh();
+  }
+
+  if (addresses.length === 0) {
+    return (
+      <p className="text-sm text-amber-800 dark:text-amber-200">
+        {t("noAddresses")}
+      </p>
+    );
   }
 
   return (
@@ -94,16 +105,7 @@ export function RegisterForm() {
           className={inputClass}
         />
       </label>
-      <div className="grid grid-cols-2 gap-3">
-        <label className="flex flex-col gap-1.5">
-          <span className={labelClass}>{t("street")}</span>
-          <input name="street" required className={inputClass} />
-        </label>
-        <label className="flex flex-col gap-1.5">
-          <span className={labelClass}>{t("house")}</span>
-          <input name="houseNumber" required className={inputClass} />
-        </label>
-      </div>
+      <AddressSelect addresses={addresses} />
       <label className="flex flex-col gap-1.5">
         <span className={labelClass}>{t("phone")}</span>
         <input name="phone" type="tel" className={inputClass} />

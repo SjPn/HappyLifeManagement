@@ -1,7 +1,9 @@
 "use client";
 
 import { updateMyProfile } from "@/actions/profile";
+import { AddressSelect } from "@/components/AddressSelect";
 import { TenancyType } from "@/lib/audience";
+import type { AddressOption } from "@/lib/communityAddresses";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -9,10 +11,10 @@ import { useState } from "react";
 
 export function ProfileEditForm(props: {
   name: string;
-  street: string;
-  houseNumber: string;
+  communityAddressId: string | null;
   phone: string | null;
   tenancyType: string;
+  addresses: AddressOption[];
 }) {
   const router = useRouter();
   const t = useTranslations("profileEdit");
@@ -41,21 +43,11 @@ export function ProfileEditForm(props: {
         <span className={labelClass}>{t("name")}</span>
         <input name="name" required defaultValue={props.name} className={inputClass} />
       </label>
-      <div className="grid grid-cols-2 gap-3">
-        <label className="flex flex-col gap-1 text-sm">
-          <span className={labelClass}>{t("street")}</span>
-          <input name="street" required defaultValue={props.street} className={inputClass} />
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          <span className={labelClass}>{t("house")}</span>
-          <input
-            name="houseNumber"
-            required
-            defaultValue={props.houseNumber}
-            className={inputClass}
-          />
-        </label>
-      </div>
+      <AddressSelect
+        addresses={props.addresses}
+        defaultValue={props.communityAddressId ?? undefined}
+        labelNs="profileEdit"
+      />
       <label className="flex flex-col gap-1 text-sm">
         <span className={labelClass}>{t("phone")}</span>
         <input
@@ -87,4 +79,3 @@ export function ProfileEditForm(props: {
     </form>
   );
 }
-

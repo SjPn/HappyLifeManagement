@@ -24,6 +24,14 @@ export default async function ChairHomePage() {
       />
 
       <div className="mb-8 flex flex-col gap-2">
+        {isChair && (
+          <Link
+            href="/chair/addresses"
+            className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+          >
+            {t("addresses")}
+          </Link>
+        )}
         <Link
           href="/chair/users"
           className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"

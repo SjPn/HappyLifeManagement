@@ -8,6 +8,7 @@ import { BalanceEditForm } from "@/components/BalanceEditForm";
 import { UserEditForm } from "@/components/UserEditForm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Role } from "@/lib/enums";
+import { listCommunityAddresses } from "@/lib/communityAddresses";
 
 export default async function ChairUsersPage() {
   const session = await auth();
@@ -21,9 +22,12 @@ export default async function ChairUsersPage() {
   const tr = await getTranslations("categories.roles");
   const tt = await getTranslations("categories.tenancy");
 
-  const users = await prisma.user.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const [users, addresses] = await Promise.all([
+    prisma.user.findMany({
+      orderBy: { createdAt: "desc" },
+    }),
+    listCommunityAddresses(),
+  ]);
 
   const isChair = session!.user!.role === "CHAIR";
 
@@ -75,10 +79,10 @@ export default async function ChairUsersPage() {
               <UserEditForm
                 userId={u.id}
                 name={u.name}
-                street={u.street}
-                houseNumber={u.houseNumber}
+                communityAddressId={u.communityAddressId}
                 phone={u.phone ?? null}
                 tenancyType={u.tenancyType}
+                addresses={addresses}
               />
             )}
           </Card>

@@ -4,13 +4,13 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { Role, UserStatus } from "@/lib/enums";
 import { TenancyType } from "@/lib/audience";
+import { resolveCommunityAddress } from "@/lib/communityAddresses";
 
 const schema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   name: z.string().min(1),
-  street: z.string().min(1),
-  houseNumber: z.string().min(1),
+  communityAddressId: z.string().min(1),
   phone: z.string().optional(),
   inviteCode: z.string().optional(),
   tenancyType: z.enum([TenancyType.OWNER, TenancyType.TENANT]),
@@ -37,13 +37,20 @@ export async function POST(req: Request) {
     email,
     password,
     name,
-    street,
-    houseNumber,
+    communityAddressId,
     phone,
     inviteCode,
     tenancyType,
   } = parsed.data;
   const normalized = email.trim().toLowerCase();
+
+  const address = await resolveCommunityAddress(communityAddressId);
+  if (!address) {
+    return NextResponse.json(
+      { error: "invalidAddress" },
+      { status: 400 },
+    );
+  }
 
   const existing = await prisma.user.findUnique({
     where: { email: normalized },
@@ -68,8 +75,9 @@ export async function POST(req: Request) {
       email: normalized,
       passwordHash,
       name: name.trim(),
-      street: street.trim(),
-      houseNumber: houseNumber.trim(),
+      street: address.street,
+      houseNumber: address.houseNumber,
+      communityAddressId: address.id,
       phone: phone?.trim() || null,
       role: Role.RESIDENT,
       status,

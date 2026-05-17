@@ -6,6 +6,7 @@ import { SignOutButton } from "@/components/AppShell";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
 import { getTranslations } from "next-intl/server";
+import { listCommunityAddresses } from "@/lib/communityAddresses";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -13,9 +14,12 @@ export default async function ProfilePage() {
   const tr = await getTranslations("categories.roles");
   const tt = await getTranslations("categories.tenancy");
 
-  const user = await prisma.user.findUnique({
-    where: { id: session!.user!.id },
-  });
+  const [user, addresses] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session!.user!.id },
+    }),
+    listCommunityAddresses(),
+  ]);
 
   const isChair = user?.role === "CHAIR";
   const isModerator = user?.role === "MODERATOR";
@@ -50,10 +54,10 @@ export default async function ProfilePage() {
           <p className="mb-3 text-sm font-semibold">{t("editProfile")}</p>
           <ProfileEditForm
             name={user.name}
-            street={user.street}
-            houseNumber={user.houseNumber}
+            communityAddressId={user.communityAddressId}
             phone={user.phone ?? null}
             tenancyType={user.tenancyType ?? "OWNER"}
+            addresses={addresses}
           />
         </Card>
       )}

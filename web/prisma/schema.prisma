@@ -19,6 +19,9 @@ model User {
   street      String
   houseNumber String
 
+  communityAddressId String?
+  communityAddress   CommunityAddress? @relation(fields: [communityAddressId], references: [id], onDelete: SetNull)
+
   role   String @default("RESIDENT") // RESIDENT | MODERATOR | CHAIR
   status String @default("PENDING") // PENDING | APPROVED | REJECTED
 
@@ -131,6 +134,18 @@ model ForumPost {
   userId    String
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime   @default(now())
+}
+
+/// Адреси домів у КГ — додає голова; житель обирає при реєстрації
+model CommunityAddress {
+  id          String   @id @default(cuid())
+  street      String
+  houseNumber String
+  createdAt   DateTime @default(now())
+
+  users User[]
+
+  @@unique([street, houseNumber])
 }
 
 /// Платежі за домоволодінням (вулиця + будинок); бачать усі мешканці з цією адресою

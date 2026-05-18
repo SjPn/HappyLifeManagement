@@ -11,7 +11,7 @@
     "votePick": "Pick an option",
     "generic": "Something went wrong. Try again.",
     "invalidAddress": "Please select an address from the list",
-    "invalidInvite": "Invalid community invite code",
+    "invalidInvite": "Invalid invitation code",
     "addressExists": "This address is already in the list",
     "addressInUse": "Cannot delete: residents are registered at this address",
     "chairOnly": "Chair only",

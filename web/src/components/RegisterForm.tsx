@@ -19,26 +19,45 @@ export function RegisterForm() {
   const [addresses, setAddresses] = useState<AddressOption[]>([]);
   const [addressesLoading, setAddressesLoading] = useState(false);
   const [inviteCode, setInviteCode] = useState("");
+  const [inviteLookup, setInviteLookup] = useState<
+    "idle" | "loading" | "valid" | "invalid" | "noAddresses"
+  >("idle");
 
   const loadAddresses = useCallback(async (code: string) => {
     const trimmed = code.trim();
     if (!trimmed) {
       setAddresses([]);
+      setInviteLookup("idle");
       return;
     }
     setAddressesLoading(true);
+    setInviteLookup("loading");
     try {
       const res = await fetch(
         `/api/addresses?inviteCode=${encodeURIComponent(trimmed)}`,
       );
       const data = await res.json().catch(() => ({}));
-      if (res.ok && Array.isArray(data.addresses)) {
-        setAddresses(data.addresses);
-      } else {
+      if (!res.ok) {
         setAddresses([]);
+        setInviteLookup(
+          data.error === "invalidInvite" || res.status === 404
+            ? "invalid"
+            : "idle",
+        );
+        return;
       }
+      if (!Array.isArray(data.addresses)) {
+        setAddresses([]);
+        setInviteLookup("idle");
+        return;
+      }
+      setAddresses(data.addresses);
+      setInviteLookup(
+        data.addresses.length === 0 ? "noAddresses" : "valid",
+      );
     } catch {
       setAddresses([]);
+      setInviteLookup("idle");
     } finally {
       setAddressesLoading(false);
     }
@@ -104,7 +123,10 @@ export function RegisterForm() {
             const v = e.target.value.toUpperCase();
             setInviteCode(v);
             if (v.trim().length >= 4) loadAddresses(v);
-            else setAddresses([]);
+            else {
+              setAddresses([]);
+              setInviteLookup("idle");
+            }
           }}
           onBlur={() => loadAddresses(inviteCode)}
           className={inputClass}
@@ -138,10 +160,18 @@ export function RegisterForm() {
           className={inputClass}
         />
       </label>
-      {addressesLoading ? (
+      {addressesLoading || inviteLookup === "loading" ? (
         <p className="text-sm text-zinc-500">…</p>
-      ) : addresses.length === 0 ? (
+      ) : inviteLookup === "invalid" ? (
+        <p className="text-sm text-red-600 dark:text-red-400">
+          {te("invalidInvite")}
+        </p>
+      ) : inviteLookup === "noAddresses" ? (
         <p className="text-sm text-amber-800 dark:text-amber-200">
+          {t("noAddresses")}
+        </p>
+      ) : addresses.length === 0 ? (
+        <p className="text-sm text-zinc-500">
           {inviteCode.trim() ? t("noAddresses") : t("inviteEnterFirst")}
         </p>
       ) : (

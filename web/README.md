@@ -64,8 +64,8 @@ npm start
 
 1. **Дві змінні в Vercel** (обовʼязково для збірки з міграціями):
    - `DATABASE_URL` — **pooler** (для роботи застосунку на Vercel).
-   - `DIRECT_URL` — **direct** connection string з Neon (без `-pooler` у хості).  
-     Без `DIRECT_URL` збірка падає з `P1002` / `pg_advisory_lock` на pooler.
+   - `DIRECT_URL` — **direct** connection string з Neon (рекомендовано).  
+     Якщо є лише pooler URL, збірка спробує автоматично прибрати `-pooler` з хоста Neon.
 2. Build: `npm run vercel-build` → `scripts/prisma-migrate-deploy.ts` + Next build.
 3. Нові зміни схеми: `npx prisma migrate dev` (локально з direct URL у `.env`) → commit `prisma/migrations/` → redeploy.
 4. Якщо таймаут на cold start Neon — **Redeploy** один раз; або виконайте локально:  

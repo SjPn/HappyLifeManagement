@@ -21,10 +21,6 @@ export default async function ProfilePage() {
     listCommunityAddresses(),
   ]);
 
-  const isModerator = user?.role === "MODERATOR";
-  const staff =
-    user?.role === "CHAIR" || isModerator;
-
   return (
     <>
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
@@ -73,14 +69,6 @@ export default async function ProfilePage() {
         >
           {t("memorandumLink")}
         </Link>
-        {staff && (
-          <Link
-            href="/chair"
-            className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-900 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/60 dark:text-blue-100 dark:hover:bg-blue-900/40"
-          >
-            {t("chairPanel")}
-          </Link>
-        )}
       </nav>
 
       <div className="mt-10">

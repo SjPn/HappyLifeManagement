@@ -11,9 +11,23 @@ export function isR2Configured(): boolean {
   );
 }
 
+/** S3 API host only — without `/bucket` in the path (Cloudflare UI sometimes shows both). */
+function normalizeR2Endpoint(raw: string): string {
+  const trimmed = raw.trim().replace(/\/$/, "");
+  try {
+    const u = new URL(trimmed);
+    if (u.pathname && u.pathname !== "/") {
+      u.pathname = "/";
+    }
+    return u.origin;
+  } catch {
+    return trimmed;
+  }
+}
+
 function r2Endpoint(): string {
   const explicit = process.env.R2_ENDPOINT?.trim();
-  if (explicit) return explicit;
+  if (explicit) return normalizeR2Endpoint(explicit);
   const accountId = process.env.R2_ACCOUNT_ID?.trim();
   if (accountId) {
     return `https://${accountId}.r2.cloudflarestorage.com`;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "@/i18n/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
 import { signIn } from "next-auth/react";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
@@ -12,7 +12,6 @@ import type { AddressOption } from "@/lib/communityAddresses";
 
 export function RegisterForm() {
   const router = useRouter();
-  const locale = useLocale();
   const t = useTranslations("auth");
   const te = useTranslations("errors");
   const [error, setError] = useState<string | null>(null);
@@ -89,11 +88,7 @@ export function RegisterForm() {
       setError(te("generic"));
       return;
     }
-    router.push(
-      data.status === "APPROVED"
-        ? `/${locale}/dashboard`
-        : `/${locale}/pending`,
-    );
+    router.push(data.status === "APPROVED" ? "/dashboard" : "/pending");
     router.refresh();
   }
 
@@ -147,7 +142,7 @@ export function RegisterForm() {
         <p className="text-sm text-zinc-500">…</p>
       ) : addresses.length === 0 ? (
         <p className="text-sm text-amber-800 dark:text-amber-200">
-          {inviteCode.trim() ? t("noAddresses") : t("invitePh")}
+          {inviteCode.trim() ? t("noAddresses") : t("inviteEnterFirst")}
         </p>
       ) : (
         <AddressSelect addresses={addresses} />

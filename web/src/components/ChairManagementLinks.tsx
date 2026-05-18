@@ -37,9 +37,16 @@ export function ChairManagementLinks({
           {t("addresses")}
         </Link>
       )}
-      <Link href="/chair/users" className={chairNavLinkClass}>
-        {t("users")}
-      </Link>
+      <span className="relative block">
+        <Link href="/chair/users" className={chairNavLinkClass}>
+          {t("users")}
+        </Link>
+        {counts.pendingResidents > 0 && (
+          <span className="absolute right-3 top-1/2 -translate-y-1/2">
+            <NotificationBadge count={counts.pendingResidents} />
+          </span>
+        )}
+      </span>
       <Link href="/chair/reports" className={chairNavLinkClass}>
         {t("reports")}
       </Link>

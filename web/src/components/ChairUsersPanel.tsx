@@ -4,11 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { Card } from "@/components/Ui";
 import { UserApproveSelect } from "@/components/UserApproveSelect";
-import { BalanceEditForm } from "@/components/BalanceEditForm";
 import { UserEditForm } from "@/components/UserEditForm";
 import { DeleteUserButton } from "@/components/DeleteUserButton";
 import { formatAddressLine } from "@/lib/household";
-import { Role } from "@/lib/enums";
+import { Role, UserStatus } from "@/lib/enums";
 import type { AddressOption } from "@/lib/communityAddresses";
 import { useTranslations } from "next-intl";
 
@@ -118,12 +117,6 @@ function UserDetailModal({
             </div>
           </div>
 
-          {isChair && user.role === Role.RESIDENT && (
-            <div className="mt-4 border-t border-zinc-100 pt-3 dark:border-zinc-800">
-              <BalanceEditForm userId={user.id} balanceUah={user.balanceUah} />
-            </div>
-          )}
-
           {canManage && (
             <UserEditForm
               userId={user.id}
@@ -163,9 +156,16 @@ export function ChairUsersPanel({
   const ts = useTranslations("categories.userStatus");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const sorted = [...users].sort((a, b) =>
-    a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
-  );
+  const sorted = [...users].sort((a, b) => {
+    const aPending = a.status === UserStatus.PENDING ? 0 : 1;
+    const bPending = b.status === UserStatus.PENDING ? 0 : 1;
+    if (aPending !== bPending) return aPending - bPending;
+    return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+  });
+
+  const pendingCount = users.filter(
+    (u) => u.role === Role.RESIDENT && u.status === UserStatus.PENDING,
+  ).length;
 
   const selected = selectedId
     ? users.find((u) => u.id === selectedId) ?? null
@@ -185,21 +185,38 @@ export function ChairUsersPanel({
 
   return (
     <>
+      {pendingCount > 0 && (
+        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900 dark:bg-red-950/40 dark:text-red-100">
+          {t("pendingResidentsAlert", { count: pendingCount })}
+        </div>
+      )}
       <Card className="overflow-hidden p-0">
         <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {sorted.map((u) => {
             const address = formatAddressLine(u.street, u.houseNumber);
+            const isPending =
+              u.role === Role.RESIDENT && u.status === UserStatus.PENDING;
             return (
               <li key={u.id}>
                 <button
                   type="button"
                   onClick={() => setSelectedId(u.id)}
-                  className="flex w-full items-baseline justify-between gap-3 px-4 py-3.5 text-left transition hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
+                  className={`flex w-full items-baseline justify-between gap-3 border-l-4 px-4 py-3.5 text-left transition ${
+                    isPending
+                      ? "border-red-600 bg-red-50/80 hover:bg-red-100/80 dark:border-red-500 dark:bg-red-950/30 dark:hover:bg-red-950/50"
+                      : "border-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
+                  }`}
                 >
                   <span className="min-w-0 font-medium text-slate-900 dark:text-slate-100">
                     {u.name}
-                    {u.status !== "APPROVED" && (
-                      <span className="ml-2 text-xs font-normal text-amber-700 dark:text-amber-300">
+                    {u.status !== UserStatus.APPROVED && (
+                      <span
+                        className={`ml-2 text-xs font-semibold ${
+                          isPending
+                            ? "text-red-700 dark:text-red-300"
+                            : "text-amber-700 dark:text-amber-300"
+                        }`}
+                      >
                         · {ts(u.status as "PENDING" | "APPROVED" | "REJECTED")}
                       </span>
                     )}

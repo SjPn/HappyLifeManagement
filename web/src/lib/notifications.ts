@@ -4,7 +4,7 @@ import {
   isStaffRole,
   voteAudienceWhere,
 } from "@/lib/audience";
-import { Role } from "@/lib/enums";
+import { Role, UserStatus } from "@/lib/enums";
 import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
 import { communityWhere } from "@/lib/tenant";
 
@@ -32,6 +32,8 @@ export type NotificationCounts = {
   home: number;
   requests: number;
   community: number;
+  /** Residents awaiting chair approval (staff only). */
+  pendingResidents: number;
 };
 
 type SessionUser = {
@@ -136,6 +138,17 @@ export async function getNotificationCounts(
   const community = board + forum + reports;
   const home = news + votes + tickets + payments;
 
+  let pendingResidents = 0;
+  if (user.role === Role.CHAIR || user.role === Role.MODERATOR) {
+    pendingResidents = await prisma.user.count({
+      where: {
+        ...tenant,
+        role: Role.RESIDENT,
+        status: UserStatus.PENDING,
+      },
+    });
+  }
+
   return {
     news,
     votes,
@@ -147,6 +160,7 @@ export async function getNotificationCounts(
     home,
     requests,
     community,
+    pendingResidents,
   };
 }
 

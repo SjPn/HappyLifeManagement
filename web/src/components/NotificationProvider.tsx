@@ -20,6 +20,7 @@ const empty: NotificationCounts = {
   home: 0,
   requests: 0,
   community: 0,
+  pendingResidents: 0,
 };
 
 const NotificationContext = createContext<{

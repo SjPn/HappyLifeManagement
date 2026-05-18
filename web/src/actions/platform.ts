@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { Role, UserStatus } from "@/lib/enums";
 import {
   generateInviteCode,
+  normalizeInviteCode,
   slugifyCommunityName,
 } from "@/lib/tenant";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
@@ -57,7 +58,7 @@ async function verifyCommunityInviteCode(
   communityId: string,
   inviteCode: string,
 ) {
-  const trimmed = inviteCode.trim();
+  const trimmed = normalizeInviteCode(inviteCode);
   if (!trimmed) return { error: "inviteConfirmRequired" as const };
 
   const community = await prisma.community.findUnique({
@@ -126,6 +127,55 @@ export async function approveCommunity(communityId: string) {
     }),
   ]);
 
+  await revalidateAllLocales("/platform/communities");
+  return { ok: true };
+}
+
+export async function setPlatformChairSuspended(
+  communityId: string,
+  userId: string,
+  suspended: boolean,
+  inviteCode: string,
+) {
+  const gate = await requirePlatformAdmin();
+  if ("error" in gate) return gate;
+
+  const verified = await verifyCommunityInviteCode(communityId, inviteCode);
+  if ("error" in verified) return verified;
+
+  const chair = await prisma.user.findFirst({
+    where: { id: userId, communityId, role: Role.CHAIR },
+  });
+  if (!chair) return { error: "notFound" as const };
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      status: suspended ? UserStatus.REJECTED : UserStatus.APPROVED,
+    },
+  });
+
+  await revalidateAllLocales("/platform/communities");
+  return { ok: true };
+}
+
+export async function deletePlatformChair(
+  communityId: string,
+  userId: string,
+  inviteCode: string,
+) {
+  const gate = await requirePlatformAdmin();
+  if ("error" in gate) return gate;
+
+  const verified = await verifyCommunityInviteCode(communityId, inviteCode);
+  if ("error" in verified) return verified;
+
+  const chair = await prisma.user.findFirst({
+    where: { id: userId, communityId, role: Role.CHAIR },
+  });
+  if (!chair) return { error: "notFound" as const };
+
+  await prisma.user.delete({ where: { id: userId } });
   await revalidateAllLocales("/platform/communities");
   return { ok: true };
 }

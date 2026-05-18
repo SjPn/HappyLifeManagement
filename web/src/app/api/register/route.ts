@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Role, UserStatus } from "@/lib/enums";
 import { TenancyType } from "@/lib/audience";
 import { resolveCommunityAddress } from "@/lib/communityAddresses";
+import { normalizeInviteCode } from "@/lib/tenant";
 
 const schema = z.object({
   email: z.string().email(),
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
     tenancyType,
   } = parsed.data;
   const normalized = email.trim().toLowerCase();
-  const code = inviteCode.trim();
+  const code = normalizeInviteCode(inviteCode);
 
   const community = await prisma.community.findUnique({
     where: { inviteCode: code },
@@ -77,12 +78,6 @@ export async function POST(req: Request) {
     );
   }
 
-  const envInvite = process.env.INVITE_CODE?.trim();
-  const status =
-    envInvite && code === envInvite
-      ? UserStatus.APPROVED
-      : UserStatus.PENDING;
-
   const passwordHash = await bcrypt.hash(password, 10);
   const memorandumVersion = "MVP-2026-05-05";
   await prisma.user.create({
@@ -96,12 +91,12 @@ export async function POST(req: Request) {
       communityAddressId: address.id,
       phone: phone?.trim() || null,
       role: Role.RESIDENT,
-      status,
+      status: UserStatus.PENDING,
       tenancyType,
       memorandumAcceptedAt: new Date(),
       memorandumVersion,
     },
   });
 
-  return NextResponse.json({ ok: true, status });
+  return NextResponse.json({ ok: true, status: UserStatus.PENDING });
 }

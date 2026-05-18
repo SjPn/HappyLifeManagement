@@ -6,7 +6,9 @@ import { SignOutButton } from "@/components/AppShell";
 import { ApkDownloadLink } from "@/components/ApkDownloadLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
+import { ChairInviteCodeForm } from "@/components/ChairInviteCodeForm";
 import { getTranslations } from "next-intl/server";
+import { Role } from "@/lib/enums";
 import { listCommunityAddresses } from "@/lib/communityAddresses";
 import { requireCommunityId } from "@/lib/tenant";
 
@@ -17,12 +19,18 @@ export default async function ProfilePage() {
   const tr = await getTranslations("categories.roles");
   const tt = await getTranslations("categories.tenancy");
 
-  const [user, addresses] = await Promise.all([
+  const [user, addresses, community] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session!.user!.id },
     }),
     listCommunityAddresses(communityId),
+    prisma.community.findUnique({
+      where: { id: communityId },
+      select: { inviteCode: true, approvedAt: true },
+    }),
   ]);
+
+  const isChair = session!.user!.role === Role.CHAIR;
 
   return (
     <>
@@ -47,6 +55,13 @@ export default async function ProfilePage() {
             : "—"}
         </p>
       </Card>
+
+      {isChair && community?.approvedAt && (
+        <Card className="mb-6">
+          <p className="mb-3 text-sm font-semibold">{t("inviteSection")}</p>
+          <ChairInviteCodeForm currentCode={community.inviteCode} />
+        </Card>
+      )}
 
       {user && (
         <Card className="mb-6">

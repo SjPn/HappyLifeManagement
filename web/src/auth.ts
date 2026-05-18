@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@/lib/enums";
+import { Role, UserStatus } from "@/lib/enums";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -22,17 +22,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const user = await prisma.user.findUnique({
           where: { email: email.trim().toLowerCase() },
-          include: { community: { select: { blockedAt: true } } },
+          include: {
+            community: { select: { blockedAt: true, approvedAt: true } },
+          },
         });
         if (!user) return null;
 
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) return null;
 
-        if (
-          user.role !== Role.PLATFORM_ADMIN &&
-          user.community?.blockedAt
-        ) {
+        if (user.status === UserStatus.REJECTED) return null;
+
+        if (user.role !== Role.PLATFORM_ADMIN && user.community?.blockedAt) {
           return null;
         }
 

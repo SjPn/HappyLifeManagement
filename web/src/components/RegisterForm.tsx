@@ -105,11 +105,18 @@ export function RegisterForm() {
           name="inviteCode"
           required
           value={inviteCode}
-          onChange={(e) => setInviteCode(e.target.value)}
+          onChange={(e) => {
+            const v = e.target.value.toUpperCase();
+            setInviteCode(v);
+            if (v.trim().length >= 4) loadAddresses(v);
+            else setAddresses([]);
+          }}
           onBlur={() => loadAddresses(inviteCode)}
           className={inputClass}
           placeholder={t("invitePh")}
+          autoComplete="off"
         />
+        <span className="text-xs text-zinc-500">{t("inviteHint")}</span>
       </label>
       <label className="flex flex-col gap-1.5">
         <span className={labelClass}>{t("name")}</span>

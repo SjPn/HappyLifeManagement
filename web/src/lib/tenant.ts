@@ -85,6 +85,16 @@ export function generateInviteCode() {
   return randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase();
 }
 
+export function normalizeInviteCode(code: string) {
+  return code.trim().toUpperCase();
+}
+
+const INVITE_CODE_RE = /^[A-Z0-9_-]{4,32}$/;
+
+export function isValidInviteCode(code: string) {
+  return INVITE_CODE_RE.test(normalizeInviteCode(code));
+}
+
 export function slugifyCommunityName(name: string) {
   const base = name
     .trim()

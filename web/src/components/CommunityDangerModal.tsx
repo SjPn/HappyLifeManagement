@@ -5,15 +5,23 @@ import { X } from "lucide-react";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
 import { useTranslations } from "next-intl";
 
-export type CommunityDangerAction = "block" | "unblock" | "delete";
+export type CommunityDangerAction =
+  | "block"
+  | "unblock"
+  | "delete"
+  | "suspendChair"
+  | "restoreChair"
+  | "deleteChair";
 
 export function CommunityDangerModal({
   communityName,
+  subjectName,
   action,
   onClose,
   onConfirm,
 }: {
   communityName: string;
+  subjectName?: string;
   action: CommunityDangerAction;
   onClose: () => void;
   onConfirm: (inviteCode: string) => Promise<{ error?: string }>;
@@ -24,19 +32,33 @@ export function CommunityDangerModal({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const chair = subjectName ?? "";
+
   const title =
     action === "delete"
       ? t("modalDeleteTitle")
       : action === "block"
         ? t("modalBlockTitle")
-        : t("modalUnblockTitle");
+        : action === "unblock"
+          ? t("modalUnblockTitle")
+          : action === "deleteChair"
+            ? t("modalDeleteChairTitle")
+            : action === "suspendChair"
+              ? t("modalSuspendChairTitle")
+              : t("modalRestoreChairTitle");
 
   const description =
     action === "delete"
       ? t("modalDeleteText", { name: communityName })
       : action === "block"
         ? t("modalBlockText", { name: communityName })
-        : t("modalUnblockText", { name: communityName });
+        : action === "unblock"
+          ? t("modalUnblockText", { name: communityName })
+          : action === "deleteChair"
+            ? t("modalDeleteChairText", { chair, community: communityName })
+            : action === "suspendChair"
+              ? t("modalSuspendChairText", { chair, community: communityName })
+              : t("modalRestoreChairText", { chair, community: communityName });
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -75,9 +97,9 @@ export function CommunityDangerModal({
   }
 
   const dangerBtn =
-    action === "delete"
+    action === "delete" || action === "deleteChair"
       ? "bg-red-600 hover:bg-red-700 text-white shadow-red-600/25"
-      : action === "block"
+      : action === "block" || action === "suspendChair"
         ? "bg-amber-600 hover:bg-amber-700 text-white"
         : primaryButtonClass;
 
@@ -149,9 +171,15 @@ export function CommunityDangerModal({
                 ? t("confirming")
                 : action === "delete"
                   ? t("confirmDeleteBtn")
-                  : action === "block"
-                    ? t("confirmBlockBtn")
-                    : t("confirmUnblockBtn")}
+                  : action === "deleteChair"
+                    ? t("confirmDeleteChairBtn")
+                    : action === "block"
+                      ? t("confirmBlockBtn")
+                      : action === "suspendChair"
+                        ? t("confirmSuspendChairBtn")
+                        : action === "restoreChair"
+                          ? t("confirmRestoreChairBtn")
+                          : t("confirmUnblockBtn")}
             </button>
           </div>
         </form>

@@ -6,7 +6,9 @@ import {
   approveCommunity,
   createCommunity,
   deleteCommunity,
+  deletePlatformChair,
   setCommunityBlocked,
+  setPlatformChairSuspended,
 } from "@/actions/platform";
 import {
   CommunityDangerModal,
@@ -14,7 +16,15 @@ import {
 } from "@/components/CommunityDangerModal";
 import { Card } from "@/components/Ui";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
+import { UserStatus } from "@/lib/enums";
 import { useTranslations } from "next-intl";
+
+export type ChairRow = {
+  id: string;
+  name: string;
+  email: string;
+  status: string;
+};
 
 export type CommunityRow = {
   id: string;
@@ -25,19 +35,28 @@ export type CommunityRow = {
   blockedAt: string | null;
   approvedAt: string | null;
   userCount: number;
+  chairs: ChairRow[];
 };
 
 type DangerModalState = {
-  id: string;
-  name: string;
+  communityId: string;
+  communityName: string;
   action: CommunityDangerAction;
   block: boolean;
+  chairId?: string;
+  chairName?: string;
 };
 
 function communityStatus(c: CommunityRow) {
   if (!c.approvedAt) return "awaitingApproval" as const;
   if (c.blockedAt) return "blocked" as const;
   return "active" as const;
+}
+
+function chairStatusLabel(status: string, t: (k: string) => string) {
+  if (status === UserStatus.APPROVED) return t("chairActive");
+  if (status === UserStatus.REJECTED) return t("chairSuspended");
+  return t("chairPending");
 }
 
 export function PlatformCommunitiesPanel({
@@ -78,8 +97,8 @@ export function PlatformCommunitiesPanel({
 
   function openBlockModal(c: CommunityRow) {
     setDangerModal({
-      id: c.id,
-      name: c.name,
+      communityId: c.id,
+      communityName: c.name,
       action: c.blockedAt ? "unblock" : "block",
       block: !c.blockedAt,
     });
@@ -87,24 +106,62 @@ export function PlatformCommunitiesPanel({
 
   function openDeleteModal(c: CommunityRow) {
     setDangerModal({
-      id: c.id,
-      name: c.name,
+      communityId: c.id,
+      communityName: c.name,
       action: "delete",
       block: false,
     });
   }
 
+  function openChairModal(
+    c: CommunityRow,
+    chair: ChairRow,
+    action: "suspendChair" | "restoreChair" | "deleteChair",
+  ) {
+    setDangerModal({
+      communityId: c.id,
+      communityName: c.name,
+      action,
+      block: action === "suspendChair",
+      chairId: chair.id,
+      chairName: chair.name,
+    });
+  }
+
   async function onDangerConfirm(inviteCode: string) {
     if (!dangerModal) return { error: "inviteMismatch" };
-    setPending(dangerModal.id);
-    const res =
-      dangerModal.action === "delete"
-        ? await deleteCommunity(dangerModal.id, inviteCode)
-        : await setCommunityBlocked(
-            dangerModal.id,
-            dangerModal.block,
-            inviteCode,
-          );
+    const key = dangerModal.chairId
+      ? `chair:${dangerModal.chairId}`
+      : dangerModal.communityId;
+    setPending(key);
+
+    let res: { ok?: boolean; error?: string } | undefined;
+
+    if (dangerModal.chairId) {
+      if (dangerModal.action === "deleteChair") {
+        res = await deletePlatformChair(
+          dangerModal.communityId,
+          dangerModal.chairId,
+          inviteCode,
+        );
+      } else {
+        res = await setPlatformChairSuspended(
+          dangerModal.communityId,
+          dangerModal.chairId,
+          dangerModal.action === "suspendChair",
+          inviteCode,
+        );
+      }
+    } else if (dangerModal.action === "delete") {
+      res = await deleteCommunity(dangerModal.communityId, inviteCode);
+    } else {
+      res = await setCommunityBlocked(
+        dangerModal.communityId,
+        dangerModal.block,
+        inviteCode,
+      );
+    }
+
     setPending(null);
     if (res && "ok" in res && res.ok) {
       router.refresh();
@@ -150,7 +207,7 @@ export function PlatformCommunitiesPanel({
           const status = communityStatus(c);
           return (
             <li key={c.id}>
-              <Card className="space-y-2">
+              <Card className="space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="font-semibold">{c.name}</p>
@@ -178,7 +235,73 @@ export function PlatformCommunitiesPanel({
                     </span>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-2 pt-2">
+
+                {c.chairs.length > 0 && (
+                  <div className="rounded-xl border border-zinc-100 bg-zinc-50/80 p-3 dark:border-zinc-800 dark:bg-zinc-950/50">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                      {t("chairsHeading")}
+                    </p>
+                    <ul className="mt-2 space-y-2">
+                      {c.chairs.map((chair) => {
+                        const chairKey = `chair:${chair.id}`;
+                        const suspended = chair.status === UserStatus.REJECTED;
+                        return (
+                          <li
+                            key={chair.id}
+                            className="flex flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-2.5 dark:border-zinc-700 dark:bg-zinc-900 sm:flex-row sm:items-center sm:justify-between"
+                          >
+                            <div className="min-w-0 text-sm">
+                              <p className="font-medium">{chair.name}</p>
+                              <p className="truncate text-xs text-zinc-500">
+                                {chair.email}
+                              </p>
+                              <p className="mt-0.5 text-xs text-zinc-500">
+                                {chairStatusLabel(chair.status, t)}
+                              </p>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {suspended ? (
+                                <button
+                                  type="button"
+                                  disabled={pending === chairKey}
+                                  onClick={() =>
+                                    openChairModal(c, chair, "restoreChair")
+                                  }
+                                  className="rounded-lg border border-zinc-200 px-2.5 py-1 text-xs font-medium dark:border-zinc-700"
+                                >
+                                  {t("restoreChair")}
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  disabled={pending === chairKey}
+                                  onClick={() =>
+                                    openChairModal(c, chair, "suspendChair")
+                                  }
+                                  className="rounded-lg border border-amber-200 px-2.5 py-1 text-xs font-medium text-amber-800 dark:border-amber-900 dark:text-amber-200"
+                                >
+                                  {t("suspendChair")}
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                disabled={pending === chairKey}
+                                onClick={() =>
+                                  openChairModal(c, chair, "deleteChair")
+                                }
+                                className="rounded-lg border border-red-200 px-2.5 py-1 text-xs font-medium text-red-700 dark:border-red-900"
+                              >
+                                {t("deleteChair")}
+                              </button>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-2">
                   {status === "awaitingApproval" && (
                     <button
                       type="button"
@@ -216,10 +339,14 @@ export function PlatformCommunitiesPanel({
 
       {dangerModal && (
         <CommunityDangerModal
-          communityName={dangerModal.name}
+          communityName={dangerModal.communityName}
+          subjectName={dangerModal.chairName}
           action={dangerModal.action}
           onClose={() => {
-            if (pending !== dangerModal.id) setDangerModal(null);
+            const key = dangerModal.chairId
+              ? `chair:${dangerModal.chairId}`
+              : dangerModal.communityId;
+            if (pending !== key) setDangerModal(null);
           }}
           onConfirm={onDangerConfirm}
         />

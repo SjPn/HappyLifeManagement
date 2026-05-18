@@ -11,7 +11,12 @@ import {
   type BillingPeriod,
 } from "@/lib/billing";
 import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
-import { communityWhere, requireCommunityId } from "@/lib/tenant";
+import {
+  communityWhere,
+  isValidInviteCode,
+  normalizeInviteCode,
+  requireCommunityId,
+} from "@/lib/tenant";
 
 function staff(session: { user?: { role?: string } } | null) {
   const r = session?.user?.role;
@@ -288,5 +293,39 @@ export async function deleteUser(userId: string) {
   revalidateAllLocales("/residents");
   revalidateAllLocales("/community");
   revalidateAllLocales("/dashboard");
+  return { ok: true as const };
+}
+
+export async function updateCommunityInviteCode(formData: FormData) {
+  const session = await auth();
+  if (session?.user?.role !== Role.CHAIR) {
+    return { error: "forbidden" as const };
+  }
+
+  const communityId = requireCommunityId(session.user);
+  const raw = String(formData.get("inviteCode") ?? "");
+  if (!isValidInviteCode(raw)) {
+    return { error: "inviteCodeInvalid" as const };
+  }
+  const inviteCode = normalizeInviteCode(raw);
+
+  const community = await prisma.community.findFirst({
+    where: { id: communityId, approvedAt: { not: null } },
+    select: { inviteCode: true },
+  });
+  if (!community) return { error: "notApproved" as const };
+  if (community.inviteCode === inviteCode) return { ok: true as const };
+
+  try {
+    await prisma.community.update({
+      where: { id: communityId },
+      data: { inviteCode },
+    });
+  } catch {
+    return { error: "inviteCodeTaken" as const };
+  }
+
+  revalidateAllLocales("/profile");
+  revalidateAllLocales("/chair");
   return { ok: true as const };
 }

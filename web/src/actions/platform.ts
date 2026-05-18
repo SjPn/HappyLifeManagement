@@ -52,10 +52,28 @@ export async function createCommunity(formData: FormData) {
   return { error: "slugConflict" };
 }
 
-export async function deleteCommunity(communityId: string, confirm: string) {
+async function verifyCommunityInviteCode(
+  communityId: string,
+  inviteCode: string,
+) {
+  const trimmed = inviteCode.trim();
+  if (!trimmed) return { error: "inviteConfirmRequired" as const };
+
+  const community = await prisma.community.findUnique({
+    where: { id: communityId },
+    select: { inviteCode: true },
+  });
+  if (!community) return { error: "notFound" as const };
+  if (community.inviteCode !== trimmed) return { error: "inviteMismatch" as const };
+  return { ok: true as const };
+}
+
+export async function deleteCommunity(communityId: string, inviteCode: string) {
   const gate = await requirePlatformAdmin();
   if ("error" in gate) return gate;
-  if (confirm !== "yes") return { error: "confirmRequired" };
+
+  const verified = await verifyCommunityInviteCode(communityId, inviteCode);
+  if ("error" in verified) return verified;
 
   await prisma.community.delete({ where: { id: communityId } });
   await revalidateAllLocales("/platform/communities");
@@ -65,11 +83,13 @@ export async function deleteCommunity(communityId: string, confirm: string) {
 export async function setCommunityBlocked(
   communityId: string,
   blocked: boolean,
-  confirm: string,
+  inviteCode: string,
 ) {
   const gate = await requirePlatformAdmin();
   if ("error" in gate) return gate;
-  if (confirm !== "yes") return { error: "confirmRequired" };
+
+  const verified = await verifyCommunityInviteCode(communityId, inviteCode);
+  if ("error" in verified) return verified;
 
   await prisma.community.update({
     where: { id: communityId },

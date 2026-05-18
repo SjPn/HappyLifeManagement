@@ -34,7 +34,15 @@ export default async function RegisterPage({
         <div className="mt-8 hl-glass rounded-2xl p-5 sm:p-6">
           <RegisterForm />
         </div>
-        <p className="mt-8 text-center text-sm text-slate-500">
+        <p className="mt-6 text-center text-sm text-slate-500">
+          <Link
+            className="font-semibold text-blue-700 hover:underline dark:text-blue-400"
+            href="/register-community"
+          >
+            {t("createCommunityLink")}
+          </Link>
+        </p>
+        <p className="mt-4 text-center text-sm text-slate-500">
           {t("hasAccount")}{" "}
           <Link
             className="font-semibold text-blue-700 hover:underline dark:text-blue-400"

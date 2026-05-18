@@ -7,6 +7,10 @@ import {
   deleteCommunity,
   setCommunityBlocked,
 } from "@/actions/platform";
+import {
+  CommunityDangerModal,
+  type CommunityDangerAction,
+} from "@/components/CommunityDangerModal";
 import { Card } from "@/components/Ui";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
 import { useTranslations } from "next-intl";
@@ -21,6 +25,13 @@ export type CommunityRow = {
   userCount: number;
 };
 
+type DangerModalState = {
+  id: string;
+  name: string;
+  action: CommunityDangerAction;
+  block: boolean;
+};
+
 export function PlatformCommunitiesPanel({
   communities,
 }: {
@@ -29,6 +40,7 @@ export function PlatformCommunitiesPanel({
   const t = useTranslations("platform");
   const router = useRouter();
   const [pending, setPending] = useState<string | null>(null);
+  const [dangerModal, setDangerModal] = useState<DangerModalState | null>(null);
 
   async function onCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,25 +53,42 @@ export function PlatformCommunitiesPanel({
     }
   }
 
-  async function onBlock(id: string, block: boolean) {
-    const msg = block ? t("confirmBlock") : t("confirmUnblock");
-    if (!window.confirm(msg)) return;
-    const confirm = window.prompt(t("typeYes")) ?? "";
-    if (confirm !== "yes") return;
-    setPending(id);
-    await setCommunityBlocked(id, block, "yes");
-    setPending(null);
-    router.refresh();
+  function openBlockModal(c: CommunityRow) {
+    setDangerModal({
+      id: c.id,
+      name: c.name,
+      action: c.blockedAt ? "unblock" : "block",
+      block: !c.blockedAt,
+    });
   }
 
-  async function onDelete(id: string, name: string) {
-    if (!window.confirm(t("confirmDelete", { name }))) return;
-    const confirm = window.prompt(t("typeYes")) ?? "";
-    if (confirm !== "yes") return;
-    setPending(id);
-    await deleteCommunity(id, "yes");
+  function openDeleteModal(c: CommunityRow) {
+    setDangerModal({
+      id: c.id,
+      name: c.name,
+      action: "delete",
+      block: false,
+    });
+  }
+
+  async function onDangerConfirm(inviteCode: string) {
+    if (!dangerModal) return { error: "inviteMismatch" };
+    setPending(dangerModal.id);
+    const res =
+      dangerModal.action === "delete"
+        ? await deleteCommunity(dangerModal.id, inviteCode)
+        : await setCommunityBlocked(
+            dangerModal.id,
+            dangerModal.block,
+            inviteCode,
+          );
     setPending(null);
-    router.refresh();
+    if (res && "ok" in res && res.ok) {
+      router.refresh();
+      return {};
+    }
+    if (res && "error" in res) return { error: res.error };
+    return { error: "inviteMismatch" };
   }
 
   return (
@@ -124,7 +153,7 @@ export function PlatformCommunitiesPanel({
                 <button
                   type="button"
                   disabled={pending === c.id}
-                  onClick={() => onBlock(c.id, !c.blockedAt)}
+                  onClick={() => openBlockModal(c)}
                   className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium dark:border-zinc-700"
                 >
                   {c.blockedAt ? t("unblock") : t("block")}
@@ -132,7 +161,7 @@ export function PlatformCommunitiesPanel({
                 <button
                   type="button"
                   disabled={pending === c.id}
-                  onClick={() => onDelete(c.id, c.name)}
+                  onClick={() => openDeleteModal(c)}
                   className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 dark:border-red-900"
                 >
                   {t("delete")}
@@ -142,6 +171,17 @@ export function PlatformCommunitiesPanel({
           </li>
         ))}
       </ul>
+
+      {dangerModal && (
+        <CommunityDangerModal
+          communityName={dangerModal.name}
+          action={dangerModal.action}
+          onClose={() => {
+            if (pending !== dangerModal.id) setDangerModal(null);
+          }}
+          onConfirm={onDangerConfirm}
+        />
+      )}
     </div>
   );
 }

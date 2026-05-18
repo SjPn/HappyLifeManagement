@@ -72,6 +72,18 @@ export default async function HomePage({
           </Link>
         </div>
 
+        <p className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
+          <Link
+            href="/register-community"
+            className="font-semibold text-blue-700 hover:underline dark:text-blue-400"
+          >
+            {t("createCommunity")}
+          </Link>
+          <span className="mt-1 block text-xs text-slate-500">
+            {t("createCommunityHint")}
+          </span>
+        </p>
+
         <ul className="mt-14 space-y-4">
           {feats.map(({ Icon, t: tit, d }) => (
             <li

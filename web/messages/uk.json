@@ -173,7 +173,29 @@
       "footerEngagement": "{posts} новин · {likes} лайків за тиждень"
     },
     "popularNewsTitle": "Популярна новина",
-    "popularNewsText": "«{title}» — {count} лайків за тиждень"
+    "popularNewsText": "«{title}» — {count} лайків за тиждень",
+    "residentHub": {
+      "pulseTitle": "Зверніть увагу",
+      "pulseText": "Відкритих заявок: {tickets}. Непрочитаних повідомлень: {messages}.",
+      "statMessages": "Повідомлення",
+      "statTickets": "Заявки",
+      "statVotes": "Голоси",
+      "statNews": "Новини",
+      "sectionQuick": "Швидкі дії",
+      "sectionMore": "Ще",
+      "actionNewTicket": "Нова заявка",
+      "actionNewTicketDesc": "Повідомити про проблему з фото",
+      "actionPayments": "Мої платежі",
+      "actionPaymentsDesc": "Нарахування та статус оплати",
+      "actionCommunity": "Спільнота",
+      "actionCommunityDesc": "Новини, форум, дошка, мешканці",
+      "actionMessages": "Повідомлення",
+      "actionMessagesDesc": "Особисте листування",
+      "actionVotes": "Голосування",
+      "actionVotesDesc": "Активні опитування ОСББ",
+      "actionNews": "Усі новини",
+      "actionNewsDesc": "Стрічка селища"
+    }
   },
   "requests": {
     "title": "Заявки",
@@ -353,6 +375,11 @@
       "households": "Будинки",
       "paid": "Сплачено",
       "unpaid": "Не сплачено"
+    },
+    "residentHub": {
+      "subscription": "Абонплата",
+      "electricity": "Світло",
+      "total": "Разом"
     }
   },
   "profile": {

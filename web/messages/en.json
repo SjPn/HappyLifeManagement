@@ -173,7 +173,29 @@
       "footerEngagement": "{posts} news posts · {likes} likes this week"
     },
     "popularNewsTitle": "Popular news",
-    "popularNewsText": "\"{title}\" — {count} likes this week"
+    "popularNewsText": "\"{title}\" — {count} likes this week",
+    "residentHub": {
+      "pulseTitle": "Needs attention",
+      "pulseText": "Open requests: {tickets}. Unread messages: {messages}.",
+      "statMessages": "Messages",
+      "statTickets": "Requests",
+      "statVotes": "Votes",
+      "statNews": "News",
+      "sectionQuick": "Quick actions",
+      "sectionMore": "More",
+      "actionNewTicket": "New request",
+      "actionNewTicketDesc": "Report an issue with a photo",
+      "actionPayments": "My payments",
+      "actionPaymentsDesc": "Charges and payment status",
+      "actionCommunity": "Community",
+      "actionCommunityDesc": "News, forum, board, residents",
+      "actionMessages": "Messages",
+      "actionMessagesDesc": "Private conversations",
+      "actionVotes": "Votes",
+      "actionVotesDesc": "Active HOA polls",
+      "actionNews": "All news",
+      "actionNewsDesc": "Village feed"
+    }
   },
   "requests": {
     "title": "Requests",
@@ -353,6 +375,11 @@
       "households": "Homes",
       "paid": "Paid",
       "unpaid": "Unpaid"
+    },
+    "residentHub": {
+      "subscription": "Subscription",
+      "electricity": "Electricity",
+      "total": "Total"
     }
   },
   "profile": {

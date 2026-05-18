@@ -173,7 +173,29 @@
       "footerEngagement": "{posts} новостей · {likes} лайков за неделю"
     },
     "popularNewsTitle": "Популярная новость",
-    "popularNewsText": "«{title}» — {count} лайков за неделю"
+    "popularNewsText": "«{title}» — {count} лайков за неделю",
+    "residentHub": {
+      "pulseTitle": "Обратите внимание",
+      "pulseText": "Открытых заявок: {tickets}. Непрочитанных сообщений: {messages}.",
+      "statMessages": "Сообщения",
+      "statTickets": "Заявки",
+      "statVotes": "Голоса",
+      "statNews": "Новости",
+      "sectionQuick": "Быстрые действия",
+      "sectionMore": "Ещё",
+      "actionNewTicket": "Новая заявка",
+      "actionNewTicketDesc": "Сообщить о проблеме с фото",
+      "actionPayments": "Мои платежи",
+      "actionPaymentsDesc": "Начисления и статус оплаты",
+      "actionCommunity": "Сообщество",
+      "actionCommunityDesc": "Новости, форум, доска, жители",
+      "actionMessages": "Сообщения",
+      "actionMessagesDesc": "Личная переписка",
+      "actionVotes": "Голосования",
+      "actionVotesDesc": "Активные опросы ОСББ",
+      "actionNews": "Все новости",
+      "actionNewsDesc": "Лента посёлка"
+    }
   },
   "requests": {
     "title": "Заявки",
@@ -353,6 +375,11 @@
       "households": "Дома",
       "paid": "Оплачено",
       "unpaid": "Не оплачено"
+    },
+    "residentHub": {
+      "subscription": "Абонплата",
+      "electricity": "Свет",
+      "total": "Итого"
     }
   },
   "profile": {

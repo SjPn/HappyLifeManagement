@@ -2,6 +2,7 @@ import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PageTitle, Card, FormSection } from "@/components/Ui";
+import { ProfileIdentityCard } from "@/components/ProfileIdentityCard";
 import { ProfileHubLinks } from "@/components/ProfileHubLinks";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
 import { ProfileCredentialsForm } from "@/components/ProfileCredentialsForm";
@@ -36,25 +37,15 @@ export default async function ProfilePage() {
     <>
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
 
-      <Card className="mb-6">
-        <p className="text-sm font-medium">{user?.name}</p>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          {user?.email}
-        </p>
-        <p className="mt-3 text-sm">
-          {user?.street} {user?.houseNumber}
-        </p>
-        <p className="mt-2 text-xs text-zinc-500">
-          {t("role")}{" "}
-          {user?.role ? tr(user.role as "RESIDENT" | "MODERATOR" | "CHAIR") : "—"}
-        </p>
-        <p className="mt-1 text-xs text-zinc-500">
-          {t("tenancyTitle")}:{" "}
-          {user?.tenancyType
-            ? tt(user.tenancyType as "OWNER" | "TENANT")
-            : "—"}
-        </p>
-      </Card>
+      {user && (
+        <ProfileIdentityCard
+          name={user.name}
+          email={user.email}
+          address={`${user.street} ${user.houseNumber}`}
+          roleLabel={`${t("role")} ${tr(user.role as "RESIDENT" | "MODERATOR" | "CHAIR")}`}
+          tenancyLabel={`${t("tenancyTitle")}: ${tt(user.tenancyType as "OWNER" | "TENANT")}`}
+        />
+      )}
 
       {isChair && community?.approvedAt && (
         <FormSection title={t("inviteSection")}>

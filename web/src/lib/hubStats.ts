@@ -1,10 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { Role, UserStatus } from "@/lib/enums";
 import {
   billingPeriodWhere,
   currentBillingPeriod,
   type BillingPeriod,
 } from "@/lib/billing";
+import { voteAudienceWhere } from "@/lib/audience";
 import { communityWhere } from "@/lib/tenant";
 
 export type CommunityHubStats = {
@@ -24,6 +24,13 @@ export type PaymentsHubStats = {
   households: number;
   paidCount: number;
   unpaidCount: number;
+};
+
+export type ResidentDashboardStats = {
+  openTickets: number;
+  activeVotes: number;
+  unreadMessages: number;
+  newsPosts: number;
 };
 
 export async function getCommunityHubStats(
@@ -77,6 +84,34 @@ export async function getPaymentsHubStats(
   ).length;
 
   return { households, paidCount, unpaidCount };
+}
+
+export async function getResidentDashboardStats(
+  communityId: string,
+  userId: string,
+  audience: { role: string; tenancyType?: string | null },
+): Promise<ResidentDashboardStats> {
+  const tenant = communityWhere(communityId);
+  const now = new Date();
+  const [openTickets, activeVotes, unreadMessages, newsPosts] = await Promise.all([
+    prisma.ticket.count({
+      where: { ...tenant, userId, status: { not: "RESOLVED" } },
+    }),
+    prisma.vote.count({
+      where: {
+        ...tenant,
+        AND: [
+          { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
+          voteAudienceWhere(audience),
+        ],
+      },
+    }),
+    prisma.directMessage.count({
+      where: { ...tenant, recipientId: userId, readAt: null },
+    }),
+    prisma.newsPost.count({ where: tenant }),
+  ]);
+  return { openTickets, activeVotes, unreadMessages, newsPosts };
 }
 
 export async function getPopularNewsId(communityId: string) {

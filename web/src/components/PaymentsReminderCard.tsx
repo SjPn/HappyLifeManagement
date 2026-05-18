@@ -1,27 +1,30 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
-import { Card } from "@/components/Ui";
-import { NotificationBadge } from "@/components/NotificationBadge";
+import { HubActionCard } from "@/components/hub/hubUi";
 import { useNotifications } from "@/components/NotificationProvider";
+import { CreditCard } from "lucide-react";
 
 export function PaymentsReminderCard({
-  children,
+  title,
+  description,
+  periodLabel,
 }: {
-  children: React.ReactNode;
+  title: string;
+  description: string;
+  periodLabel: string;
 }) {
   const { counts } = useNotifications();
 
   return (
-    <Link href="/payments" className="mt-3 block">
-      <Card className="relative transition hover:border-blue-300 hover:bg-blue-50/30 dark:hover:border-blue-800 dark:hover:bg-blue-950/20">
-        {counts.payments > 0 && (
-          <span className="absolute right-3 top-3">
-            <NotificationBadge count={counts.payments} />
-          </span>
-        )}
-        {children}
-      </Card>
-    </Link>
+    <div className="mt-5">
+      <HubActionCard
+        href="/payments"
+        icon={CreditCard}
+        title={title}
+        description={`${periodLabel} · ${description}`}
+        badge={counts.payments}
+        tone="emerald"
+      />
+    </div>
   );
 }

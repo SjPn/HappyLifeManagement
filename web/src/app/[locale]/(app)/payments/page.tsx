@@ -1,6 +1,8 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PageTitle, Card, ButtonLink } from "@/components/Ui";
+import { HubPulseBanner, HubSection } from "@/components/hub/hubUi";
+import { ResidentPaymentsHubBar } from "@/components/ResidentPaymentsHubBar";
 import { PaymentEditForm } from "@/components/PaymentEditForm";
 import { PaymentPaidToggle } from "@/components/PaymentPaidToggle";
 import { PaymentPeriodNav } from "@/components/PaymentPeriodNav";
@@ -104,53 +106,28 @@ async function ResidentPaymentsView({
       </Card>
 
       {isPaid ? (
-        <Card className="mb-4 border-blue-300 bg-blue-100/80 dark:border-blue-700 dark:bg-blue-950/50">
-          <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-            {t("paidBadge")}
-          </p>
-          <p className="mt-2 text-sm text-blue-800 dark:text-blue-200">
-            {t("paidStatus", { period: periodLabel })}
-          </p>
-          {billing?.paidAt && (
-            <p className="mt-1 text-xs text-blue-700/90 dark:text-blue-300/90">
-              {t("historyPaid", {
-                date: billing.paidAt.toLocaleDateString(dateLocaleForUi(locale), {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                }),
-              })}
-            </p>
-          )}
-        </Card>
+        <HubPulseBanner
+          title={t("paidBadge")}
+          message={
+            billing?.paidAt
+              ? `${t("paidStatus", { period: periodLabel })} · ${t("historyPaid", {
+                  date: billing.paidAt.toLocaleDateString(dateLocaleForUi(locale), {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  }),
+                })}`
+              : t("paidStatus", { period: periodLabel })
+          }
+        />
       ) : (
-        <div className="flex flex-col gap-3">
-        <Card>
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            {t("subscription")}
-          </p>
-          <p className="mt-2 text-2xl font-bold tabular-nums">
-            {formatUah(subscription, locale)}
-          </p>
-        </Card>
-
-        <Card>
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            {t("electricity")}
-          </p>
-          <p className="mt-2 text-2xl font-bold tabular-nums">
-            {formatUah(electricity, locale)}
-          </p>
-        </Card>
-
-        <Card className="border-blue-200 bg-blue-50/40 dark:border-blue-900 dark:bg-blue-950/20">
-          <p className="text-xs font-semibold uppercase tracking-wide text-blue-800 dark:text-blue-200">
-            {t("total")}
-          </p>
-          <p className="mt-2 text-2xl font-bold tabular-nums text-blue-900 dark:text-blue-100">
-            {formatUah(total, locale)}
-          </p>
-        </Card>
+        <div className="mb-4">
+          <ResidentPaymentsHubBar
+            subscriptionLabel={formatUah(subscription, locale)}
+            electricityLabel={formatUah(electricity, locale)}
+            totalLabel={formatUah(total, locale)}
+            highlightTotal={total > 0}
+          />
         </div>
       )}
 
@@ -173,10 +150,7 @@ async function ResidentPaymentsView({
       )}
 
       {historyRows.length > 0 && (
-        <>
-          <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-            {t("historyTitle")}
-          </h2>
+        <HubSection title={t("historyTitle")} className="!mt-8">
           <div className="flex flex-col gap-2">
             {historyRows.map((row) => {
               const rowTotal =
@@ -210,7 +184,7 @@ async function ResidentPaymentsView({
               );
             })}
           </div>
-        </>
+        </HubSection>
       )}
 
       <div className="mt-6">

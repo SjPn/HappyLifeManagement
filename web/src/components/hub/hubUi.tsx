@@ -19,35 +19,52 @@ export type HubAccentTone = keyof typeof hubAccent;
 export function HubStatTile({
   href,
   value,
+  displayValue,
   label,
   highlight,
 }: {
-  href: string;
+  href?: string;
   value: number;
+  /** Shown instead of `value` (e.g. formatted currency). */
+  displayValue?: string;
   label: string;
   highlight?: boolean;
 }) {
-  return (
-    <Link
-      href={href}
-      className={`hl-glass flex min-w-0 flex-1 flex-col items-center rounded-2xl px-2 py-3 text-center transition hover:-translate-y-0.5 hover:border-blue-300/60 hover:shadow-lg active:scale-[0.98] sm:px-3 ${
-        highlight ? "ring-2 ring-amber-400/50 dark:ring-amber-500/40" : ""
-      }`}
-    >
+  const shown = displayValue ?? String(value);
+  const inner = (
+    <>
       <span
-        className={`text-2xl font-bold tabular-nums tracking-tight ${
+        className={`text-xl font-bold tabular-nums tracking-tight sm:text-2xl ${
           highlight
             ? "text-amber-700 dark:text-amber-300"
             : "bg-gradient-to-br from-blue-600 to-sky-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-sky-300"
         }`}
       >
-        {value}
+        {shown}
       </span>
       <span className="mt-1 text-[0.65rem] font-semibold uppercase leading-tight tracking-wide text-slate-500 dark:text-slate-400">
         {label}
       </span>
-    </Link>
+    </>
   );
+
+  const className = `hl-glass flex min-w-0 flex-1 flex-col items-center rounded-2xl px-2 py-3 text-center sm:px-3 ${
+    highlight ? "ring-2 ring-amber-400/50 dark:ring-amber-500/40" : ""
+  } ${
+    href
+      ? "transition hover:-translate-y-0.5 hover:border-blue-300/60 hover:shadow-lg active:scale-[0.98]"
+      : ""
+  }`;
+
+  if (href) {
+    return (
+      <Link href={href} className={className}>
+        {inner}
+      </Link>
+    );
+  }
+
+  return <div className={className}>{inner}</div>;
 }
 
 export function HubStatsRow({ children }: { children: React.ReactNode }) {

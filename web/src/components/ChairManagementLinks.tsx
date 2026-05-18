@@ -34,6 +34,9 @@ export function ChairManagementLinks({
       )}
       {isChair && (
         <>
+          <Link href="/community/news" className={chairNavLinkClass}>
+            {t("newsHomeButton")}
+          </Link>
           <Link href="/chair/addresses" className={chairNavLinkClass}>
             {t("addresses")}
           </Link>

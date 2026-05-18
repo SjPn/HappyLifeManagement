@@ -171,10 +171,7 @@ export default async function DashboardPage() {
       )}
 
       {isChair ? (
-        <ChairPublishBlocks
-          newsEyebrow={tChair("newsEyebrow")}
-          voteEyebrow={tChair("voteEyebrow")}
-        />
+        <ChairPublishBlocks voteEyebrow={tChair("voteEyebrow")} />
       ) : (
         <>
           <NewsSectionHeader

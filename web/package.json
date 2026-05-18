@@ -14,6 +14,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "upload:apk": "tsx scripts/upload-apk-to-r2.ts",
     "db:migrate:production": "prisma migrate deploy && tsx scripts/migrate_shchaslyve_zhyttya.ts",
     "postinstall": "prisma generate"
   },

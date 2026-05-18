@@ -410,6 +410,8 @@
       "generic": "Could not save"
     },
     "downloadApp": "Download app (APK)",
+    "apkUnavailable": "The app file is not published yet. Contact your chair or administrator.",
+    "apkOpenInBrowser": "Opens in your browser — confirm installation when prompted.",
     "hubSectionInfo": "Info",
     "hubSectionApp": "App",
     "hubSectionAccount": "Account",

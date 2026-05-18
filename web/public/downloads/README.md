@@ -1,5 +1,13 @@
 # APK downloads
 
-Place `happylife.apk` here after building from `mobile/` (see `mobile/README.md`).
+1. Build APK from `mobile/` (see `mobile/README.md`).
+2. Copy to `happylife.apk` in this folder **or** upload to R2:
 
-Or set `NEXT_PUBLIC_APK_URL` to an external download link.
+```bash
+cd web
+npm run upload:apk
+```
+
+3. Set `NEXT_PUBLIC_APK_URL` in Vercel to the printed URL (if using R2).
+
+The site serves downloads via `/api/download/apk`.

@@ -147,10 +147,7 @@ export default async function DashboardPage() {
       )}
 
       {isChair && (
-        <ChairDashboardActions
-          paymentsLabel={t("chairPaymentsButton")}
-          managementLabel={tChair("title")}
-        />
+        <ChairDashboardActions paymentsLabel={t("chairPaymentsButton")} />
       )}
 
       {!isChair && showResidentPaymentsCard && (

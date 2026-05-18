@@ -3,13 +3,12 @@
 import { ButtonLink } from "@/components/Ui";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { useNotifications } from "@/components/NotificationProvider";
+import { ChairManagementLinks } from "@/components/ChairManagementLinks";
 
 export function ChairDashboardActions({
   paymentsLabel,
-  managementLabel,
 }: {
   paymentsLabel: string;
-  managementLabel: string;
 }) {
   const { counts } = useNotifications();
 
@@ -25,9 +24,7 @@ export function ChairDashboardActions({
           </span>
         )}
       </span>
-      <ButtonLink href="/chair" className="w-full justify-center">
-        {managementLabel}
-      </ButtonLink>
+      <ChairManagementLinks isChair />
     </div>
   );
 }

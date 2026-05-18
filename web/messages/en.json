@@ -326,6 +326,8 @@
     "backProfile": "← Back to profile",
     "deleteUser": "Delete resident",
     "deleteUserConfirm": "Delete {name} from the system? This cannot be undone.",
+    "closeModal": "Close",
+    "usersListEmpty": "No registered users yet.",
     "usersTitle": "Residents",
     "usersSubtitle": "Address verification; chair enters per-home charges and balance.",
     "tenancyColTitle": "Residency",

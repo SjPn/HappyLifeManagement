@@ -8,9 +8,11 @@ import { useState } from "react";
 export function DeleteUserButton({
   userId,
   userName,
+  onDeleted,
 }: {
   userId: string;
   userName: string;
+  onDeleted?: () => void;
 }) {
   const router = useRouter();
   const t = useTranslations("chair");
@@ -28,6 +30,7 @@ export function DeleteUserButton({
       setError(te(res.error));
       return;
     }
+    onDeleted?.();
     router.refresh();
   }
 

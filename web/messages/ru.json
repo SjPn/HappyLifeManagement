@@ -619,5 +619,11 @@
       "APPROVED": "Одобрен",
       "REJECTED": "Отклонён"
     }
+  },
+  "newsLikes": {
+    "likeAria": "Поставить лайк",
+    "unlikeAria": "Убрать лайк",
+    "count": "{count, plural, one {# лайк} few {# лайка} many {# лайков} other {# лайка}}",
+    "popular": "Популярно"
   }
 }

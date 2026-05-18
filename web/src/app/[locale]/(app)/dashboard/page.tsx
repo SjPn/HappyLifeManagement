@@ -16,14 +16,21 @@ import { NewsSectionHeader } from "@/components/NewsSectionHeader";
 import { DashboardSectionLink } from "@/components/DashboardSectionLink";
 import { PaymentsReminderCard } from "@/components/PaymentsReminderCard";
 import { ChairDashboardActions } from "@/components/ChairDashboardActions";
+import { NewsPostCard } from "@/components/NewsPostCard";
+import { newsPostCardProps, newsPostListInclude } from "@/lib/newsPosts";
 
 export default async function DashboardPage() {
   const session = await auth();
   const communityId = await requireCommunityIdFromSession(session!.user!);
   const userId = session!.user!.id;
   const isChair = session!.user!.role === "CHAIR";
+  const canLikeNews =
+    !isChair &&
+    session!.user!.status === "APPROVED" &&
+    session!.user!.role !== "MODERATOR";
   const locale = await getLocale();
   const t = await getTranslations("dashboard");
+  const tLikes = await getTranslations("newsLikes");
   const tn = await getTranslations("nav");
   const dateLocale = dateLocaleForUi(locale);
 
@@ -55,7 +62,7 @@ export default async function DashboardPage() {
           where: communityWhere(communityId),
           orderBy: { createdAt: "desc" },
           take: 4,
-          include: { author: { select: { name: true } } },
+          include: newsPostListInclude(userId),
         }),
     isChair
       ? Promise.resolve([])
@@ -181,28 +188,19 @@ export default async function DashboardPage() {
               </Card>
             )}
             {news.map((n) => (
-              <Card key={n.id}>
-                <p className="font-medium">{n.title}</p>
-                {n.imageUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={n.imageUrl}
-                    alt=""
-                    className="mt-3 max-h-72 w-full rounded-xl object-cover ring-1 ring-black/5"
-                  />
-                )}
-                <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
-                  {n.body}
-                </p>
-                <p className="mt-3 text-xs text-zinc-500">
-                  {n.author.name} ·{" "}
-                  {n.createdAt.toLocaleDateString(dateLocale, {
+              <NewsPostCard
+                key={n.id}
+                {...newsPostCardProps(
+                  n,
+                  n.createdAt.toLocaleDateString(dateLocale, {
                     day: "numeric",
                     month: "short",
                     year: "numeric",
-                  })}
-                </p>
-              </Card>
+                  }),
+                  canLikeNews,
+                  tLikes("popular"),
+                )}
+              />
             ))}
           </div>
 

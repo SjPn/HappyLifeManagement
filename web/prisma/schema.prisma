@@ -72,6 +72,7 @@ model User {
   forumPosts        ForumPost[]
   reportsAuthored   ConfidentialReport[] @relation("ReportAuthor")
   newsAuthored      NewsPost[]           @relation("NewsAuthor")
+  newsLikes         NewsPostLike[]
   seenState         UserSeenState?
   messagesSent      DirectMessage[]      @relation("SentMessages")
   messagesReceived  DirectMessage[]      @relation("ReceivedMessages")
@@ -91,15 +92,28 @@ model UserSeenState {
 }
 
 model NewsPost {
-  id          String    @id @default(cuid())
+  id          String         @id @default(cuid())
   communityId String
-  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  community   Community      @relation(fields: [communityId], references: [id], onDelete: Cascade)
   title       String
   body        String
   imageUrl    String?
   authorId    String
-  author      User      @relation("NewsAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
+  author      User           @relation("NewsAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime       @default(now())
+  likes       NewsPostLike[]
+}
+
+model NewsPostLike {
+  id         String   @id @default(cuid())
+  newsPostId String
+  newsPost   NewsPost @relation(fields: [newsPostId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, newsPostId])
+  @@index([newsPostId])
 }
 
 model Ticket {

@@ -619,5 +619,11 @@
       "APPROVED": "Approved",
       "REJECTED": "Rejected"
     }
+  },
+  "newsLikes": {
+    "likeAria": "Like this news post",
+    "unlikeAria": "Remove your like",
+    "count": "{count, plural, one {# like} other {# likes}}",
+    "popular": "Popular"
   }
 }

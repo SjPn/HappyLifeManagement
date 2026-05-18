@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { BoardCategory } from "@/lib/enums";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
 import { savePublicUpload } from "@/lib/upload";
+import { mapUploadError } from "@/lib/uploadErrors";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 const allowed = new Set<string>(Object.values(BoardCategory));
@@ -34,8 +35,8 @@ export async function createBoardPost(formData: FormData) {
   if (imageField instanceof File && imageField.size > 0) {
     try {
       imageUrl = await savePublicUpload(imageField);
-    } catch {
-      return { error: "badFile" as const };
+    } catch (e) {
+      return { error: mapUploadError(e) };
     }
   }
 
@@ -87,8 +88,8 @@ export async function updateBoardPost(formData: FormData) {
   if (imageField instanceof File && imageField.size > 0) {
     try {
       imageUrl = await savePublicUpload(imageField);
-    } catch {
-      return { error: "badFile" as const };
+    } catch (e) {
+      return { error: mapUploadError(e) };
     }
   }
 

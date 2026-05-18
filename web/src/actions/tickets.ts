@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { TicketCategory } from "@/lib/enums";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
 import { savePublicUpload } from "@/lib/upload";
+import { mapUploadError } from "@/lib/uploadErrors";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 const allowedCategories = new Set<string>(Object.values(TicketCategory));
@@ -35,8 +36,8 @@ export async function createTicket(formData: FormData) {
   if (file instanceof File && file.size > 0) {
     try {
       photoUrl = await savePublicUpload(file);
-    } catch {
-      return { error: "badFile" as const };
+    } catch (e) {
+      return { error: mapUploadError(e) };
     }
   }
 

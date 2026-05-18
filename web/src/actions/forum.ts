@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
 import { savePublicUpload } from "@/lib/upload";
+import { mapUploadError } from "@/lib/uploadErrors";
 import {
   parseAudienceScope,
   userMatchesAudience,
@@ -32,8 +33,8 @@ export async function createForumTopic(formData: FormData) {
   if (img instanceof File && img.size > 0) {
     try {
       imageUrl = await savePublicUpload(img);
-    } catch {
-      return { error: "badFile" as const };
+    } catch (e) {
+      return { error: mapUploadError(e) };
     }
   }
 
@@ -95,8 +96,8 @@ export async function createForumReply(formData: FormData) {
   if (img instanceof File && img.size > 0) {
     try {
       imageUrl = await savePublicUpload(img);
-    } catch {
-      return { error: "badFile" as const };
+    } catch (e) {
+      return { error: mapUploadError(e) };
     }
   }
 
@@ -147,8 +148,8 @@ export async function updateForumTopic(formData: FormData) {
   if (img instanceof File && img.size > 0) {
     try {
       imageUrl = await savePublicUpload(img);
-    } catch {
-      return { error: "badFile" as const };
+    } catch (e) {
+      return { error: mapUploadError(e) };
     }
   }
 

@@ -2,6 +2,7 @@
   "errors": {
     "noAccess": "Access denied",
     "badFile": "Invalid file or file too large (max 5 MB)",
+    "storageNotConfigured": "Photo upload is not configured on the server (set Cloudflare R2 env vars on Vercel)",
     "noDescription": "Please add a description",
     "requiredFields": "Please fill required fields",
     "topicRequired": "Topic and first message are required",

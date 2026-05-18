@@ -2,6 +2,7 @@
   "errors": {
     "noAccess": "Немає доступу",
     "badFile": "Недопустимий файл або завеликий розмір (до 5 МБ)",
+    "storageNotConfigured": "Завантаження фото на сервері не налаштоване (потрібен Cloudflare R2 у Vercel)",
     "noDescription": "Вкажіть опис",
     "requiredFields": "Заповніть обов’язкові поля",
     "topicRequired": "Тема й перше повідомлення обов’язкові",

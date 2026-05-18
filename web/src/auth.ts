@@ -58,6 +58,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           (user as { tenancyType?: string }).tenancyType ?? "OWNER";
         token.communityId =
           (user as { communityId?: string | null }).communityId ?? null;
+      } else if (token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: {
+            role: true,
+            status: true,
+            tenancyType: true,
+            communityId: true,
+          },
+        });
+        if (dbUser) {
+          token.role = dbUser.role;
+          token.status = dbUser.status;
+          token.tenancyType = dbUser.tenancyType;
+          token.communityId = dbUser.communityId;
+        }
       }
       return token;
     },

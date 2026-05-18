@@ -25,8 +25,26 @@ export function communityWhere(communityId: string) {
   return { communityId };
 }
 
+export async function resolveCommunityId(user: SessionUser): Promise<string | null> {
+  if (isPlatformAdmin(user.role)) return null;
+  if (user.communityId) return user.communityId;
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { communityId: true },
+  });
+  return dbUser?.communityId ?? null;
+}
+
+export async function requireCommunityIdFromSession(
+  user: SessionUser,
+): Promise<string> {
+  const id = await resolveCommunityId(user);
+  if (!id) throw new Error("MISSING_COMMUNITY_ID");
+  return id;
+}
+
 export async function getCommunityForSession(user: SessionUser) {
-  const id = user.communityId;
+  const id = await resolveCommunityId(user);
   if (!id) return null;
   return prisma.community.findUnique({
     where: { id },

@@ -10,7 +10,7 @@ import {
   currentBillingPeriod,
   formatBillingPeriodLabel,
 } from "@/lib/billing";
-import { communityWhere, requireCommunityId } from "@/lib/tenant";
+import { communityWhere, requireCommunityIdFromSession } from "@/lib/tenant";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 import { NewsSectionHeader } from "@/components/NewsSectionHeader";
 import { DashboardSectionLink } from "@/components/DashboardSectionLink";
@@ -20,7 +20,7 @@ import { ChairPublishBlocks } from "@/components/ChairPublishBlocks";
 
 export default async function DashboardPage() {
   const session = await auth();
-  const communityId = requireCommunityId(session!.user!);
+  const communityId = await requireCommunityIdFromSession(session!.user!);
   const userId = session!.user!.id;
   const isChair = session!.user!.role === "CHAIR";
   const locale = await getLocale();

@@ -10,9 +10,11 @@ const statuses = ["NEW", "IN_PROGRESS", "RESOLVED"] as const;
 export function TicketStatusForm({
   ticketId,
   current,
+  onStatusChange,
 }: {
   ticketId: string;
   current: string;
+  onStatusChange?: (status: string) => void;
 }) {
   const router = useRouter();
   const t = useTranslations("requests");
@@ -24,6 +26,7 @@ export function TicketStatusForm({
     setLoading(true);
     await updateTicketStatus(ticketId, status);
     setLoading(false);
+    onStatusChange?.(status);
     router.refresh();
   }
 

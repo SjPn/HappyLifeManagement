@@ -16,6 +16,7 @@
     "addressExists": "Така адреса вже є в списку",
     "addressInUse": "Неможливо видалити: на цій адресі є зареєстровані мешканці",
     "chairOnly": "Лише для голови",
+    "staffOnly": "Лише для голови або модератора",
     "badData": "Некоректні дані",
     "badValue": "Некоректне значення",
     "chairOnlyVote": "Лише голова може створювати голосування",
@@ -202,7 +203,14 @@
       "inProgress": "В роботі",
       "archive": "Архів"
     },
-    "newDesc": "Опис проблеми та фото"
+    "newDesc": "Опис проблеми та фото",
+    "commentsTitle": "Коментарі та фото",
+    "commentsCount": "{count, plural, one {# відповідь} few {# відповіді} many {# відповідей} other {# відповіді}}",
+    "addCommentTitle": "Додати коментар",
+    "commentBody": "Текст",
+    "commentPhoto": "Фото (необов’язково)",
+    "commentSend": "Надіслати",
+    "commentSending": "Надсилання…"
   },
   "votes": {
     "title": "Голосування",

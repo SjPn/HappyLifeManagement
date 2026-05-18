@@ -14,8 +14,19 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Card } from "@/components/Ui";
 import { TicketCategory } from "@/lib/enums";
+import { ticketCategoryLabel } from "@/lib/ticketDisplay";
 import { TicketStatusForm } from "@/components/TicketStatusForm";
+import { TicketCommentForm } from "@/components/TicketCommentForm";
 import { useTranslations } from "next-intl";
+
+export type TicketCommentRow = {
+  id: string;
+  body: string;
+  imageUrl: string | null;
+  createdAt: string;
+  authorName: string;
+  authorRole: string;
+};
 
 export type TicketRow = {
   id: string;
@@ -28,6 +39,8 @@ export type TicketRow = {
   userName: string;
   userStreet: string;
   userHouseNumber: string;
+  ownerId: string;
+  comments: TicketCommentRow[];
 };
 
 function ticketTitle(description: string, maxLen = 72) {
@@ -61,20 +74,24 @@ function statusBadgeClass(status: string) {
 function TicketDetailModal({
   ticket,
   staff,
+  currentUserId,
   onClose,
   onResolved,
 }: {
   ticket: TicketRow;
   staff: boolean;
+  currentUserId: string;
   onClose: () => void;
   onResolved?: () => void;
 }) {
   const t = useTranslations("requests");
   const tc = useTranslations("categories.ticket");
   const tst = useTranslations("categories.ticketStatus");
+  const tr = useTranslations("categories.roles");
   const tChair = useTranslations("chair");
 
   const createdLabel = new Date(ticket.createdAt).toLocaleString();
+  const canReply = staff || ticket.ownerId === currentUserId;
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -110,7 +127,7 @@ function TicketDetailModal({
         <div className="flex items-start justify-between gap-3 border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
           <div className="min-w-0 pr-2">
             <p className="text-xs font-medium uppercase text-blue-700 dark:text-blue-300">
-              {tc(ticket.category as "ROADS" | "LIGHTING" | "SECURITY" | "WATER" | "TRASH" | "OTHER")}
+              {ticketCategoryLabel(tc, ticket.category)}
             </p>
             <h2
               id="ticket-modal-title"
@@ -165,6 +182,39 @@ function TicketDetailModal({
             {createdLabel}
           </p>
 
+          {ticket.comments.length > 0 && (
+            <div className="mt-5 space-y-3">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600/90 dark:text-blue-400/90">
+                {t("commentsTitle")}
+              </p>
+              {ticket.comments.map((c) => (
+                <div
+                  key={c.id}
+                  className="rounded-xl border border-zinc-100 bg-zinc-50/80 p-3 dark:border-zinc-800 dark:bg-zinc-900/40"
+                >
+                  <p className="text-xs text-zinc-500">
+                    {c.authorName} ·{" "}
+                    {tr(c.authorRole as "RESIDENT" | "MODERATOR" | "CHAIR")} ·{" "}
+                    {new Date(c.createdAt).toLocaleString()}
+                  </p>
+                  {c.body && (
+                    <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-800 dark:text-zinc-200">
+                      {c.body}
+                    </p>
+                  )}
+                  {c.imageUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={c.imageUrl}
+                      alt=""
+                      className="mt-3 max-h-48 w-full rounded-lg object-cover ring-1 ring-black/5"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
           {staff && (
             <div className="mt-4 border-t border-zinc-100 pt-3 dark:border-zinc-800">
               <p className="mb-2 text-xs text-zinc-500">{t("status")}</p>
@@ -177,6 +227,8 @@ function TicketDetailModal({
               />
             </div>
           )}
+
+          {canReply && <TicketCommentForm ticketId={ticket.id} />}
         </div>
       </div>
     </div>
@@ -186,6 +238,7 @@ function TicketDetailModal({
 export function RequestsPanel({
   tickets,
   staff,
+  currentUserId,
   emptyMessage,
   archiveHref,
   archiveCount,
@@ -194,6 +247,7 @@ export function RequestsPanel({
 }: {
   tickets: TicketRow[];
   staff: boolean;
+  currentUserId: string;
   emptyMessage: string;
   archiveHref?: string;
   archiveCount?: number;
@@ -222,8 +276,7 @@ export function RequestsPanel({
       ) : (
         <div className="flex flex-col gap-2.5">
           {tickets.map((tk) => {
-            const Icon =
-              ticketCategoryIcon[tk.category] ?? HelpCircle;
+            const Icon = ticketCategoryIcon[tk.category] ?? HelpCircle;
             return (
               <button
                 key={tk.id}
@@ -239,7 +292,10 @@ export function RequestsPanel({
                     {ticketTitle(tk.description)}
                   </span>
                   <span className="mt-0.5 block text-xs text-slate-500">
-                    {tc(tk.category as "ROADS" | "LIGHTING" | "SECURITY" | "WATER" | "TRASH" | "OTHER")}
+                    {ticketCategoryLabel(tc, tk.category)}
+                    {tk.comments.length > 0
+                      ? ` · ${t("commentsCount", { count: tk.comments.length })}`
+                      : ""}
                   </span>
                 </span>
                 <span
@@ -273,6 +329,7 @@ export function RequestsPanel({
         <TicketDetailModal
           ticket={selected}
           staff={staff}
+          currentUserId={currentUserId}
           onClose={close}
           onResolved={close}
         />

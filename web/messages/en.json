@@ -16,6 +16,7 @@
     "addressExists": "This address is already in the list",
     "addressInUse": "Cannot delete: residents are registered at this address",
     "chairOnly": "Chair only",
+    "staffOnly": "Chair or moderator only",
     "badData": "Invalid data",
     "badValue": "Invalid value",
     "chairOnlyVote": "Only the chair can create votes",
@@ -202,7 +203,14 @@
       "inProgress": "In progress",
       "archive": "Archive"
     },
-    "newDesc": "Describe the issue and add a photo"
+    "newDesc": "Describe the issue and add a photo",
+    "commentsTitle": "Comments and photos",
+    "commentsCount": "{count, plural, one {# reply} other {# replies}}",
+    "addCommentTitle": "Add comment",
+    "commentBody": "Message",
+    "commentPhoto": "Photo (optional)",
+    "commentSend": "Send",
+    "commentSending": "Sending…"
   },
   "votes": {
     "title": "Votes",

@@ -73,6 +73,7 @@ model User {
   reportsAuthored   ConfidentialReport[] @relation("ReportAuthor")
   newsAuthored      NewsPost[]           @relation("NewsAuthor")
   newsLikes         NewsPostLike[]
+  ticketComments    TicketComment[]
   seenState         UserSeenState?
   messagesSent      DirectMessage[]      @relation("SentMessages")
   messagesReceived  DirectMessage[]      @relation("ReceivedMessages")
@@ -117,18 +118,32 @@ model NewsPostLike {
 }
 
 model Ticket {
-  id           String    @id @default(cuid())
+  id           String          @id @default(cuid())
   communityId  String
-  community    Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  community    Community       @relation(fields: [communityId], references: [id], onDelete: Cascade)
   category     String
   description  String
   photoUrl     String?
   locationNote String?
-  status       String    @default("NEW")
+  status       String          @default("NEW")
   userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  comments     TicketComment[]
+}
+
+model TicketComment {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String   @default("")
+  imageUrl  String?
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])
 }
 
 model Vote {

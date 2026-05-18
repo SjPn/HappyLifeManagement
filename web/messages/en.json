@@ -233,7 +233,7 @@
     "saveEdit": "Save changes",
     "back": "← Back to community",
     "anonymousLabel": "Post anonymously",
-    "anonymousHint": "Residents and tenants will not see the author. Chair and moderator can.",
+    "anonymousHint": "Residents and tenants will not see the author.",
     "anonymousAuthor": "Anonymous",
     "anonymousStaffNote": "anonymous to residents"
   },

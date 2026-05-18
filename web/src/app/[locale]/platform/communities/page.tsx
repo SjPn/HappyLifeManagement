@@ -20,6 +20,7 @@ export default async function PlatformCommunitiesPage() {
     inviteCode: c.inviteCode,
     defaultLocale: c.defaultLocale,
     blockedAt: c.blockedAt?.toISOString() ?? null,
+    approvedAt: c.approvedAt?.toISOString() ?? null,
     userCount: c._count.users,
   }));
 

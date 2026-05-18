@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import {
+  approveCommunity,
   createCommunity,
   deleteCommunity,
   setCommunityBlocked,
@@ -22,6 +23,7 @@ export type CommunityRow = {
   inviteCode: string;
   defaultLocale: string;
   blockedAt: string | null;
+  approvedAt: string | null;
   userCount: number;
 };
 
@@ -31,6 +33,12 @@ type DangerModalState = {
   action: CommunityDangerAction;
   block: boolean;
 };
+
+function communityStatus(c: CommunityRow) {
+  if (!c.approvedAt) return "awaitingApproval" as const;
+  if (c.blockedAt) return "blocked" as const;
+  return "active" as const;
+}
 
 export function PlatformCommunitiesPanel({
   communities,
@@ -42,6 +50,13 @@ export function PlatformCommunitiesPanel({
   const [pending, setPending] = useState<string | null>(null);
   const [dangerModal, setDangerModal] = useState<DangerModalState | null>(null);
 
+  const sorted = [...communities].sort((a, b) => {
+    const aPending = !a.approvedAt ? 0 : 1;
+    const bPending = !b.approvedAt ? 0 : 1;
+    if (aPending !== bPending) return aPending - bPending;
+    return 0;
+  });
+
   async function onCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setPending("create");
@@ -51,6 +66,14 @@ export function PlatformCommunitiesPanel({
       e.currentTarget.reset();
       router.refresh();
     }
+  }
+
+  async function onApprove(id: string, name: string) {
+    if (!window.confirm(t("confirmApprove", { name }))) return;
+    setPending(id);
+    await approveCommunity(id);
+    setPending(null);
+    router.refresh();
   }
 
   function openBlockModal(c: CommunityRow) {
@@ -123,53 +146,72 @@ export function PlatformCommunitiesPanel({
       </Card>
 
       <ul className="space-y-3">
-        {communities.map((c) => (
-          <li key={c.id}>
-            <Card className="space-y-2">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-semibold">{c.name}</p>
-                  <p className="text-xs text-zinc-500">
-                    {c.slug} · {t("users", { count: c.userCount })}
-                  </p>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    {t("inviteCode")}:{" "}
-                    <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">
-                      {c.inviteCode}
-                    </code>
-                  </p>
+        {sorted.map((c) => {
+          const status = communityStatus(c);
+          return (
+            <li key={c.id}>
+              <Card className="space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="font-semibold">{c.name}</p>
+                    <p className="text-xs text-zinc-500">
+                      {c.slug} · {t("users", { count: c.userCount })}
+                    </p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {t("inviteCode")}:{" "}
+                      <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">
+                        {c.inviteCode}
+                      </code>
+                    </p>
+                  </div>
+                  {status === "awaitingApproval" ? (
+                    <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                      {t("awaitingApproval")}
+                    </span>
+                  ) : status === "blocked" ? (
+                    <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-950 dark:text-red-200">
+                      {t("blocked")}
+                    </span>
+                  ) : (
+                    <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">
+                      {t("active")}
+                    </span>
+                  )}
                 </div>
-                {c.blockedAt ? (
-                  <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-950 dark:text-red-200">
-                    {t("blocked")}
-                  </span>
-                ) : (
-                  <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">
-                    {t("active")}
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2 pt-2">
-                <button
-                  type="button"
-                  disabled={pending === c.id}
-                  onClick={() => openBlockModal(c)}
-                  className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium dark:border-zinc-700"
-                >
-                  {c.blockedAt ? t("unblock") : t("block")}
-                </button>
-                <button
-                  type="button"
-                  disabled={pending === c.id}
-                  onClick={() => openDeleteModal(c)}
-                  className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 dark:border-red-900"
-                >
-                  {t("delete")}
-                </button>
-              </div>
-            </Card>
-          </li>
-        ))}
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {status === "awaitingApproval" && (
+                    <button
+                      type="button"
+                      disabled={pending === c.id}
+                      onClick={() => onApprove(c.id, c.name)}
+                      className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                    >
+                      {t("approve")}
+                    </button>
+                  )}
+                  {status !== "awaitingApproval" && (
+                    <button
+                      type="button"
+                      disabled={pending === c.id}
+                      onClick={() => openBlockModal(c)}
+                      className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium dark:border-zinc-700"
+                    >
+                      {c.blockedAt ? t("unblock") : t("block")}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    disabled={pending === c.id}
+                    onClick={() => openDeleteModal(c)}
+                    className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 dark:border-red-900"
+                  >
+                    {t("delete")}
+                  </button>
+                </div>
+              </Card>
+            </li>
+          );
+        })}
       </ul>
 
       {dangerModal && (

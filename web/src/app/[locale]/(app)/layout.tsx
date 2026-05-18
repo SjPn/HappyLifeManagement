@@ -30,6 +30,9 @@ export default async function AppGroupLayout({
   if (!community) {
     redirect(`/${locale}/login`);
   }
+  if (!community.approvedAt) {
+    redirect(`/${locale}/pending?reason=community`);
+  }
   if (community.blockedAt) {
     redirect(`/${locale}/blocked`);
   }

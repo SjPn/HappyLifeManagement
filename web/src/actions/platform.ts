@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@/lib/enums";
+import { Role, UserStatus } from "@/lib/enums";
 import {
   generateInviteCode,
   slugifyCommunityName,
@@ -38,6 +38,7 @@ export async function createCommunity(formData: FormData) {
           name,
           slug: i === 0 ? slug : `${slug}-${i + 1}`,
           inviteCode,
+          approvedAt: new Date(),
           defaultLocale: ["uk", "ru", "en"].includes(defaultLocale)
             ? defaultLocale
             : "uk",
@@ -99,6 +100,36 @@ export async function setCommunityBlocked(
   return { ok: true };
 }
 
+export async function approveCommunity(communityId: string) {
+  const gate = await requirePlatformAdmin();
+  if ("error" in gate) return gate;
+
+  const community = await prisma.community.findUnique({
+    where: { id: communityId },
+    select: { approvedAt: true },
+  });
+  if (!community) return { error: "notFound" as const };
+  if (community.approvedAt) return { error: "alreadyApproved" as const };
+
+  await prisma.$transaction([
+    prisma.community.update({
+      where: { id: communityId },
+      data: { approvedAt: new Date() },
+    }),
+    prisma.user.updateMany({
+      where: {
+        communityId,
+        role: Role.CHAIR,
+        status: UserStatus.PENDING,
+      },
+      data: { status: UserStatus.APPROVED },
+    }),
+  ]);
+
+  await revalidateAllLocales("/platform/communities");
+  return { ok: true };
+}
+
 export async function registerCommunitySelfServe(formData: FormData) {
   const communityName = String(formData.get("communityName") ?? "").trim();
   const slugRaw = String(formData.get("slug") ?? "").trim();
@@ -137,14 +168,19 @@ export async function registerCommunitySelfServe(formData: FormData) {
             street: "—",
             houseNumber: "—",
             role: Role.CHAIR,
-            status: "APPROVED",
+            status: UserStatus.PENDING,
             memorandumAcceptedAt: new Date(),
             memorandumVersion: "MVP-2026-05-05",
           },
         },
       },
     });
-    return { ok: true, inviteCode: community.inviteCode, slug: community.slug };
+    return {
+      ok: true,
+      pending: true,
+      inviteCode: community.inviteCode,
+      slug: community.slug,
+    };
   } catch {
     return { error: "slugConflict" };
   }

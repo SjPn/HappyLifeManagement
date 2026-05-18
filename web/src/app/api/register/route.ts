@@ -47,9 +47,9 @@ export async function POST(req: Request) {
 
   const community = await prisma.community.findUnique({
     where: { inviteCode: code },
-    select: { id: true, blockedAt: true },
+    select: { id: true, blockedAt: true, approvedAt: true },
   });
-  if (!community || community.blockedAt) {
+  if (!community || community.blockedAt || !community.approvedAt) {
     return NextResponse.json(
       { error: "invalidInvite" },
       { status: 400 },

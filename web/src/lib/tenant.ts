@@ -54,6 +54,7 @@ export async function getCommunityForSession(user: SessionUser) {
       slug: true,
       defaultLocale: true,
       blockedAt: true,
+      approvedAt: true,
       memorandumBody: true,
       memorandumVersion: true,
       tariffsBody: true,
@@ -64,11 +65,18 @@ export async function getCommunityForSession(user: SessionUser) {
 export async function assertCommunityActive(communityId: string) {
   const c = await prisma.community.findUnique({
     where: { id: communityId },
-    select: { blockedAt: true, name: true },
+    select: { blockedAt: true, approvedAt: true, name: true },
   });
   if (!c) throw new Error("COMMUNITY_NOT_FOUND");
+  if (!c.approvedAt) throw new Error("COMMUNITY_NOT_APPROVED");
   if (c.blockedAt) throw new Error("COMMUNITY_BLOCKED");
   return c;
+}
+
+export function isCommunityApproved(community: {
+  approvedAt: Date | null;
+}) {
+  return community.approvedAt != null;
 }
 
 import { randomUUID } from "crypto";

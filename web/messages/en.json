@@ -87,6 +87,7 @@
   "pending": {
     "title": "Awaiting approval",
     "text": "Your address is being verified by the community chair. Once approved, all sections unlock.",
+    "communityText": "Your new community request is being reviewed by the platform administrator. After approval you can manage the community and residents can register with the invite code.",
     "signedInAs": "Signed in as",
     "homeLink": "Back to site home"
   },
@@ -305,7 +306,10 @@
     "inviteCode": "Invite code",
     "users": "{count} users",
     "blocked": "Blocked",
+    "awaitingApproval": "Pending review",
     "active": "Active",
+    "approve": "Approve",
+    "confirmApprove": "Approve community “{name}”? The chair will get full access.",
     "block": "Block",
     "unblock": "Unblock",
     "delete": "Delete",
@@ -344,6 +348,9 @@
     "joinExisting": "Join existing community",
     "login": "Sign in",
     "created": "Community created!",
+    "pendingApprovalTitle": "Request submitted",
+    "pendingApprovalText": "The community and chair account have been created. Access will open after platform approval.",
+    "inviteAfterApproval": "The resident invite code will work after approval.",
     "inviteLabel": "Invite code for residents",
     "inviteHint": "Share this code when neighbors register.",
     "errors": {

@@ -19,6 +19,7 @@ model Community {
   memorandumVersion String    @default("MVP-2026-05-05")
   tariffsBody       String?
   blockedAt         DateTime?
+  approvedAt        DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 

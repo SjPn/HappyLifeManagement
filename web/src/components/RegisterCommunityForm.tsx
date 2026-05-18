@@ -13,7 +13,10 @@ export function RegisterCommunityForm() {
   const t = useTranslations("onboard");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [success, setSuccess] = useState<{
+    inviteCode: string;
+    pending: boolean;
+  } | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -27,7 +30,10 @@ export function RegisterCommunityForm() {
       return;
     }
 
-    setInviteCode(res.inviteCode);
+    setSuccess({
+      inviteCode: res.inviteCode,
+      pending: "pending" in res && res.pending === true,
+    });
 
     const email = (
       e.currentTarget.elements.namedItem("email") as HTMLInputElement
@@ -45,23 +51,28 @@ export function RegisterCommunityForm() {
       setError(t("errors.loginAfterCreate"));
       return;
     }
-    router.push("/dashboard");
+    router.push("/pending?reason=community");
     router.refresh();
   }
 
-  if (inviteCode) {
+  if (success) {
     return (
       <div className="space-y-3 text-sm">
-        <p className="font-semibold text-emerald-800 dark:text-emerald-200">
-          {t("created")}
+        <p className="font-semibold text-amber-800 dark:text-amber-200">
+          {success.pending ? t("pendingApprovalTitle") : t("created")}
+        </p>
+        <p className="text-zinc-600 dark:text-zinc-400">
+          {success.pending ? t("pendingApprovalText") : t("inviteHint")}
         </p>
         <p>
           {t("inviteLabel")}:{" "}
           <code className="rounded bg-zinc-100 px-2 py-1 dark:bg-zinc-800">
-            {inviteCode}
+            {success.inviteCode}
           </code>
         </p>
-        <p className="text-zinc-600 dark:text-zinc-400">{t("inviteHint")}</p>
+        {success.pending && (
+          <p className="text-xs text-zinc-500">{t("inviteAfterApproval")}</p>
+        )}
       </div>
     );
   }

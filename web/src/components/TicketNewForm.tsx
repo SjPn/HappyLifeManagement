@@ -7,6 +7,7 @@ import { useState } from "react";
 import { TicketCategory } from "@/lib/enums";
 import { translateActionError } from "@/lib/actionError";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
+import { IMAGE_ACCEPT, validateImageFile } from "@/lib/uploadLimits";
 
 export function TicketNewForm() {
   const router = useRouter();
@@ -19,16 +20,29 @@ export function TicketNewForm() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    setLoading(true);
-    const form = new FormData(e.currentTarget);
-    const res = await createTicket(form);
-    setLoading(false);
-    if (res && "error" in res && res.error) {
-      setError(translateActionError(te, res.error));
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const photo = data.get("photo");
+    const fileErr = photo instanceof File ? validateImageFile(photo) : null;
+    if (fileErr) {
+      setError(translateActionError(te, fileErr));
       return;
     }
-    router.push("/requests");
-    router.refresh();
+
+    setLoading(true);
+    try {
+      const res = await createTicket(data);
+      if (res && "error" in res && res.error) {
+        setError(translateActionError(te, res.error));
+        return;
+      }
+      router.push("/requests");
+      router.refresh();
+    } catch {
+      setError(translateActionError(te, "generic"));
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -73,7 +87,7 @@ export function TicketNewForm() {
         <input
           name="photo"
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
+          accept={IMAGE_ACCEPT}
           className="text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-blue-800 dark:text-slate-300 dark:file:bg-blue-950 dark:file:text-blue-200"
         />
         <span className="text-xs text-slate-500">{t("photoHint")}</span>

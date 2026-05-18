@@ -3,8 +3,9 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { resolveImageUploadMeta } from "@/lib/imageMime";
 import { isR2Configured, publicObjectUrl, putR2Object } from "@/lib/r2";
+import { MAX_UPLOAD_BYTES } from "@/lib/uploadLimits";
 
-export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+export { MAX_UPLOAD_BYTES } from "@/lib/uploadLimits";
 
 async function saveLocalUpload(
   name: string,

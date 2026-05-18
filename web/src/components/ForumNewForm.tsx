@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
 import { AudienceScope } from "@/lib/audience";
+import { translateActionError } from "@/lib/actionError";
 
 export function ForumNewForm() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export function ForumNewForm() {
     const res = await createForumTopic(new FormData(e.currentTarget));
     setLoading(false);
     if (res && "error" in res && res.error) {
-      setError(te(res.error));
+      setError(translateActionError(te, res.error));
       return;
     }
     router.push("/community/forum");

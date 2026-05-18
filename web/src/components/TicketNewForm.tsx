@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useState } from "react";
 import { TicketCategory } from "@/lib/enums";
+import { translateActionError } from "@/lib/actionError";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
 
 export function TicketNewForm() {
@@ -23,7 +24,7 @@ export function TicketNewForm() {
     const res = await createTicket(form);
     setLoading(false);
     if (res && "error" in res && res.error) {
-      setError(te(res.error));
+      setError(translateActionError(te, res.error));
       return;
     }
     router.push("/requests");

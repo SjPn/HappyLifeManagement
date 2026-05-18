@@ -2,16 +2,35 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 let client: S3Client | null = null;
 
-export function isR2Configured(): boolean {
-  return Boolean(
-    process.env.R2_ACCESS_KEY_ID &&
-      process.env.R2_SECRET_ACCESS_KEY &&
-      process.env.R2_BUCKET_NAME &&
-      process.env.R2_PUBLIC_BASE_URL?.trim(),
-  );
+function readEnv(...keys: string[]): string | undefined {
+  for (const key of keys) {
+    const v = process.env[key]?.trim();
+    if (v) return v;
+  }
+  return undefined;
 }
 
-/** S3 API host only — without `/bucket` in the path (Cloudflare UI sometimes shows both). */
+export function getR2Env() {
+  return {
+    accessKeyId: readEnv("R2_ACCESS_KEY_ID", "AWS_ACCESS_KEY_ID", "S3_ACCESS_KEY_ID"),
+    secretAccessKey: readEnv(
+      "R2_SECRET_ACCESS_KEY",
+      "AWS_SECRET_ACCESS_KEY",
+      "S3_SECRET_ACCESS_KEY",
+    ),
+    bucket: readEnv("R2_BUCKET_NAME", "S3_BUCKET_NAME", "BUCKET_NAME"),
+    publicBaseUrl: readEnv("R2_PUBLIC_BASE_URL", "R2_PUBLIC_URL"),
+    endpoint: readEnv("R2_ENDPOINT"),
+    accountId: readEnv("R2_ACCOUNT_ID"),
+  };
+}
+
+export function isR2Configured(): boolean {
+  const { accessKeyId, secretAccessKey, bucket, publicBaseUrl } = getR2Env();
+  return Boolean(accessKeyId && secretAccessKey && bucket && publicBaseUrl);
+}
+
+/** S3 API host only — without `/bucket` in the path. */
 function normalizeR2Endpoint(raw: string): string {
   const trimmed = raw.trim().replace(/\/$/, "");
   try {
@@ -26,9 +45,8 @@ function normalizeR2Endpoint(raw: string): string {
 }
 
 function r2Endpoint(): string {
-  const explicit = process.env.R2_ENDPOINT?.trim();
-  if (explicit) return normalizeR2Endpoint(explicit);
-  const accountId = process.env.R2_ACCOUNT_ID?.trim();
+  const { endpoint, accountId } = getR2Env();
+  if (endpoint) return normalizeR2Endpoint(endpoint);
   if (accountId) {
     return `https://${accountId}.r2.cloudflarestorage.com`;
   }
@@ -36,13 +54,17 @@ function r2Endpoint(): string {
 }
 
 function getR2Client(): S3Client {
+  const { accessKeyId, secretAccessKey } = getR2Env();
+  if (!accessKeyId || !secretAccessKey) {
+    throw new Error("STORAGE_NOT_CONFIGURED");
+  }
   if (!client) {
     client = new S3Client({
       region: "auto",
       endpoint: r2Endpoint(),
       credentials: {
-        accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+        accessKeyId,
+        secretAccessKey,
       },
     });
   }
@@ -50,7 +72,7 @@ function getR2Client(): S3Client {
 }
 
 export function publicObjectUrl(key: string): string {
-  const base = process.env.R2_PUBLIC_BASE_URL!.trim().replace(/\/$/, "");
+  const base = getR2Env().publicBaseUrl!.replace(/\/$/, "");
   return `${base}/${key}`;
 }
 
@@ -59,9 +81,12 @@ export async function putR2Object(
   body: Buffer,
   contentType: string,
 ): Promise<void> {
+  const bucket = getR2Env().bucket;
+  if (!bucket) throw new Error("STORAGE_NOT_CONFIGURED");
+
   await getR2Client().send(
     new PutObjectCommand({
-      Bucket: process.env.R2_BUCKET_NAME!,
+      Bucket: bucket,
       Key: key,
       Body: body,
       ContentType: contentType,

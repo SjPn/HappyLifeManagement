@@ -4,6 +4,7 @@ import { updateForumTopic } from "@/actions/forum";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { translateActionError } from "@/lib/actionError";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
 import { AudienceScope } from "@/lib/audience";
 
@@ -29,7 +30,7 @@ export function ForumTopicEditForm(props: {
     const res = await updateForumTopic(fd);
     setLoading(false);
     if (res && "error" in res && res.error) {
-      setError(te(res.error));
+      setError(translateActionError(te, res.error));
       return;
     }
     router.push(`/community/forum/${props.topicId}`);

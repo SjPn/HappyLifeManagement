@@ -5,6 +5,7 @@ import { BoardCategory } from "@/lib/enums";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { translateActionError } from "@/lib/actionError";
 import {
   inputClass,
   labelClass,
@@ -34,7 +35,7 @@ export function BoardEditForm(props: {
     const res = await updateBoardPost(fd);
     setLoading(false);
     if (res && "error" in res && res.error) {
-      setError(te(res.error));
+      setError(translateActionError(te, res.error));
       return;
     }
     router.push("/community/board");

@@ -1,5 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
+import { VoteCreateForm } from "@/components/VoteCreateForm";
 import { prisma } from "@/lib/prisma";
 import { PageTitle, Card } from "@/components/Ui";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -18,7 +19,9 @@ export default async function VotesListPage() {
   }
   const userId = session!.user!.id;
   const locale = await getLocale();
+  const isChair = session!.user!.role === "CHAIR";
   const t = await getTranslations("votes");
+  const tChair = await getTranslations("chair");
   const dateLocale = dateLocaleForUi(locale);
 
   const votes = await prisma.vote.findMany({
@@ -42,6 +45,16 @@ export default async function VotesListPage() {
     <>
       <MarkNotificationsSeen scopes={["votes"]} />
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
+
+      {isChair && (
+        <Card className="mb-6">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+            {tChair("voteEyebrow")}
+          </p>
+          <VoteCreateForm />
+        </Card>
+      )}
+
       <div className="flex flex-col gap-3">
         {votes.map((v) => {
           const active = !v.endsAt || v.endsAt > now;

@@ -1,6 +1,8 @@
 "use client";
 
 import { createVote } from "@/actions/votes";
+import { PublishSuccessModal } from "@/components/PublishSuccessModal";
+import { translateActionError } from "@/lib/actionError";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -14,6 +16,7 @@ export function VoteCreateForm() {
   const te = useTranslations("errors");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [launched, setLaunched] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -24,14 +27,16 @@ export function VoteCreateForm() {
     const res = await createVote(fd);
     setLoading(false);
     if (res && "error" in res && res.error) {
-      setError(te(res.error));
+      setError(translateActionError(te, res.error));
       return;
     }
     e.currentTarget.reset();
+    setLaunched(true);
     router.refresh();
   }
 
   return (
+    <>
     <form onSubmit={onSubmit} className="flex flex-col gap-3">
       <label className="flex flex-col gap-1 text-sm">
         <span className={labelClass}>{t("voteQuestionField")}</span>
@@ -93,5 +98,15 @@ export function VoteCreateForm() {
         {loading ? t("voteCreating") : t("voteLaunchBtn")}
       </button>
     </form>
+
+    {launched && (
+      <PublishSuccessModal
+        title={t("votePublishedTitle")}
+        message={t("votePublishedText")}
+        closeLabel={t("votePublishedClose")}
+        onClose={() => setLaunched(false)}
+      />
+    )}
+    </>
   );
 }

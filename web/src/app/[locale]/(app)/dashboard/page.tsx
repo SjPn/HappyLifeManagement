@@ -16,7 +16,6 @@ import { NewsSectionHeader } from "@/components/NewsSectionHeader";
 import { DashboardSectionLink } from "@/components/DashboardSectionLink";
 import { PaymentsReminderCard } from "@/components/PaymentsReminderCard";
 import { ChairDashboardActions } from "@/components/ChairDashboardActions";
-import { ChairPublishBlocks } from "@/components/ChairPublishBlocks";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -25,7 +24,6 @@ export default async function DashboardPage() {
   const isChair = session!.user!.role === "CHAIR";
   const locale = await getLocale();
   const t = await getTranslations("dashboard");
-  const tChair = await getTranslations("chair");
   const tn = await getTranslations("nav");
   const dateLocale = dateLocaleForUi(locale);
 
@@ -170,9 +168,7 @@ export default async function DashboardPage() {
         </PaymentsReminderCard>
       )}
 
-      {isChair ? (
-        <ChairPublishBlocks voteEyebrow={tChair("voteEyebrow")} />
-      ) : (
+      {!isChair && (
         <>
           <NewsSectionHeader
             title={t("newsSection")}

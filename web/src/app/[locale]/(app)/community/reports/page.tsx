@@ -7,9 +7,11 @@ import { getTranslations } from "next-intl/server";
 import { getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function ReportsPage() {
   const session = await auth();
+  const communityId = requireCommunityId(session!.user!);
   if (session!.user!.role === "MODERATOR") {
     const locale = await getLocale();
     redirect(`/${locale}/chair`);
@@ -21,6 +23,7 @@ export default async function ReportsPage() {
 
   const items = await prisma.confidentialReport.findMany({
     where: {
+      ...communityWhere(communityId),
       OR: [{ published: true }, { authorId: userId }],
     },
     orderBy: { createdAt: "desc" },

@@ -4,9 +4,11 @@ import { redirect } from "next/navigation";
 import { PageTitle } from "@/components/Ui";
 import { ReportModerationRow } from "@/components/ReportModerationRow";
 import { getLocale, getTranslations } from "next-intl/server";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function ChairReportsPage() {
   const session = await auth();
+  const communityId = requireCommunityId(session!.user!);
   const locale = await getLocale();
   if (session!.user!.role !== "CHAIR" && session!.user!.role !== "MODERATOR") {
     redirect(`/${locale}/dashboard`);
@@ -16,6 +18,7 @@ export default async function ChairReportsPage() {
   const canSeeAuthor = session!.user!.role === "MODERATOR";
 
   const reports = await prisma.confidentialReport.findMany({
+    where: communityWhere(communityId),
     orderBy: { createdAt: "desc" },
     include: { author: { select: { name: true, email: true } } },
   });

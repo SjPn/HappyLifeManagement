@@ -41,6 +41,11 @@ export default async function CommunityHubPage() {
             title: t("residentsTitle"),
             desc: t("residentsDesc"),
           },
+          {
+            href: "/messages",
+            title: t("messagesTitle"),
+            desc: t("messagesDesc"),
+          },
         ]}
       />
     </>

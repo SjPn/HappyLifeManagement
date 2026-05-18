@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { TicketCategory } from "@/lib/enums";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
 import { savePublicUpload } from "@/lib/upload";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 const allowedCategories = new Set<string>(Object.values(TicketCategory));
 
@@ -16,6 +17,8 @@ export async function createTicket(formData: FormData) {
   if (session.user.role === "MODERATOR") {
     return { error: "forbidden" as const };
   }
+
+  const communityId = requireCommunityId(session.user);
 
   const categoryRaw = String(formData.get("category") || "");
   const category = allowedCategories.has(categoryRaw)
@@ -39,6 +42,7 @@ export async function createTicket(formData: FormData) {
 
   await prisma.ticket.create({
     data: {
+      communityId,
       category,
       description,
       locationNote,
@@ -59,8 +63,15 @@ export async function updateTicketStatus(ticketId: string, status: string) {
     return { error: "staffOnly" as const };
   }
 
+  const communityId = requireCommunityId(session.user);
+
   const allowed = new Set(["NEW", "IN_PROGRESS", "RESOLVED"]);
   if (!allowed.has(status)) return { error: "badStatus" as const };
+
+  const ticket = await prisma.ticket.findFirst({
+    where: { id: ticketId, ...communityWhere(communityId) },
+  });
+  if (!ticket) return { error: "generic" as const };
 
   await prisma.ticket.update({
     where: { id: ticketId },

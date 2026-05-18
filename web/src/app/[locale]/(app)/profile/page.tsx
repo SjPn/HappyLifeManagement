@@ -3,13 +3,16 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PageTitle, Card } from "@/components/Ui";
 import { SignOutButton } from "@/components/AppShell";
+import { ApkDownloadLink } from "@/components/ApkDownloadLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
 import { getTranslations } from "next-intl/server";
 import { listCommunityAddresses } from "@/lib/communityAddresses";
+import { requireCommunityId } from "@/lib/tenant";
 
 export default async function ProfilePage() {
   const session = await auth();
+  const communityId = requireCommunityId(session!.user!);
   const t = await getTranslations("profile");
   const tr = await getTranslations("categories.roles");
   const tt = await getTranslations("categories.tenancy");
@@ -18,7 +21,7 @@ export default async function ProfilePage() {
     prisma.user.findUnique({
       where: { id: session!.user!.id },
     }),
-    listCommunityAddresses(),
+    listCommunityAddresses(communityId),
   ]);
 
   return (
@@ -71,7 +74,8 @@ export default async function ProfilePage() {
         </Link>
       </nav>
 
-      <div className="mt-10">
+      <div className="mt-10 flex flex-col items-center gap-3">
+        <ApkDownloadLink />
         <SignOutButton />
       </div>
     </>

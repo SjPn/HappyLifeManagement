@@ -7,9 +7,11 @@ import { dateLocaleForUi } from "@/lib/dateLocale";
 import { voteAudienceWhere } from "@/lib/audience";
 import { redirect } from "next/navigation";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function VotesListPage() {
   const session = await auth();
+  const communityId = requireCommunityId(session!.user!);
   if (session!.user!.role === "MODERATOR") {
     const locale = await getLocale();
     redirect(`/${locale}/chair`);
@@ -20,10 +22,13 @@ export default async function VotesListPage() {
   const dateLocale = dateLocaleForUi(locale);
 
   const votes = await prisma.vote.findMany({
-    where: voteAudienceWhere({
-      role: session!.user!.role,
-      tenancyType: session!.user!.tenancyType,
-    }),
+    where: {
+      ...communityWhere(communityId),
+      ...voteAudienceWhere({
+        role: session!.user!.role,
+        tenancyType: session!.user!.tenancyType,
+      }),
+    },
     orderBy: { createdAt: "desc" },
     include: {
       options: { orderBy: { sortOrder: "asc" } },

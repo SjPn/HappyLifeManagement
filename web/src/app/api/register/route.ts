@@ -12,7 +12,7 @@ const schema = z.object({
   name: z.string().min(1),
   communityAddressId: z.string().min(1),
   phone: z.string().optional(),
-  inviteCode: z.string().optional(),
+  inviteCode: z.string().min(1),
   tenancyType: z.enum([TenancyType.OWNER, TenancyType.TENANT]),
   memorandumAccepted: z.literal(true),
 });
@@ -43,8 +43,23 @@ export async function POST(req: Request) {
     tenancyType,
   } = parsed.data;
   const normalized = email.trim().toLowerCase();
+  const code = inviteCode.trim();
 
-  const address = await resolveCommunityAddress(communityAddressId);
+  const community = await prisma.community.findUnique({
+    where: { inviteCode: code },
+    select: { id: true, blockedAt: true },
+  });
+  if (!community || community.blockedAt) {
+    return NextResponse.json(
+      { error: "invalidInvite" },
+      { status: 400 },
+    );
+  }
+
+  const address = await resolveCommunityAddress(
+    communityAddressId,
+    community.id,
+  );
   if (!address) {
     return NextResponse.json(
       { error: "invalidAddress" },
@@ -62,9 +77,9 @@ export async function POST(req: Request) {
     );
   }
 
-  const invite = process.env.INVITE_CODE?.trim();
+  const envInvite = process.env.INVITE_CODE?.trim();
   const status =
-    invite && inviteCode?.trim() === invite
+    envInvite && code === envInvite
       ? UserStatus.APPROVED
       : UserStatus.PENDING;
 
@@ -75,6 +90,7 @@ export async function POST(req: Request) {
       email: normalized,
       passwordHash,
       name: name.trim(),
+      communityId: community.id,
       street: address.street,
       houseNumber: address.houseNumber,
       communityAddressId: address.id,

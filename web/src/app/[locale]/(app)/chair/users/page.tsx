@@ -9,9 +9,11 @@ import {
 } from "@/components/ChairUsersPanel";
 import { getLocale, getTranslations } from "next-intl/server";
 import { listCommunityAddresses } from "@/lib/communityAddresses";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function ChairUsersPage() {
   const session = await auth();
+  const communityId = requireCommunityId(session!.user!);
   const locale = await getLocale();
   if (session!.user!.role !== "CHAIR" && session!.user!.role !== "MODERATOR") {
     redirect(`/${locale}/dashboard`);
@@ -21,6 +23,7 @@ export default async function ChairUsersPage() {
 
   const [users, addresses] = await Promise.all([
     prisma.user.findMany({
+      where: communityWhere(communityId),
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -36,7 +39,7 @@ export default async function ChairUsersPage() {
         phone: true,
       },
     }),
-    listCommunityAddresses(),
+    listCommunityAddresses(communityId),
   ]);
 
   const isChair = session!.user!.role === "CHAIR";

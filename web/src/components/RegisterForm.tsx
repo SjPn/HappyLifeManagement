@@ -2,7 +2,7 @@
 
 import { useRouter } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { signIn } from "next-auth/react";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
 import { TenancyType } from "@/lib/audience";
@@ -10,13 +10,40 @@ import { Link } from "@/i18n/navigation";
 import { AddressSelect } from "@/components/AddressSelect";
 import type { AddressOption } from "@/lib/communityAddresses";
 
-export function RegisterForm({ addresses }: { addresses: AddressOption[] }) {
+export function RegisterForm() {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations("auth");
   const te = useTranslations("errors");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [addresses, setAddresses] = useState<AddressOption[]>([]);
+  const [addressesLoading, setAddressesLoading] = useState(false);
+  const [inviteCode, setInviteCode] = useState("");
+
+  const loadAddresses = useCallback(async (code: string) => {
+    const trimmed = code.trim();
+    if (!trimmed) {
+      setAddresses([]);
+      return;
+    }
+    setAddressesLoading(true);
+    try {
+      const res = await fetch(
+        `/api/addresses?inviteCode=${encodeURIComponent(trimmed)}`,
+      );
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && Array.isArray(data.addresses)) {
+        setAddresses(data.addresses);
+      } else {
+        setAddresses([]);
+      }
+    } catch {
+      setAddresses([]);
+    } finally {
+      setAddressesLoading(false);
+    }
+  }, []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -70,16 +97,20 @@ export function RegisterForm({ addresses }: { addresses: AddressOption[] }) {
     router.refresh();
   }
 
-  if (addresses.length === 0) {
-    return (
-      <p className="text-sm text-amber-800 dark:text-amber-200">
-        {t("noAddresses")}
-      </p>
-    );
-  }
-
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4">
+      <label className="flex flex-col gap-1.5">
+        <span className={labelClass}>{t("invite")}</span>
+        <input
+          name="inviteCode"
+          required
+          value={inviteCode}
+          onChange={(e) => setInviteCode(e.target.value)}
+          onBlur={() => loadAddresses(inviteCode)}
+          className={inputClass}
+          placeholder={t("invitePh")}
+        />
+      </label>
       <label className="flex flex-col gap-1.5">
         <span className={labelClass}>{t("name")}</span>
         <input name="name" required className={inputClass} />
@@ -105,7 +136,15 @@ export function RegisterForm({ addresses }: { addresses: AddressOption[] }) {
           className={inputClass}
         />
       </label>
-      <AddressSelect addresses={addresses} />
+      {addressesLoading ? (
+        <p className="text-sm text-zinc-500">…</p>
+      ) : addresses.length === 0 ? (
+        <p className="text-sm text-amber-800 dark:text-amber-200">
+          {inviteCode.trim() ? t("noAddresses") : t("invitePh")}
+        </p>
+      ) : (
+        <AddressSelect addresses={addresses} />
+      )}
       <label className="flex flex-col gap-1.5">
         <span className={labelClass}>{t("phone")}</span>
         <input name="phone" type="tel" className={inputClass} />
@@ -154,20 +193,12 @@ export function RegisterForm({ addresses }: { addresses: AddressOption[] }) {
           .
         </span>
       </label>
-      <label className="flex flex-col gap-1.5">
-        <span className={labelClass}>{t("invite")}</span>
-        <input
-          name="inviteCode"
-          className={inputClass}
-          placeholder={t("invitePh")}
-        />
-      </label>
       {error && (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || addresses.length === 0}
         className={`mt-2 ${primaryButtonClass}`}
       >
         {loading ? t("signingUp") : t("signUp")}

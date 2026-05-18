@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { ReportKind } from "@/lib/enums";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 const kinds = new Set<string>(Object.values(ReportKind));
 
@@ -16,6 +17,8 @@ export async function createConfidentialReport(formData: FormData) {
     return { error: "forbidden" as const };
   }
 
+  const communityId = requireCommunityId(session.user);
+
   const kindRaw = String(formData.get("kind") || "");
   const kind = kinds.has(kindRaw) ? kindRaw : "SUGGESTION";
   const category = String(formData.get("category") || "").trim() || "Загальне";
@@ -24,6 +27,7 @@ export async function createConfidentialReport(formData: FormData) {
 
   await prisma.confidentialReport.create({
     data: {
+      communityId,
       kind,
       category,
       body,
@@ -47,8 +51,15 @@ export async function updateReportStatus(
     return { error: "noAccess" as const };
   }
 
+  const communityId = requireCommunityId(session.user);
+
   const allowed = new Set(["NEW", "REVIEWING", "CLOSED"]);
   if (!allowed.has(status)) return { error: "badStatus" as const };
+
+  const report = await prisma.confidentialReport.findFirst({
+    where: { id: reportId, ...communityWhere(communityId) },
+  });
+  if (!report) return { error: "generic" as const };
 
   await prisma.confidentialReport.update({
     where: { id: reportId },

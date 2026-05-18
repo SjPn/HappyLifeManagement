@@ -12,6 +12,8 @@ export default async function LoginPage({
 }) {
   const { locale } = await params;
   const session = await auth();
+  if (session?.user?.role === "PLATFORM_ADMIN")
+    redirect(`/${locale}/platform/communities`);
   if (session?.user?.status === "APPROVED")
     redirect(`/${locale}/dashboard`);
   if (session?.user && session.user.status === "PENDING")
@@ -42,6 +44,14 @@ export default async function LoginPage({
             href="/register"
           >
             {t("toRegister")}
+          </Link>
+        </p>
+        <p className="mt-4 text-center text-sm text-slate-500">
+          <Link
+            className="font-semibold text-blue-700 hover:underline dark:text-blue-400"
+            href="/register-community"
+          >
+            {t("registerCommunity")}
           </Link>
         </p>
       </div>

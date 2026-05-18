@@ -10,28 +10,41 @@ import {
 } from "../src/lib/enums";
 import { AudienceScope, TenancyType } from "../src/lib/audience";
 import { normalizeHouseNumber, normalizeStreet } from "../src/lib/household";
+import { generateInviteCode } from "../src/lib/tenant";
 
 const prisma = new PrismaClient();
 
-async function ensureAddress(street: string, houseNumber: string) {
+async function ensureAddress(
+  communityId: string,
+  street: string,
+  houseNumber: string,
+) {
   const s = normalizeStreet(street);
   const h = normalizeHouseNumber(houseNumber);
   return prisma.communityAddress.upsert({
-    where: { street_houseNumber: { street: s, houseNumber: h } },
-    create: { street: s, houseNumber: h },
+    where: {
+      communityId_street_houseNumber: {
+        communityId,
+        street: s,
+        houseNumber: h,
+      },
+    },
+    create: { communityId, street: s, houseNumber: h },
     update: {},
   });
 }
 
 async function linkUserAddress(
   userId: string,
+  communityId: string,
   street: string,
   houseNumber: string,
 ) {
-  const addr = await ensureAddress(street, houseNumber);
+  const addr = await ensureAddress(communityId, street, houseNumber);
   await prisma.user.update({
     where: { id: userId },
     data: {
+      communityId,
       communityAddressId: addr.id,
       street: addr.street,
       houseNumber: addr.houseNumber,
@@ -43,9 +56,42 @@ async function linkUserAddress(
 async function main() {
   const hash = (p: string) => bcrypt.hashSync(p, 10);
 
+  const community = await prisma.community.upsert({
+    where: { id: "cm_shchaslyve_zhyttya" },
+    update: {
+      name: "Щасливе Життя",
+      slug: "shchaslyve-zhyttya",
+      inviteCode: process.env.INVITE_CODE?.trim() || "HAPPY2026",
+    },
+    create: {
+      id: "cm_shchaslyve_zhyttya",
+      slug: "shchaslyve-zhyttya",
+      name: "Щасливе Життя",
+      inviteCode: process.env.INVITE_CODE?.trim() || "HAPPY2026",
+      defaultLocale: "uk",
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: "admin@happylife.demo" },
+    update: { role: Role.PLATFORM_ADMIN, communityId: null },
+    create: {
+      email: "admin@happylife.demo",
+      passwordHash: hash("Pl@tf0rmAdm1n"),
+      name: "Platform Admin",
+      street: "—",
+      houseNumber: "—",
+      role: Role.PLATFORM_ADMIN,
+      status: UserStatus.APPROVED,
+      tenancyType: TenancyType.OWNER,
+      balanceUah: 0,
+      communityId: null,
+    },
+  });
+
   const chair = await prisma.user.upsert({
     where: { email: "chair@hlm.kiev.ua" },
-    update: { tenancyType: TenancyType.OWNER },
+    update: { tenancyType: TenancyType.OWNER, communityId: community.id },
     create: {
       email: "chair@hlm.kiev.ua",
       passwordHash: hash("H@ppYL!fe"),
@@ -56,12 +102,13 @@ async function main() {
       status: UserStatus.APPROVED,
       tenancyType: TenancyType.OWNER,
       balanceUah: 0,
+      communityId: community.id,
     },
   });
 
   const mod = await prisma.user.upsert({
     where: { email: "mod@hlm.kiev.ua" },
-    update: { tenancyType: TenancyType.OWNER },
+    update: { tenancyType: TenancyType.OWNER, communityId: community.id },
     create: {
       email: "mod@hlm.kiev.ua",
       passwordHash: hash("M0deR@toR$"),
@@ -72,12 +119,13 @@ async function main() {
       status: UserStatus.APPROVED,
       tenancyType: TenancyType.OWNER,
       balanceUah: 0,
+      communityId: community.id,
     },
   });
 
   const resident = await prisma.user.upsert({
     where: { email: "neighbor@happylife.demo" },
-    update: { tenancyType: TenancyType.TENANT },
+    update: { tenancyType: TenancyType.TENANT, communityId: community.id },
     create: {
       email: "neighbor@happylife.demo",
       passwordHash: hash("demo123"),
@@ -88,19 +136,22 @@ async function main() {
       status: UserStatus.APPROVED,
       tenancyType: TenancyType.TENANT,
       balanceUah: 3500,
+      communityId: community.id,
     },
   });
 
-  await linkUserAddress(chair.id, chair.street, chair.houseNumber);
-  await linkUserAddress(mod.id, mod.street, mod.houseNumber);
+  await linkUserAddress(chair.id, community.id, chair.street, chair.houseNumber);
+  await linkUserAddress(mod.id, community.id, mod.street, mod.houseNumber);
   const residentAddr = await linkUserAddress(
     resident.id,
+    community.id,
     resident.street,
     resident.houseNumber,
   );
 
   const vote = await prisma.vote.create({
     data: {
+      communityId: community.id,
       title: "Провести ямочный ремонт главной дороги в июне?",
       description: "Работы планируются за счёт целевого взноса.",
       type: VoteType.YES_NO,
@@ -117,6 +168,7 @@ async function main() {
 
   await prisma.boardPost.create({
     data: {
+      communityId: community.id,
       category: BoardCategory.SELL_GIVE,
       title: "Отдам саженцы смородины",
       body: "Самовывоз, участок 15. Написать в комментарии темы на форуме.",
@@ -126,11 +178,13 @@ async function main() {
 
   const topic = await prisma.forumTopic.create({
     data: {
+      communityId: community.id,
       title: "Организация дежурств по уборке",
       audience: AudienceScope.ALL,
       userId: resident.id,
       posts: {
         create: {
+          communityId: community.id,
           body: "Предлагаю составить график на лето — кто готов координировать?",
           userId: resident.id,
         },
@@ -140,6 +194,7 @@ async function main() {
 
   await prisma.confidentialReport.create({
     data: {
+      communityId: community.id,
       kind: ReportKind.SUGGESTION,
       category: "Благоустройство",
       body: "Просьба рассмотреть установку лавочки у пруда.",
@@ -152,7 +207,8 @@ async function main() {
   const now = new Date();
   await prisma.householdBilling.upsert({
     where: {
-      street_houseNumber_periodYear_periodMonth: {
+      communityId_street_houseNumber_periodYear_periodMonth: {
+        communityId: community.id,
         street: residentAddr.street,
         houseNumber: residentAddr.houseNumber,
         periodYear: now.getFullYear(),
@@ -160,6 +216,7 @@ async function main() {
       },
     },
     create: {
+      communityId: community.id,
       street: residentAddr.street,
       houseNumber: residentAddr.houseNumber,
       periodYear: now.getFullYear(),
@@ -175,6 +232,7 @@ async function main() {
 
   await prisma.ticket.create({
     data: {
+      communityId: community.id,
       category: TicketCategory.ROADS,
       description: "Выбоина на повороте к калитке",
       status: "NEW",
@@ -183,6 +241,8 @@ async function main() {
   });
 
   console.log("Seed OK:", {
+    community: community.slug,
+    inviteCode: community.inviteCode,
     chair: chair.email,
     mod: mod.email,
     resident: resident.email,

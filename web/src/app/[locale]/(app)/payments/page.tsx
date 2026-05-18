@@ -12,10 +12,12 @@ import { Role } from "@/lib/enums";
 import {
   billingPeriodKey,
   billingPeriodWhere,
+  billingUniqueWhere,
   formatBillingPeriodLabel,
   parseBillingPeriod,
   type BillingPeriod,
 } from "@/lib/billing";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 import {
   formatAddressLine,
@@ -25,29 +27,23 @@ import {
 } from "@/lib/household";
 
 async function getBillingForAddress(
+  communityId: string,
   street: string,
   houseNumber: string,
   period: BillingPeriod,
 ) {
-  const s = normalizeStreet(street);
-  const h = normalizeHouseNumber(houseNumber);
   return prisma.householdBilling.findUnique({
-    where: {
-      street_houseNumber_periodYear_periodMonth: {
-        street: s,
-        houseNumber: h,
-        periodYear: period.year,
-        periodMonth: period.month,
-      },
-    },
+    where: billingUniqueWhere(communityId, street, houseNumber, period),
   });
 }
 
 async function ResidentPaymentsView({
+  communityId,
   userId,
   locale,
   period,
 }: {
+  communityId: string;
   userId: string;
   locale: string;
   period: BillingPeriod;
@@ -69,9 +65,9 @@ async function ResidentPaymentsView({
 
   const [billing, history] = user
     ? await Promise.all([
-        getBillingForAddress(user.street, user.houseNumber, period),
+        getBillingForAddress(communityId, user.street, user.houseNumber, period),
         prisma.householdBilling.findMany({
-          where: { street, houseNumber },
+          where: { ...communityWhere(communityId), street, houseNumber },
           orderBy: [{ periodYear: "desc" }, { periodMonth: "desc" }],
           take: 24,
         }),
@@ -234,14 +230,20 @@ type HouseholdRow = {
   paidAt: Date | null;
 };
 
-async function ChairPaymentsManageView({ period }: { period: BillingPeriod }) {
+async function ChairPaymentsManageView({
+  communityId,
+  period,
+}: {
+  communityId: string;
+  period: BillingPeriod;
+}) {
   const locale = await getLocale();
   const t = await getTranslations("payments");
   const periodLabel = formatBillingPeriodLabel(locale, period);
 
   const [residents, billings] = await Promise.all([
     prisma.user.findMany({
-      where: { role: Role.RESIDENT },
+      where: { ...communityWhere(communityId), role: Role.RESIDENT },
       orderBy: [{ street: "asc" }, { houseNumber: "asc" }, { name: "asc" }],
       select: {
         name: true,
@@ -252,7 +254,7 @@ async function ChairPaymentsManageView({ period }: { period: BillingPeriod }) {
       },
     }),
     prisma.householdBilling.findMany({
-      where: billingPeriodWhere(period),
+      where: billingPeriodWhere(communityId, period),
     }),
   ]);
 
@@ -412,6 +414,7 @@ export default async function PaymentsPage({
     redirect(`/${locale}/chair`);
   }
 
+  const communityId = requireCommunityId(session!.user!);
   const sp = await searchParams;
   const period = parseBillingPeriod(sp.y, sp.m);
   const locale = await getLocale();
@@ -419,10 +422,15 @@ export default async function PaymentsPage({
   const isChair = session!.user!.role === "CHAIR";
 
   if (isChair) {
-    return <ChairPaymentsManageView period={period} />;
+    return <ChairPaymentsManageView communityId={communityId} period={period} />;
   }
 
   return (
-    <ResidentPaymentsView userId={userId} locale={locale} period={period} />
+    <ResidentPaymentsView
+      communityId={communityId}
+      userId={userId}
+      locale={locale}
+      period={period}
+    />
   );
 }

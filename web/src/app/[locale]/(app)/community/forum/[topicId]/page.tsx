@@ -7,6 +7,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { auth } from "@/auth";
 import { userMatchesAudience } from "@/lib/audience";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function ForumTopicPage({
   params,
@@ -22,8 +23,9 @@ export default async function ForumTopicPage({
   const t = await getTranslations("forum");
   const dateLocale = dateLocaleForUi(locale);
 
-  const topic = await prisma.forumTopic.findUnique({
-    where: { id: topicId },
+  const communityId = requireCommunityId(session!.user!);
+  const topic = await prisma.forumTopic.findFirst({
+    where: { id: topicId, ...communityWhere(communityId) },
     include: {
       user: { select: { name: true } },
       posts: {

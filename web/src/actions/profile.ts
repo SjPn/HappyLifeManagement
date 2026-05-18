@@ -5,10 +5,13 @@ import { prisma } from "@/lib/prisma";
 import { TenancyType } from "@/lib/audience";
 import { resolveCommunityAddress } from "@/lib/communityAddresses";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
+import { requireCommunityId } from "@/lib/tenant";
 
 export async function updateMyProfile(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) return { error: "noAccess" as const };
+
+  const communityId = requireCommunityId(session.user);
 
   const name = String(formData.get("name") || "").trim();
   const communityAddressId = String(
@@ -21,7 +24,7 @@ export async function updateMyProfile(formData: FormData) {
 
   if (!name || !communityAddressId) return { error: "requiredFields" as const };
 
-  const address = await resolveCommunityAddress(communityAddressId);
+  const address = await resolveCommunityAddress(communityAddressId, communityId);
   if (!address) return { error: "invalidAddress" as const };
 
   await prisma.user.update({

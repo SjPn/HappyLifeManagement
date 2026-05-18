@@ -11,6 +11,7 @@
     "votePick": "Pick an option",
     "generic": "Something went wrong. Try again.",
     "invalidAddress": "Please select an address from the list",
+    "invalidInvite": "Invalid community invite code",
     "addressExists": "This address is already in the list",
     "addressInUse": "Cannot delete: residents are registered at this address",
     "chairOnly": "Chair only",
@@ -77,7 +78,8 @@
     "signingIn": "Signing in…",
     "signUp": "Sign up",
     "signingUp": "Signing up…",
-    "errorLogin": "Invalid email or password"
+    "errorLogin": "Invalid email or password",
+    "registerCommunity": "Create a new community"
   },
   "pending": {
     "title": "Awaiting approval",
@@ -168,7 +170,9 @@
     "reportsTitle": "Confidential reports",
     "reportsDesc": "Processing rules apply; moderators see the author",
     "residentsTitle": "Residents",
-    "residentsDesc": "Approved owners and tenants with addresses"
+    "residentsDesc": "Approved owners and tenants with addresses",
+    "messagesTitle": "Messages",
+    "messagesDesc": "Direct chat with residents"
   },
   "board": {
     "title": "Community board",
@@ -271,7 +275,68 @@
     "chairPanel": "Management",
     "signOut": "Sign out",
     "tenancyTitle": "Residency",
-    "editProfile": "Edit profile"
+    "editProfile": "Edit profile",
+    "downloadApp": "Download app (APK)"
+  },
+  "messages": {
+    "title": "Messages",
+    "subtitle": "Private chats with residents",
+    "empty": "No conversations yet. Pick a neighbor.",
+    "newChat": "New chat",
+    "pickResident": "Who to message?",
+    "noResidents": "No other approved residents.",
+    "back": "← Back to list",
+    "placeholder": "Message…",
+    "send": "Send"
+  },
+  "platform": {
+    "eyebrow": "Platform",
+    "title": "Community management",
+    "subtitle": "Create, block, and remove HOAs / villages.",
+    "communitiesNav": "Communities",
+    "createTitle": "New community",
+    "communityName": "Name",
+    "slug": "Slug (URL)",
+    "defaultLocale": "Default locale",
+    "createBtn": "Create",
+    "inviteCode": "Invite code",
+    "users": "{count} users",
+    "blocked": "Blocked",
+    "active": "Active",
+    "block": "Block",
+    "unblock": "Unblock",
+    "delete": "Delete",
+    "confirmBlock": "Block access to this community?",
+    "confirmUnblock": "Unblock this community?",
+    "confirmDelete": "Delete community “{name}” and all data?",
+    "typeYes": "Type yes to confirm"
+  },
+  "onboard": {
+    "title": "New community",
+    "subtitle": "Create your village and become the first chair.",
+    "communityName": "Community name",
+    "slug": "Short id (latin)",
+    "chairName": "Your name",
+    "email": "Email",
+    "password": "Password (min 6)",
+    "submit": "Create",
+    "submitting": "Creating…",
+    "joinExisting": "Join existing community",
+    "login": "Sign in",
+    "created": "Community created!",
+    "inviteLabel": "Invite code for residents",
+    "inviteHint": "Share this code when neighbors register.",
+    "errors": {
+      "generic": "Error. Please try again.",
+      "invalidFields": "Fill in all fields",
+      "emailTaken": "Email already in use",
+      "slugConflict": "This slug already exists",
+      "loginAfterCreate": "Community created but sign-in failed — sign in manually"
+    }
+  },
+  "blocked": {
+    "title": "Access suspended",
+    "text": "Community “{name}” is temporarily blocked. Contact the platform administrator."
   },
   "residents": {
     "title": "Residents",
@@ -414,7 +479,8 @@
     "roles": {
       "RESIDENT": "Resident",
       "MODERATOR": "Moderator",
-      "CHAIR": "Chair"
+      "CHAIR": "Chair",
+      "PLATFORM_ADMIN": "Platform admin"
     },
     "audience": {
       "ALL": "All residents (owners and tenants)",

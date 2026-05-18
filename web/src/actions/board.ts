@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { BoardCategory } from "@/lib/enums";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
 import { savePublicUpload } from "@/lib/upload";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 const allowed = new Set<string>(Object.values(BoardCategory));
 
@@ -16,6 +17,8 @@ export async function createBoardPost(formData: FormData) {
   if (session.user.role === "MODERATOR") {
     return { error: "forbidden" as const };
   }
+
+  const communityId = requireCommunityId(session.user);
 
   const categoryRaw = String(formData.get("category") || "");
   const category: string = allowed.has(categoryRaw)
@@ -38,6 +41,7 @@ export async function createBoardPost(formData: FormData) {
 
   await prisma.boardPost.create({
     data: {
+      communityId,
       category,
       title,
       body,
@@ -56,6 +60,9 @@ export async function updateBoardPost(formData: FormData) {
   if (!session?.user?.id || session.user.status !== "APPROVED") {
     return { error: "noAccess" as const };
   }
+
+  const communityId = requireCommunityId(session.user);
+
   const id = String(formData.get("id") || "");
   const title = String(formData.get("title") || "").trim();
   const body = String(formData.get("body") || "").trim();
@@ -65,7 +72,9 @@ export async function updateBoardPost(formData: FormData) {
 
   if (!id || !title || !body) return { error: "requiredFields" as const };
 
-  const existing = await prisma.boardPost.findUnique({ where: { id } });
+  const existing = await prisma.boardPost.findFirst({
+    where: { id, ...communityWhere(communityId) },
+  });
   if (!existing) return { error: "generic" as const };
 
   const canEdit =
@@ -104,6 +113,13 @@ export async function deleteBoardPost(id: string) {
   if (session.user.role !== "MODERATOR" && session.user.role !== "CHAIR") {
     return { error: "forbidden" as const };
   }
+
+  const communityId = requireCommunityId(session.user);
+
+  const existing = await prisma.boardPost.findFirst({
+    where: { id, ...communityWhere(communityId) },
+  });
+  if (!existing) return { error: "generic" as const };
 
   await prisma.boardPost.delete({ where: { id } });
   revalidateAllLocales("/community/board");

@@ -7,6 +7,7 @@ import { VoteForm } from "@/components/VoteForm";
 import { getTranslations } from "next-intl/server";
 import { userMatchesAudience } from "@/lib/audience";
 import { getLocale } from "next-intl/server";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function VoteDetailPage({
   params,
@@ -19,11 +20,12 @@ export default async function VoteDetailPage({
     const locale = await getLocale();
     redirect(`/${locale}/chair`);
   }
+  const communityId = requireCommunityId(session!.user!);
   const userId = session!.user!.id;
   const t = await getTranslations("votes");
 
-  const vote = await prisma.vote.findUnique({
-    where: { id },
+  const vote = await prisma.vote.findFirst({
+    where: { id, ...communityWhere(communityId) },
     include: {
       options: { orderBy: { sortOrder: "asc" } },
       responses: {

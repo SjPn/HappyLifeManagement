@@ -11,6 +11,7 @@ import {
   type BillingPeriod,
 } from "@/lib/billing";
 import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 function staff(session: { user?: { role?: string } } | null) {
   const r = session?.user?.role;
@@ -20,12 +21,20 @@ function staff(session: { user?: { role?: string } } | null) {
 export async function setUserStatus(userId: string, status: string) {
   const session = await auth();
   if (!staff(session)) return { error: "forbidden" as const };
+
+  const communityId = requireCommunityId(session!.user!);
+
   const allowed = new Set<string>([
     UserStatus.PENDING,
     UserStatus.APPROVED,
     UserStatus.REJECTED,
   ]);
   if (!allowed.has(status)) return { error: "badStatus" as const };
+
+  const user = await prisma.user.findFirst({
+    where: { id: userId, ...communityWhere(communityId) },
+  });
+  if (!user) return { error: "badData" as const };
 
   await prisma.user.update({
     where: { id: userId },
@@ -43,6 +52,8 @@ export async function setUserBalance(formData: FormData) {
     return { error: "forbidden" as const };
   }
 
+  const communityId = requireCommunityId(session.user);
+
   const userId = String(formData.get("userId") || "");
   const balanceRaw = String(formData.get("balanceUah") || "").replace(
     ",",
@@ -52,6 +63,11 @@ export async function setUserBalance(formData: FormData) {
   if (!userId || !Number.isFinite(balanceUah)) {
     return { error: "badData" as const };
   }
+
+  const user = await prisma.user.findFirst({
+    where: { id: userId, ...communityWhere(communityId) },
+  });
+  if (!user) return { error: "badData" as const };
 
   await prisma.user.update({
     where: { id: userId },
@@ -94,6 +110,8 @@ export async function setHouseholdPayments(formData: FormData) {
     return { error: "forbidden" as const };
   }
 
+  const communityId = requireCommunityId(session.user);
+
   const period = parseBillingPeriodFromForm(formData);
   const street = normalizeStreet(String(formData.get("street") || ""));
   const houseNumber = normalizeHouseNumber(
@@ -113,8 +131,14 @@ export async function setHouseholdPayments(formData: FormData) {
     return { error: "badData" as const };
   }
 
+  const uniqueWhere = billingUniqueWhere(
+    communityId,
+    street,
+    houseNumber,
+    period,
+  );
   const existing = await prisma.householdBilling.findUnique({
-    where: billingUniqueWhere(street, houseNumber, period),
+    where: uniqueWhere,
   });
   const amountsChanged =
     existing != null &&
@@ -122,8 +146,9 @@ export async function setHouseholdPayments(formData: FormData) {
       existing.electricityUah !== electricityUah);
 
   await prisma.householdBilling.upsert({
-    where: billingUniqueWhere(street, houseNumber, period),
+    where: uniqueWhere,
     create: {
+      communityId,
       street,
       houseNumber,
       periodYear: period.year,
@@ -151,6 +176,8 @@ export async function setHouseholdPaid(formData: FormData) {
     return { error: "forbidden" as const };
   }
 
+  const communityId = requireCommunityId(session.user);
+
   const period = parseBillingPeriodFromForm(formData);
   const street = normalizeStreet(String(formData.get("street") || ""));
   const houseNumber = normalizeHouseNumber(
@@ -161,9 +188,17 @@ export async function setHouseholdPaid(formData: FormData) {
     return { error: "badData" as const };
   }
 
+  const uniqueWhere = billingUniqueWhere(
+    communityId,
+    street,
+    houseNumber,
+    period,
+  );
+
   await prisma.householdBilling.upsert({
-    where: billingUniqueWhere(street, houseNumber, period),
+    where: uniqueWhere,
     create: {
+      communityId,
       street,
       houseNumber,
       periodYear: period.year,
@@ -184,6 +219,8 @@ export async function updateUserProfile(formData: FormData) {
   const session = await auth();
   if (!staff(session)) return { error: "forbidden" as const };
 
+  const communityId = requireCommunityId(session!.user!);
+
   const userId = String(formData.get("userId") || "");
   const name = String(formData.get("name") || "").trim();
   const communityAddressId = String(
@@ -198,7 +235,12 @@ export async function updateUserProfile(formData: FormData) {
     return { error: "requiredFields" as const };
   }
 
-  const address = await resolveCommunityAddress(communityAddressId);
+  const target = await prisma.user.findFirst({
+    where: { id: userId, ...communityWhere(communityId) },
+  });
+  if (!target) return { error: "badData" as const };
+
+  const address = await resolveCommunityAddress(communityAddressId, communityId);
   if (!address) return { error: "invalidAddress" as const };
 
   await prisma.user.update({
@@ -228,8 +270,10 @@ export async function deleteUser(userId: string) {
     return { error: "cannotDeleteSelf" as const };
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
+  const communityId = requireCommunityId(session!.user!);
+
+  const user = await prisma.user.findFirst({
+    where: { id: userId, ...communityWhere(communityId) },
     select: { role: true },
   });
   if (!user) return { error: "badData" as const };

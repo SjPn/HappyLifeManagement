@@ -62,9 +62,16 @@ npm start
 
 ## Деплой (Vercel + Neon)
 
-1. `DATABASE_URL` у Vercel (runtime може бути pooler; для `db push` локально — **direct** endpoint).
-2. Після зміни `schema.prisma` — локально `npx prisma db push`, потім git push → Vercel deploy.
-3. Завантаження фото: `public/uploads/` (на Vercel ефемерно — винести в S3 згодом).
+1. `DATABASE_URL` у Vercel (runtime може бути pooler; для міграцій локально — **direct** endpoint).
+2. Build на Vercel: `npm run vercel-build` (`prisma migrate deploy` + Next build).
+3. Нові зміни схеми: `npx prisma migrate dev` → commit `prisma/migrations/` → deploy.
+4. Завантаження фото: `public/uploads/` (на Vercel ефемерно — винести в S3 згодом).
+
+### Поселок «Щасливе Життя» (production)
+
+- ID: `cm_shchaslyve_zhyttya`
+- Код запрошення для реєстрації: **`HAPPY2026`** (з `.env` `INVITE_CODE`)
+- Повторна міграція даних: `npm run db:migrate:production`
 
 ## Навігація (4 таби)
 

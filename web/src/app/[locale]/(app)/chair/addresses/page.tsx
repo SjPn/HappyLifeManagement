@@ -6,9 +6,11 @@ import { AddressAddForm } from "@/components/AddressAddForm";
 import { DeleteAddressButton } from "@/components/DeleteAddressButton";
 import { formatAddressLine } from "@/lib/household";
 import { getLocale, getTranslations } from "next-intl/server";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function ChairAddressesPage() {
   const session = await auth();
+  const communityId = requireCommunityId(session!.user!);
   const locale = await getLocale();
   if (session!.user!.role !== "CHAIR") {
     redirect(`/${locale}/chair`);
@@ -17,6 +19,7 @@ export default async function ChairAddressesPage() {
   const t = await getTranslations("addresses");
 
   const addresses = await prisma.communityAddress.findMany({
+    where: communityWhere(communityId),
     orderBy: [{ street: "asc" }, { houseNumber: "asc" }],
     include: {
       _count: { select: { users: true } },

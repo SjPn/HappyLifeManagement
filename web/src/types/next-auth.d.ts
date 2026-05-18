@@ -7,6 +7,7 @@ declare module "next-auth" {
       role: string;
       status: string;
       tenancyType?: string;
+      communityId?: string | null;
     };
   }
 
@@ -14,6 +15,7 @@ declare module "next-auth" {
     role?: string;
     status?: string;
     tenancyType?: string;
+    communityId?: string | null;
   }
 }
 
@@ -23,5 +25,6 @@ declare module "next-auth/jwt" {
     role: string;
     status: string;
     tenancyType?: string;
+    communityId?: string | null;
   }
 }

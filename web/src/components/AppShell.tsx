@@ -40,7 +40,13 @@ const tabs: {
   { href: "/profile", navKey: "more", Icon: LayoutGrid },
 ];
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+  communityName,
+}: {
+  children: React.ReactNode;
+  communityName?: string;
+}) {
   const pathname = usePathname();
   const t = useTranslations("nav");
   const { data } = useSession();
@@ -54,6 +60,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))]">
       <main className="relative z-0 mx-auto w-full min-w-0 max-w-lg flex-1 px-4 pb-2 pt-5 sm:px-5">
+        {communityName ? (
+          <p className="mb-3 truncate text-center text-xs font-semibold uppercase tracking-wide text-blue-700/90 dark:text-blue-300/90">
+            {communityName}
+          </p>
+        ) : null}
         {children}
       </main>
 

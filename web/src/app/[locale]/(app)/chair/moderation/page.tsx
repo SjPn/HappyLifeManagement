@@ -4,9 +4,11 @@ import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PageTitle, Card } from "@/components/Ui";
 import { DeleteBoardPostButton, DeleteForumTopicButton, DeleteVoteButton } from "@/components/ModerationDeleteButtons";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function ChairModerationPage() {
   const session = await auth();
+  const communityId = requireCommunityId(session!.user!);
   const locale = await getLocale();
   if (session!.user!.role !== "CHAIR" && session!.user!.role !== "MODERATOR") {
     redirect(`/${locale}/dashboard`);
@@ -14,18 +16,22 @@ export default async function ChairModerationPage() {
 
   const t = await getTranslations("moderation");
 
+  const tenant = communityWhere(communityId);
   const [board, topics, votes] = await Promise.all([
     prisma.boardPost.findMany({
+      where: tenant,
       orderBy: { createdAt: "desc" },
       take: 30,
       include: { user: { select: { name: true } } },
     }),
     prisma.forumTopic.findMany({
+      where: tenant,
       orderBy: { createdAt: "desc" },
       take: 30,
       include: { user: { select: { name: true } }, posts: { select: { id: true } } },
     }),
     prisma.vote.findMany({
+      where: tenant,
       orderBy: { createdAt: "desc" },
       take: 30,
       include: { options: { select: { id: true } } },

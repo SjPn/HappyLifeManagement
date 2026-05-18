@@ -50,3 +50,4 @@
 - Исходное видение: `e:\MVP_happyLife.docx`
 - Дорожная карта и задачи: `docs/TODO_ROADMAP.md`
 - Контекст для разработки и ИИ-сессий: `docs/DEVELOPMENT_CONTEXT.md`
+- Оценка продукта и сравнение с рынком: `docs/PROJECT_EVALUATION.md`

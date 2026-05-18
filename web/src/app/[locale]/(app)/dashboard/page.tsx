@@ -6,11 +6,11 @@ import { formatUah } from "@/lib/money";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { voteAudienceWhere } from "@/lib/audience";
 import {
-  billingPeriodWhere,
+  billingUniqueWhere,
   currentBillingPeriod,
   formatBillingPeriodLabel,
 } from "@/lib/billing";
-import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 import { NewsSectionHeader } from "@/components/NewsSectionHeader";
 import { DashboardSectionLink } from "@/components/DashboardSectionLink";
@@ -20,6 +20,7 @@ import { ChairPublishBlocks } from "@/components/ChairPublishBlocks";
 
 export default async function DashboardPage() {
   const session = await auth();
+  const communityId = requireCommunityId(session!.user!);
   const userId = session!.user!.id;
   const isChair = session!.user!.role === "CHAIR";
   const locale = await getLocale();
@@ -53,6 +54,7 @@ export default async function DashboardPage() {
     isChair
       ? Promise.resolve([])
       : prisma.newsPost.findMany({
+          where: communityWhere(communityId),
           orderBy: { createdAt: "desc" },
           take: 4,
           include: { author: { select: { name: true } } },
@@ -61,6 +63,7 @@ export default async function DashboardPage() {
       ? Promise.resolve([])
       : prisma.vote.findMany({
           where: {
+            ...communityWhere(communityId),
             AND: [
               { OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }] },
               voteAudienceWhere({
@@ -91,13 +94,12 @@ export default async function DashboardPage() {
   const householdBilling =
     !isChair && user?.street && user?.houseNumber
       ? await prisma.householdBilling.findUnique({
-          where: {
-            street_houseNumber_periodYear_periodMonth: {
-              street: normalizeStreet(user.street),
-              houseNumber: normalizeHouseNumber(user.houseNumber),
-              ...billingPeriodWhere(billingPeriod),
-            },
-          },
+          where: billingUniqueWhere(
+            communityId,
+            user.street,
+            user.houseNumber,
+            billingPeriod,
+          ),
         })
       : null;
 

@@ -4,6 +4,7 @@ import { PageTitle } from "@/components/Ui";
 import { RequestsPanel, type TicketRow } from "@/components/RequestsPanel";
 import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 function toTicketRows(
   tickets: {
@@ -41,7 +42,10 @@ export default async function RequestsArchivePage() {
   const staff = role === "CHAIR" || role === "MODERATOR";
   const t = await getTranslations("requests");
 
-  const baseWhere = staff ? {} : { userId: session!.user!.id };
+  const communityId = requireCommunityId(session!.user!);
+  const baseWhere = staff
+    ? communityWhere(communityId)
+    : { ...communityWhere(communityId), userId: session!.user!.id };
 
   const archiveTickets = await prisma.ticket.findMany({
     where: { ...baseWhere, status: "RESOLVED" },

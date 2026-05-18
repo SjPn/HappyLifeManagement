@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PageTitle, Card } from "@/components/Ui";
 import { ForumTopicEditForm } from "@/components/ForumTopicEditForm";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function ForumTopicEditPage({
   params,
@@ -17,8 +18,9 @@ export default async function ForumTopicEditPage({
     redirect(`/${locale}/chair`);
   }
 
-  const topic = await prisma.forumTopic.findUnique({
-    where: { id: topicId },
+  const communityId = requireCommunityId(session!.user!);
+  const topic = await prisma.forumTopic.findFirst({
+    where: { id: topicId, ...communityWhere(communityId) },
     include: { posts: { orderBy: { createdAt: "asc" }, take: 1 } },
   });
   if (!topic) notFound();

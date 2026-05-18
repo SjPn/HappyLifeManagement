@@ -3,8 +3,11 @@ import { formatAddressLine } from "@/lib/household";
 
 export type AddressOption = { id: string; label: string };
 
-export async function listCommunityAddresses(): Promise<AddressOption[]> {
+export async function listCommunityAddresses(
+  communityId: string,
+): Promise<AddressOption[]> {
   const rows = await prisma.communityAddress.findMany({
+    where: { communityId },
     orderBy: [{ street: "asc" }, { houseNumber: "asc" }],
   });
   return rows.map((a) => ({
@@ -13,8 +16,13 @@ export async function listCommunityAddresses(): Promise<AddressOption[]> {
   }));
 }
 
-export async function resolveCommunityAddress(addressId: string) {
+export async function resolveCommunityAddress(
+  addressId: string,
+  communityId: string,
+) {
   const id = addressId.trim();
   if (!id) return null;
-  return prisma.communityAddress.findUnique({ where: { id } });
+  return prisma.communityAddress.findFirst({
+    where: { id, communityId },
+  });
 }

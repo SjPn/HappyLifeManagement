@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { getNotificationCounts } from "@/lib/notifications";
 import { prisma } from "@/lib/prisma";
+import { requireCommunityId } from "@/lib/tenant";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -9,8 +10,15 @@ export async function GET() {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+  let communityId: string;
+  try {
+    communityId = requireCommunityId(session.user);
+  } catch {
+    return NextResponse.json({ error: "no_community" }, { status: 403 });
+  }
+
+  const user = await prisma.user.findFirst({
+    where: { id: session.user.id, communityId },
     select: {
       id: true,
       role: true,
@@ -24,6 +32,6 @@ export async function GET() {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
-  const counts = await getNotificationCounts(user);
+  const counts = await getNotificationCounts({ ...user, communityId });
   return NextResponse.json(counts);
 }

@@ -6,18 +6,20 @@
 
 > **Назначение:** срез состояния, который актуализируется в конце каждой сессии. Если что-то ниже устарело — сначала обнови этот блок и `TODO_ROADMAP.md`, потом продолжай.
 
-**Последняя дата апдейта:** 2026-05-17 · Ветка: `main` · Репозиторий: `SjPn/HappyLifeManagement` · Прод: Vercel `hlm-nu.vercel.app` + Neon.
+**Последняя дата апдейта:** 2026-05-18 (production Neon → поселок «Щасливе Життя») · Ветка: `main` · Репозиторий: `SjPn/HappyLifeManagement` · Прод: Vercel `hlm-nu.vercel.app` + Neon.
 
-**Последние коммиты (`git log -6`):** `66c3554` · `3e6ef4b` · `7e834ac` · `3def4e2` · `b9a4d67` · `325a9e7` (см. сообщения в git).
+**Последние коммиты (`git log -8`):** `6f73ef6` · `63a1d19` · `2fcdbf8` · `a51b2f2` · `39749d1` · `ab95a6b` · `913a3fe` · `9a341bb`.
 
-- Раздел **«Мої платежі»** (`/{locale}/payments`): житель видит абонплату + електроенергію; голова вносить на `/{locale}/payments` по месяцам (`HouseholdBilling`). `/meters` — редирект.
-- **UX:** 4 таба; главная → платежи/голоса/заявки; мешканці в спільноті; «Ще» без дублей ссылок.
+- Раздел **«Мої платежі»** (`/{locale}/payments`): житель видит абонплату + электро; при `paidAt` — «Оплачено». Голова вносит на `/payments` по месяцам (`HouseholdBilling`). `/meters` — редирект.
+- **Заявки** (`/requests`): список **название + статус** → модалка (`RequestsPanel`); архив `/requests/archive` для `RESOLVED`.
+- **Голова / жители** (`/chair/users`): список **имя | адрес** → модалка (`ChairUsersPanel`).
+- **UX:** 4 таба; синяя тема; бейджи «новое»; управление с главной; из **«Ещё»** убрана ссылка «Управление». Один тенант (одна БД на посёлок).
 
 **Где код:** `web/` (Next.js 16 App Router + Prisma 5 + Postgres + Auth.js v5 + next-intl). База — Postgres (Neon), на Vercel — единый деплой.
 
 **Схема платежей:** `HouseholdBilling` (месяц+адрес) + отдельно `User.balanceUah` в `/chair/users`. Код только `prisma.householdBilling` (P2021 если задеплоен старый билд).
 
-**Что работает (`npm run build`, 2026-05-17):**
+**Что работает (`npm run build`, 2026-05-18):**
 
 - Локали с префиксом URL `/uk` (default) / `/ru` / `/en`; root `/` редиректит на `/uk` через `web/src/app/page.tsx` (фолбэк к `next-intl` middleware).
 - Auth.js v5: вход email/password, JWT-сессия, корректный sign-out (`SignOutButton` уходит через `signOut({ redirect: false })` + клиентский `window.location.assign('/${locale}')`).
@@ -59,9 +61,15 @@ git -C .. log --oneline -5
 git -C .. status
 ```
 
+**Паттерны UI (зафиксировать при новых списках):**
+
+- Компактный список на странице → **модалка** с деталями и действиями (заявки, жители у головы).
+- Завершённые сущности — **отдельный архив** (заявки `RESOLVED` → `/requests/archive`).
+
 **Источники истины:**
 
 - Продуктовое видение и роли — `docs/PROJECT_OVERVIEW.md`.
+- Сравнение с рынком (ДАХ и аналоги) — `docs/PROJECT_EVALUATION.md`.
 - Дорожная карта — `docs/TODO_ROADMAP.md`.
 - Локальный запуск, Prisma/Auth трюки, заметки по деплою — `web/README.md`.
 - Транскрипт прошлых чатов — `C:\Users\intel\.cursor\projects\e-MyPyPro-HappyLife\agent-transcripts\` (по uuid сессии).

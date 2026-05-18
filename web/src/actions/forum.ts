@@ -8,6 +8,7 @@ import {
   parseAudienceScope,
   userMatchesAudience,
 } from "@/lib/audience";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export async function createForumTopic(formData: FormData) {
   const session = await auth();
@@ -17,6 +18,8 @@ export async function createForumTopic(formData: FormData) {
   if (session.user.role === "MODERATOR") {
     return { error: "forbidden" as const };
   }
+
+  const communityId = requireCommunityId(session.user);
 
   const title = String(formData.get("title") || "").trim();
   const body = String(formData.get("body") || "").trim();
@@ -36,11 +39,13 @@ export async function createForumTopic(formData: FormData) {
 
   await prisma.forumTopic.create({
     data: {
+      communityId,
       title,
       audience,
       userId: session.user.id,
       posts: {
         create: {
+          communityId,
           body,
           imageUrl,
           userId: session.user.id,
@@ -63,13 +68,17 @@ export async function createForumReply(formData: FormData) {
     return { error: "forbidden" as const };
   }
 
+  const communityId = requireCommunityId(session.user);
+
   const topicId = String(formData.get("topicId") || "");
   const body = String(formData.get("body") || "").trim();
   const img = formData.get("image");
 
   if (!topicId || !body) return { error: "emptyMessage" as const };
 
-  const topic = await prisma.forumTopic.findUnique({ where: { id: topicId } });
+  const topic = await prisma.forumTopic.findFirst({
+    where: { id: topicId, ...communityWhere(communityId) },
+  });
   if (!topic) return { error: "noTopic" as const };
 
   if (
@@ -93,6 +102,7 @@ export async function createForumReply(formData: FormData) {
 
   await prisma.forumPost.create({
     data: {
+      communityId,
       topicId,
       body,
       imageUrl,
@@ -110,6 +120,9 @@ export async function updateForumTopic(formData: FormData) {
   if (!session?.user?.id || session.user.status !== "APPROVED") {
     return { error: "noAccess" as const };
   }
+
+  const communityId = requireCommunityId(session.user);
+
   const topicId = String(formData.get("topicId") || "");
   const title = String(formData.get("title") || "").trim();
   const body = String(formData.get("body") || "").trim();
@@ -118,8 +131,8 @@ export async function updateForumTopic(formData: FormData) {
 
   if (!topicId || !title || !body) return { error: "requiredFields" as const };
 
-  const topic = await prisma.forumTopic.findUnique({
-    where: { id: topicId },
+  const topic = await prisma.forumTopic.findFirst({
+    where: { id: topicId, ...communityWhere(communityId) },
     include: { posts: { orderBy: { createdAt: "asc" }, take: 1 } },
   });
   if (!topic) return { error: "noTopic" as const };
@@ -167,6 +180,13 @@ export async function deleteForumTopic(topicId: string) {
   if (session.user.role !== "MODERATOR" && session.user.role !== "CHAIR") {
     return { error: "forbidden" as const };
   }
+
+  const communityId = requireCommunityId(session.user);
+
+  const topic = await prisma.forumTopic.findFirst({
+    where: { id: topicId, ...communityWhere(communityId) },
+  });
+  if (!topic) return { error: "generic" as const };
 
   await prisma.forumTopic.delete({ where: { id: topicId } });
   revalidateAllLocales("/community/forum");

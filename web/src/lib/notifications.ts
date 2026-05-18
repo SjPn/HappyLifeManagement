@@ -6,6 +6,7 @@ import {
 } from "@/lib/audience";
 import { Role } from "@/lib/enums";
 import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
+import { communityWhere } from "@/lib/tenant";
 
 export const NotificationScope = {
   news: "news",
@@ -36,6 +37,7 @@ export type NotificationCounts = {
 type SessionUser = {
   id: string;
   role: string;
+  communityId: string;
   tenancyType?: string | null;
   street?: string;
   houseNumber?: string;
@@ -78,14 +80,16 @@ export async function getNotificationCounts(
 ): Promise<NotificationCounts> {
   const seen = await getSeenState(user.id);
   const now = new Date();
+  const tenant = communityWhere(user.communityId);
 
   const [news, votes, tickets, payments, board, forumTopics, forumPosts, reports] =
     await Promise.all([
       prisma.newsPost.count({
-        where: { createdAt: { gt: seen.newsAt } },
+        where: { ...tenant, createdAt: { gt: seen.newsAt } },
       }),
       prisma.vote.count({
         where: {
+          ...tenant,
           createdAt: { gt: seen.votesAt },
           AND: [
             { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
@@ -99,10 +103,11 @@ export async function getNotificationCounts(
       countTickets(user, seen.ticketsAt),
       countPayments(user, seen.paymentsAt),
       prisma.boardPost.count({
-        where: { createdAt: { gt: seen.boardAt } },
+        where: { ...tenant, createdAt: { gt: seen.boardAt } },
       }),
       prisma.forumTopic.count({
         where: {
+          ...tenant,
           createdAt: { gt: seen.forumAt },
           ...forumTopicAudienceWhere({
             role: user.role,
@@ -112,11 +117,15 @@ export async function getNotificationCounts(
       }),
       prisma.forumPost.count({
         where: {
+          ...tenant,
           createdAt: { gt: seen.forumAt },
-          topic: forumTopicAudienceWhere({
-            role: user.role,
-            tenancyType: user.tenancyType,
-          }),
+          topic: {
+            ...tenant,
+            ...forumTopicAudienceWhere({
+              role: user.role,
+              tenancyType: user.tenancyType,
+            }),
+          },
         },
       }),
       countReports(user, seen.reportsAt),
@@ -142,25 +151,28 @@ export async function getNotificationCounts(
 }
 
 async function countTickets(user: SessionUser, since: Date) {
+  const tenant = communityWhere(user.communityId);
   if (user.role === Role.CHAIR || user.role === Role.MODERATOR) {
     return prisma.ticket.count({
-      where: { updatedAt: { gt: since } },
+      where: { ...tenant, updatedAt: { gt: since } },
     });
   }
   return prisma.ticket.count({
-    where: { userId: user.id, updatedAt: { gt: since } },
+    where: { ...tenant, userId: user.id, updatedAt: { gt: since } },
   });
 }
 
 async function countPayments(user: SessionUser, since: Date) {
+  const tenant = communityWhere(user.communityId);
   if (user.role === Role.CHAIR) {
     return prisma.householdBilling.count({
-      where: { updatedAt: { gt: since } },
+      where: { ...tenant, updatedAt: { gt: since } },
     });
   }
   if (!user.street || !user.houseNumber) return 0;
   return prisma.householdBilling.count({
     where: {
+      ...tenant,
       updatedAt: { gt: since },
       street: normalizeStreet(user.street),
       houseNumber: normalizeHouseNumber(user.houseNumber),
@@ -169,13 +181,15 @@ async function countPayments(user: SessionUser, since: Date) {
 }
 
 async function countReports(user: SessionUser, since: Date) {
+  const tenant = communityWhere(user.communityId);
   if (isStaffRole(user.role)) {
     return prisma.confidentialReport.count({
-      where: { createdAt: { gt: since } },
+      where: { ...tenant, createdAt: { gt: since } },
     });
   }
   return prisma.confidentialReport.count({
     where: {
+      ...tenant,
       OR: [
         { published: true, createdAt: { gt: since } },
         { authorId: user.id, createdAt: { gt: since } },

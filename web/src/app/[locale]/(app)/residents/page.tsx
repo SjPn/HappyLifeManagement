@@ -4,9 +4,11 @@ import { prisma } from "@/lib/prisma";
 import { PageTitle, Card } from "@/components/Ui";
 import { getTranslations } from "next-intl/server";
 import { TenancyType } from "@/lib/audience";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function ResidentsPage() {
   const session = await auth();
+  const communityId = requireCommunityId(session!.user!);
   const t = await getTranslations("residents");
   const tt = await getTranslations("categories.tenancy");
   const isStaff =
@@ -15,7 +17,11 @@ export default async function ResidentsPage() {
   const backLabel = (await getTranslations("board"))("back");
 
   const users = await prisma.user.findMany({
-    where: { status: "APPROVED", role: "RESIDENT" },
+    where: {
+      ...communityWhere(communityId),
+      status: "APPROVED",
+      role: "RESIDENT",
+    },
     orderBy: [{ street: "asc" }, { houseNumber: "asc" }, { name: "asc" }],
     select: { id: true, name: true, street: true, houseNumber: true, tenancyType: true },
   });

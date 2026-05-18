@@ -7,9 +7,11 @@ import { dateLocaleForUi } from "@/lib/dateLocale";
 import { forumTopicAudienceWhere } from "@/lib/audience";
 import { redirect } from "next/navigation";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function ForumListPage() {
   const session = await auth();
+  const communityId = requireCommunityId(session!.user!);
   if (session!.user!.role === "MODERATOR") {
     const locale = await getLocale();
     redirect(`/${locale}/chair`);
@@ -19,10 +21,13 @@ export default async function ForumListPage() {
   const dateLocale = dateLocaleForUi(locale);
 
   const topics = await prisma.forumTopic.findMany({
-    where: forumTopicAudienceWhere({
-      role: session!.user!.role,
-      tenancyType: session!.user!.tenancyType,
-    }),
+    where: {
+      ...communityWhere(communityId),
+      ...forumTopicAudienceWhere({
+        role: session!.user!.role,
+        tenancyType: session!.user!.tenancyType,
+      }),
+    },
     orderBy: { createdAt: "desc" },
     take: 40,
     include: {

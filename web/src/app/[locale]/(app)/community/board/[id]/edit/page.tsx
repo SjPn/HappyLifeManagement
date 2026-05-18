@@ -4,6 +4,7 @@ import { redirect, notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PageTitle, Card } from "@/components/Ui";
 import { BoardEditForm } from "@/components/BoardEditForm";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function BoardEditPage({
   params,
@@ -17,7 +18,10 @@ export default async function BoardEditPage({
     redirect(`/${locale}/chair`);
   }
 
-  const post = await prisma.boardPost.findUnique({ where: { id } });
+  const communityId = requireCommunityId(session!.user!);
+  const post = await prisma.boardPost.findFirst({
+    where: { id, ...communityWhere(communityId) },
+  });
   if (!post) notFound();
 
   const canEdit =

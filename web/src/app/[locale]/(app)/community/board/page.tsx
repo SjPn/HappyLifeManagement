@@ -6,9 +6,11 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { redirect } from "next/navigation";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function BoardPage() {
   const session = await auth();
+  const communityId = requireCommunityId(session!.user!);
   if (session!.user!.role === "MODERATOR") {
     const locale = await getLocale();
     redirect(`/${locale}/chair`);
@@ -20,6 +22,7 @@ export default async function BoardPage() {
   const dateLocale = dateLocaleForUi(locale);
 
   const posts = await prisma.boardPost.findMany({
+    where: communityWhere(communityId),
     orderBy: { createdAt: "desc" },
     take: 40,
     include: { user: { select: { name: true } } },

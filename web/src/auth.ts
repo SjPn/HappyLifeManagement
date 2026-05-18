@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { Role } from "@/lib/enums";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -21,11 +22,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const user = await prisma.user.findUnique({
           where: { email: email.trim().toLowerCase() },
+          include: { community: { select: { blockedAt: true } } },
         });
         if (!user) return null;
 
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) return null;
+
+        if (
+          user.role !== Role.PLATFORM_ADMIN &&
+          user.community?.blockedAt
+        ) {
+          return null;
+        }
 
         return {
           id: user.id,
@@ -34,6 +43,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           role: user.role,
           status: user.status,
           tenancyType: user.tenancyType,
+          communityId: user.communityId,
         };
       },
     }),
@@ -42,9 +52,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id as string;
-        token.role = user.role ?? "RESIDENT";
+        token.role = user.role ?? Role.RESIDENT;
         token.status = user.status ?? "PENDING";
-        token.tenancyType = (user as { tenancyType?: string }).tenancyType ?? "OWNER";
+        token.tenancyType =
+          (user as { tenancyType?: string }).tenancyType ?? "OWNER";
+        token.communityId =
+          (user as { communityId?: string | null }).communityId ?? null;
       }
       return token;
     },
@@ -55,6 +68,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.status = token.status as string;
         session.user.tenancyType =
           (token.tenancyType as string | undefined) ?? "OWNER";
+        session.user.communityId =
+          (token.communityId as string | null | undefined) ?? null;
       }
       return session;
     },

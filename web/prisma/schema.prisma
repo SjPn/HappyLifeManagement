@@ -7,14 +7,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Postgres: храним строковые коды; см. src/lib/enums.ts
+// Postgres: строковые коды; см. src/lib/enums.ts
+
+model Community {
+  id                String    @id @default(cuid())
+  slug              String    @unique
+  name              String
+  inviteCode        String    @unique
+  defaultLocale     String    @default("uk")
+  memorandumBody    String?
+  memorandumVersion String    @default("MVP-2026-05-05")
+  tariffsBody       String?
+  blockedAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  users              User[]
+  addresses          CommunityAddress[]
+  tickets            Ticket[]
+  votes              Vote[]
+  newsPosts          NewsPost[]
+  boardPosts         BoardPost[]
+  forumTopics        ForumTopic[]
+  forumPosts         ForumPost[]
+  reports            ConfidentialReport[]
+  householdBillings  HouseholdBilling[]
+  directMessages     DirectMessage[]
+}
 
 model User {
-  id           String @id @default(cuid())
-  email        String @unique
+  id           String  @id @default(cuid())
+  email        String  @unique
   passwordHash String
   name         String
   phone        String?
+
+  communityId String?
+  community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
 
   street      String
   houseNumber String
@@ -22,13 +51,11 @@ model User {
   communityAddressId String?
   communityAddress   CommunityAddress? @relation(fields: [communityAddressId], references: [id], onDelete: SetNull)
 
-  role   String @default("RESIDENT") // RESIDENT | MODERATOR | CHAIR
+  role   String @default("RESIDENT") // RESIDENT | MODERATOR | CHAIR | PLATFORM_ADMIN
   status String @default("PENDING") // PENDING | APPROVED | REJECTED
 
-  /// OWNER | TENANT — з реєстрації; впливає на доступ до голосувань / тем за audience
   tenancyType String @default("OWNER")
 
-  /// Consent to the resident memorandum (terms of community interaction)
   memorandumAcceptedAt DateTime?
   memorandumVersion    String?
 
@@ -37,17 +64,18 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tickets         Ticket[]
-  voteResponses   VoteResponse[]
-  boardPosts      BoardPost[]
-  forumTopics     ForumTopic[]
-  forumPosts      ForumPost[]
-  reportsAuthored ConfidentialReport[] @relation("ReportAuthor")
-  newsAuthored    NewsPost[]           @relation("NewsAuthor")
-  seenState       UserSeenState?
+  tickets           Ticket[]
+  voteResponses     VoteResponse[]
+  boardPosts        BoardPost[]
+  forumTopics       ForumTopic[]
+  forumPosts        ForumPost[]
+  reportsAuthored   ConfidentialReport[] @relation("ReportAuthor")
+  newsAuthored      NewsPost[]           @relation("NewsAuthor")
+  seenState         UserSeenState?
+  messagesSent      DirectMessage[]      @relation("SentMessages")
+  messagesReceived  DirectMessage[]      @relation("ReceivedMessages")
 }
 
-/// Коли користувач останній раз відкривав розділ (для червоних лічильників «нове»)
 model UserSeenState {
   userId     String   @id
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -58,49 +86,55 @@ model UserSeenState {
   boardAt    DateTime @default(now())
   forumAt    DateTime @default(now())
   reportsAt  DateTime @default(now())
+  messagesAt DateTime @default(now())
 }
 
 model NewsPost {
-  id        String   @id @default(cuid())
-  title     String
-  body      String
-  authorId  String
-  author    User     @relation("NewsAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  title       String
+  body        String
+  authorId    String
+  author      User      @relation("NewsAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
 }
 
 model Ticket {
-  id           String @id @default(cuid())
-  category     String // TicketCategory
+  id           String    @id @default(cuid())
+  communityId  String
+  community    Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  category     String
   description  String
   photoUrl     String?
   locationNote String?
-  status       String @default("NEW") // TicketStatus
+  status       String    @default("NEW")
   userId       String
-  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Vote {
-  id          String    @id @default(cuid())
+  id          String       @id @default(cuid())
+  communityId String
+  community   Community    @relation(fields: [communityId], references: [id], onDelete: Cascade)
   title       String
   description String?
-  type        String // YES_NO | SINGLE_CHOICE
-  /// ALL | OWNERS_ONLY | TENANTS_ONLY — хто бачить і голосує
-  audience    String    @default("ALL")
+  type        String
+  audience    String       @default("ALL")
   endsAt      DateTime?
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime     @default(now())
   options     VoteOption[]
   responses   VoteResponse[]
 }
 
 model VoteOption {
-  id        String @id @default(cuid())
+  id        String         @id @default(cuid())
   text      String
-  sortOrder Int    @default(0)
+  sortOrder Int            @default(0)
   voteId    String
-  vote      Vote   @relation(fields: [voteId], references: [id], onDelete: Cascade)
+  vote      Vote           @relation(fields: [voteId], references: [id], onDelete: Cascade)
   responses VoteResponse[]
 }
 
@@ -118,78 +152,101 @@ model VoteResponse {
 }
 
 model BoardPost {
-  id        String   @id @default(cuid())
-  category  String // BoardCategory
-  title     String
-  body      String
-  imageUrl  String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  category    String
+  title       String
+  body        String
+  imageUrl    String?
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
 }
 
 model ForumTopic {
-  id        String      @id @default(cuid())
-  title     String
-  /// ALL | OWNERS_ONLY | TENANTS_ONLY
-  audience  String      @default("ALL")
-  userId    String
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime    @default(now())
-  posts     ForumPost[]
+  id          String      @id @default(cuid())
+  communityId String
+  community   Community   @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  title       String
+  audience    String      @default("ALL")
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+  posts       ForumPost[]
 }
 
 model ForumPost {
-  id        String     @id @default(cuid())
-  body      String
-  imageUrl  String?
-  topicId   String
-  topic     ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime   @default(now())
+  id          String     @id @default(cuid())
+  communityId String
+  community   Community  @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  body        String
+  imageUrl    String?
+  topicId     String
+  topic       ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
 }
 
-/// Адреси домів у КГ — додає голова; житель обирає при реєстрації
 model CommunityAddress {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
   street      String
   houseNumber String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
   users User[]
 
-  @@unique([street, houseNumber])
+  @@unique([communityId, street, houseNumber])
 }
 
-/// Нарахування за домоволодінням за календарний місяць (історія зберігається)
 model HouseholdBilling {
   id                 String    @id @default(cuid())
+  communityId        String
+  community          Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
   street             String
   houseNumber        String
   periodYear         Int
   periodMonth        Int
   subscriptionFeeUah Float     @default(0)
   electricityUah     Float     @default(0)
-  /// Голова відмічає оплату за цей місяць
   paidAt             DateTime?
   updatedAt          DateTime  @updatedAt
   createdAt          DateTime  @default(now())
 
-  @@unique([street, houseNumber, periodYear, periodMonth])
-  @@index([street, houseNumber, periodYear, periodMonth])
+  @@unique([communityId, street, houseNumber, periodYear, periodMonth])
+  @@index([communityId, street, houseNumber, periodYear, periodMonth])
 }
 
 model ConfidentialReport {
-  id        String   @id @default(cuid())
-  kind      String // ReportKind
-  category  String
-  body      String
-  photoUrl  String?
-  published Boolean  @default(false)
-  authorId  String
-  author    User     @relation("ReportAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  status    String   @default("NEW") // ReportStatus
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  kind        String
+  category    String
+  body        String
+  photoUrl    String?
+  published   Boolean   @default(false)
+  authorId    String
+  author      User      @relation("ReportAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  status      String    @default("NEW")
+  createdAt   DateTime  @default(now())
 }
 
+model DirectMessage {
+  id          String    @id @default(cuid())
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  senderId    String
+  sender      User      @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  recipientId String
+  recipient   User      @relation("ReceivedMessages", fields: [recipientId], references: [id], onDelete: Cascade)
+  body        String
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([communityId, recipientId, createdAt])
+  @@index([communityId, senderId, createdAt])
+}

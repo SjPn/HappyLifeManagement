@@ -52,17 +52,23 @@ export function formatBillingPeriodLabel(
   });
 }
 
-export function billingPeriodWhere(p: BillingPeriod) {
-  return { periodYear: p.year, periodMonth: p.month };
+export function billingPeriodWhere(communityId: string, p: BillingPeriod) {
+  return {
+    communityId,
+    periodYear: p.year,
+    periodMonth: p.month,
+  };
 }
 
 export function billingUniqueWhere(
+  communityId: string,
   street: string,
   houseNumber: string,
   p: BillingPeriod,
 ) {
   return {
-    street_houseNumber_periodYear_periodMonth: {
+    communityId_street_houseNumber_periodYear_periodMonth: {
+      communityId,
       street: normalizeStreet(street),
       houseNumber: normalizeHouseNumber(houseNumber),
       periodYear: p.year,

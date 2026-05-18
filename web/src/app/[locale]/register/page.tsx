@@ -4,8 +4,6 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { RegisterForm } from "@/components/RegisterForm";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { listCommunityAddresses } from "@/lib/communityAddresses";
-
 export default async function RegisterPage({
   params,
 }: {
@@ -17,8 +15,6 @@ export default async function RegisterPage({
     redirect(`/${locale}/dashboard`);
 
   const t = await getTranslations("auth");
-  const addresses = await listCommunityAddresses();
-
   return (
     <div className="relative min-h-screen px-4 py-12">
       <div className="absolute right-4 top-4">
@@ -36,7 +32,7 @@ export default async function RegisterPage({
           {t("registerHint")}
         </p>
         <div className="mt-8 hl-glass rounded-2xl p-5 sm:p-6">
-          <RegisterForm addresses={addresses} />
+          <RegisterForm />
         </div>
         <p className="mt-8 text-center text-sm text-slate-500">
           {t("hasAccount")}{" "}

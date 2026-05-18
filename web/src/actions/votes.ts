@@ -7,6 +7,7 @@ import {
   parseAudienceScope,
   userMatchesAudience,
 } from "@/lib/audience";
+import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export async function submitVote(formData: FormData) {
   const session = await auth();
@@ -18,12 +19,14 @@ export async function submitVote(formData: FormData) {
     return { error: "forbidden" as const };
   }
 
+  const communityId = requireCommunityId(session.user);
+
   const voteId = String(formData.get("voteId") || "");
   const optionId = String(formData.get("optionId") || "");
   if (!voteId || !optionId) return { error: "votePick" as const };
 
-  const vote = await prisma.vote.findUnique({
-    where: { id: voteId },
+  const vote = await prisma.vote.findFirst({
+    where: { id: voteId, ...communityWhere(communityId) },
     include: { options: true, responses: true },
   });
   if (!vote) return { error: "generic" as const };
@@ -72,6 +75,8 @@ export async function createVote(formData: FormData) {
     return { error: "forbidden" as const };
   }
 
+  const communityId = requireCommunityId(session.user);
+
   const title = String(formData.get("title") || "").trim();
   const description =
     String(formData.get("description") || "").trim() || null;
@@ -89,6 +94,7 @@ export async function createVote(formData: FormData) {
   if (type === "YES_NO" || !type) {
     await prisma.vote.create({
       data: {
+        communityId,
         title,
         description,
         type: "YES_NO",
@@ -118,6 +124,13 @@ export async function deleteVote(voteId: string) {
   if (session.user.role !== "MODERATOR" && session.user.role !== "CHAIR") {
     return { error: "forbidden" as const };
   }
+
+  const communityId = requireCommunityId(session.user);
+
+  const vote = await prisma.vote.findFirst({
+    where: { id: voteId, ...communityWhere(communityId) },
+  });
+  if (!vote) return { error: "generic" as const };
 
   await prisma.vote.delete({ where: { id: voteId } });
   revalidateAllLocales("/votes");

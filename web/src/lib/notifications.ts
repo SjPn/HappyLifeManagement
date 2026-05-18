@@ -136,7 +136,6 @@ export async function getNotificationCounts(
   const forum = forumTopics + forumPosts;
   const requests = tickets;
   const community = board + forum + reports;
-  const home = news + votes + tickets + payments;
 
   let pendingResidents = 0;
   if (user.role === Role.CHAIR || user.role === Role.MODERATOR) {
@@ -148,6 +147,8 @@ export async function getNotificationCounts(
       },
     });
   }
+
+  const home = news + votes + tickets + payments + pendingResidents;
 
   return {
     news,

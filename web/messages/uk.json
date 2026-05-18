@@ -432,7 +432,8 @@
     "subtitle": "Правила та принципи взаємодії мешканців містечка.",
     "placeholderTitle": "Тут буде меморандум взаємодії",
     "placeholderBody": "Додайте правила поведінки, комунікації, тиші, безпеки, утримання території та відповідальності.",
-    "versionLine": "Версія: MVP (чернетка)"
+    "versionLine": "Версія: MVP (чернетка)",
+    "versionLabel": "Версія: {version}"
   },
   "addresses": {
     "title": "Адреси домів",
@@ -476,6 +477,23 @@
     "usersTitle": "Мешканці",
     "usersSubtitle": "Підтвердження адреси нових мешканців. Платежі за будинок — у розділі «Платежі».",
     "pendingResidentsAlert": "Є {count} мешканців, які очікують підтвердження адреси. Рядки виділені червоним.",
+    "editTariffs": "Редагувати тарифи",
+    "editMemorandum": "Редагувати меморандум",
+    "memorandumEditSubtitle": "Текст меморандуму для мешканців",
+    "tariffsEditSubtitle": "Текст тарифів для мешканців",
+    "memorandumEditHint": "Мешканці бачать цей текст на сторінці «Меморандум». При реєстрації потрібна згода з актуальною версією.",
+    "tariffsEditHint": "Мешканці бачать цей текст на сторінці «Тарифи».",
+    "contentBodyLabel": "Текст",
+    "contentBodyPlaceholder": "Абзаци, списки, контакти — звичайний текст",
+    "contentVersionLabel": "Версія документа",
+    "contentVersionPlaceholder": "наприклад 2026-05",
+    "contentSave": "Зберегти",
+    "contentSaving": "Збереження…",
+    "contentSaved": "Збережено",
+    "viewPublicPage": "Переглянути публічну сторінку →",
+    "contentErrors": {
+      "generic": "Не вдалося зберегти"
+    },
     "tenancyColTitle": "Проживання",
     "addressStatus": "Статус адреси",
     "balance": "Баланс ₴",

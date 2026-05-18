@@ -416,7 +416,8 @@
     "subtitle": "Rules and principles for community interaction.",
     "placeholderTitle": "Memorandum placeholder",
     "placeholderBody": "Add rules for behavior, communication, quiet hours, safety, and shared space maintenance.",
-    "versionLine": "Version: MVP (draft)"
+    "versionLine": "Version: MVP (draft)",
+    "versionLabel": "Version: {version}"
   },
   "addresses": {
     "title": "Home addresses",
@@ -460,6 +461,23 @@
     "usersTitle": "Residents",
     "usersSubtitle": "Approve new residents' addresses. Per-home charges are under Payments.",
     "pendingResidentsAlert": "{count} residents are waiting for address approval. Highlighted in red.",
+    "editTariffs": "Edit tariffs page",
+    "editMemorandum": "Edit memorandum",
+    "memorandumEditSubtitle": "Memorandum text for residents",
+    "tariffsEditSubtitle": "Tariffs text for residents",
+    "memorandumEditHint": "Residents see this on the Memorandum page. Registration requires agreeing to the current version.",
+    "tariffsEditHint": "Residents see this on the Tariffs page.",
+    "contentBodyLabel": "Content",
+    "contentBodyPlaceholder": "Plain text: paragraphs, lists, contacts",
+    "contentVersionLabel": "Document version",
+    "contentVersionPlaceholder": "e.g. 2026-05",
+    "contentSave": "Save",
+    "contentSaving": "Saving…",
+    "contentSaved": "Saved",
+    "viewPublicPage": "View public page →",
+    "contentErrors": {
+      "generic": "Could not save"
+    },
     "tenancyColTitle": "Residency",
     "addressStatus": "Address status",
     "balance": "Balance (UAH)",

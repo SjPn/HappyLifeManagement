@@ -33,9 +33,17 @@ export function ChairManagementLinks({
         </span>
       )}
       {isChair && (
-        <Link href="/chair/addresses" className={chairNavLinkClass}>
-          {t("addresses")}
-        </Link>
+        <>
+          <Link href="/chair/addresses" className={chairNavLinkClass}>
+            {t("addresses")}
+          </Link>
+          <Link href="/chair/tariffs" className={chairNavLinkClass}>
+            {t("editTariffs")}
+          </Link>
+          <Link href="/chair/memorandum" className={chairNavLinkClass}>
+            {t("editMemorandum")}
+          </Link>
+        </>
       )}
       <span className="relative block">
         <Link href="/chair/users" className={chairNavLinkClass}>

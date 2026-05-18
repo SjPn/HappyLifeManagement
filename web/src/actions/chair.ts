@@ -329,3 +329,56 @@ export async function updateCommunityInviteCode(formData: FormData) {
   revalidateAllLocales("/chair");
   return { ok: true as const };
 }
+
+const MAX_CONTENT_LENGTH = 50_000;
+
+export async function updateCommunityMemorandum(formData: FormData) {
+  const session = await auth();
+  if (session?.user?.role !== Role.CHAIR) {
+    return { error: "forbidden" as const };
+  }
+
+  const communityId = requireCommunityId(session.user);
+  const body = String(formData.get("body") ?? "").trim();
+  const version =
+    String(formData.get("version") ?? "").trim() || "MVP-2026-05-05";
+
+  if (body.length > MAX_CONTENT_LENGTH) {
+    return { error: "tooLong" as const };
+  }
+
+  await prisma.community.update({
+    where: { id: communityId },
+    data: {
+      memorandumBody: body || null,
+      memorandumVersion: version,
+    },
+  });
+
+  revalidateAllLocales("/info/memorandum");
+  revalidateAllLocales("/chair/memorandum");
+  return { ok: true as const };
+}
+
+export async function updateCommunityTariffs(formData: FormData) {
+  const session = await auth();
+  if (session?.user?.role !== Role.CHAIR) {
+    return { error: "forbidden" as const };
+  }
+
+  const communityId = requireCommunityId(session.user);
+  const body = String(formData.get("body") ?? "").trim();
+
+  if (body.length > MAX_CONTENT_LENGTH) {
+    return { error: "tooLong" as const };
+  }
+
+  await prisma.community.update({
+    where: { id: communityId },
+    data: { tariffsBody: body || null },
+  });
+
+  revalidateAllLocales("/info/tariffs");
+  revalidateAllLocales("/chair/tariffs");
+  return { ok: true as const };
+}

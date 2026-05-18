@@ -416,7 +416,8 @@
     "subtitle": "Правила и принципы взаимодействия жителей городка.",
     "placeholderTitle": "Здесь будет меморандум взаимодействия",
     "placeholderBody": "Добавьте правила поведения, коммуникации, тишины, безопасности, содержания территории и ответственности.",
-    "versionLine": "Версия: MVP (черновик)"
+    "versionLine": "Версия: MVP (черновик)",
+    "versionLabel": "Версия: {version}"
   },
   "addresses": {
     "title": "Адреса домов",
@@ -460,6 +461,23 @@
     "usersTitle": "Жители",
     "usersSubtitle": "Подтверждение адреса новых жителей. Платежи по дому — в разделе «Платежи».",
     "pendingResidentsAlert": "{count} жителей ожидают подтверждения адреса. Строки выделены красным.",
+    "editTariffs": "Редактировать тарифы",
+    "editMemorandum": "Редактировать меморандум",
+    "memorandumEditSubtitle": "Текст меморандума для жителей",
+    "tariffsEditSubtitle": "Текст тарифов для жителей",
+    "memorandumEditHint": "Жители видят этот текст на странице «Меморандум». При регистрации требуется согласие с актуальной версией.",
+    "tariffsEditHint": "Жители видят этот текст на странице «Тарифы».",
+    "contentBodyLabel": "Текст",
+    "contentBodyPlaceholder": "Абзацы, списки, контакты — обычный текст",
+    "contentVersionLabel": "Версия документа",
+    "contentVersionPlaceholder": "например 2026-05",
+    "contentSave": "Сохранить",
+    "contentSaving": "Сохранение…",
+    "contentSaved": "Сохранено",
+    "viewPublicPage": "Открыть публичную страницу →",
+    "contentErrors": {
+      "generic": "Не удалось сохранить"
+    },
     "tenancyColTitle": "Проживание",
     "addressStatus": "Статус адреса",
     "balance": "Баланс ₴",

@@ -32,12 +32,18 @@ export default async function PlatformLayout({
         </div>
         <SignOutButton />
       </header>
-      <nav className="mb-6 flex gap-2 text-sm">
+      <nav className="mb-6 flex flex-wrap gap-2 text-sm">
         <Link
           href="/platform/communities"
           className="rounded-lg bg-blue-50 px-3 py-2 font-medium text-blue-900 dark:bg-blue-950/50 dark:text-blue-100"
         >
           {t("communitiesNav")}
+        </Link>
+        <Link
+          href="/platform/account"
+          className="rounded-lg border border-zinc-200 px-3 py-2 font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+        >
+          {t("accountNav")}
         </Link>
       </nav>
       {children}

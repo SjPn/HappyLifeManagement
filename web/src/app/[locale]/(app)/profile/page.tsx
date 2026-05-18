@@ -6,6 +6,7 @@ import { SignOutButton } from "@/components/AppShell";
 import { ApkDownloadLink } from "@/components/ApkDownloadLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
+import { ProfileCredentialsForm } from "@/components/ProfileCredentialsForm";
 import { ChairInviteCodeForm } from "@/components/ChairInviteCodeForm";
 import { getTranslations } from "next-intl/server";
 import { Role } from "@/lib/enums";
@@ -60,6 +61,12 @@ export default async function ProfilePage() {
         <Card className="mb-6">
           <p className="mb-3 text-sm font-semibold">{t("inviteSection")}</p>
           <ChairInviteCodeForm currentCode={community.inviteCode} />
+        </Card>
+      )}
+
+      {user && (
+        <Card className="mb-6">
+          <ProfileCredentialsForm currentEmail={user.email} />
         </Card>
       )}
 

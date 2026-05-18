@@ -68,10 +68,21 @@ export function RegisterForm() {
     setError(null);
     setLoading(true);
     const form = e.currentTarget;
+    const password = (form.elements.namedItem("password") as HTMLInputElement)
+      .value;
+    const passwordConfirm = (
+      form.elements.namedItem("passwordConfirm") as HTMLInputElement
+    ).value;
+    if (password !== passwordConfirm) {
+      setError(te("passwordMismatch"));
+      setLoading(false);
+      return;
+    }
+
     const payload = {
       email: (form.elements.namedItem("email") as HTMLInputElement).value,
-      password: (form.elements.namedItem("password") as HTMLInputElement)
-        .value,
+      password,
+      passwordConfirm,
       name: (form.elements.namedItem("name") as HTMLInputElement).value,
       communityAddressId: (
         form.elements.namedItem("communityAddressId") as HTMLSelectElement
@@ -153,6 +164,17 @@ export function RegisterForm() {
         <span className={labelClass}>{t("passwordMin")}</span>
         <input
           name="password"
+          type="password"
+          required
+          minLength={6}
+          autoComplete="new-password"
+          className={inputClass}
+        />
+      </label>
+      <label className="flex flex-col gap-1.5">
+        <span className={labelClass}>{t("passwordConfirm")}</span>
+        <input
+          name="passwordConfirm"
           type="password"
           required
           minLength={6}

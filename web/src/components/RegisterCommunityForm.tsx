@@ -21,8 +21,18 @@ export function RegisterCommunityForm() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    const form = e.currentTarget;
+    const password = (form.elements.namedItem("password") as HTMLInputElement)
+      .value;
+    const passwordConfirm = (
+      form.elements.namedItem("passwordConfirm") as HTMLInputElement
+    ).value;
+    if (password !== passwordConfirm) {
+      setError(t("errors.passwordMismatch"));
+      return;
+    }
     setLoading(true);
-    const res = await registerCommunitySelfServe(new FormData(e.currentTarget));
+    const res = await registerCommunitySelfServe(new FormData(form));
     setLoading(false);
 
     if (!res || "error" in res) {
@@ -35,12 +45,7 @@ export function RegisterCommunityForm() {
       pending: "pending" in res && res.pending === true,
     });
 
-    const email = (
-      e.currentTarget.elements.namedItem("email") as HTMLInputElement
-    ).value;
-    const password = (
-      e.currentTarget.elements.namedItem("password") as HTMLInputElement
-    ).value;
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
 
     const sign = await signIn("credentials", {
       email,
@@ -102,6 +107,18 @@ export function RegisterCommunityForm() {
           type="password"
           required
           minLength={6}
+          autoComplete="new-password"
+          className={inputClass}
+        />
+      </label>
+      <label className="flex flex-col gap-1.5">
+        <span className={labelClass}>{t("passwordConfirm")}</span>
+        <input
+          name="passwordConfirm"
+          type="password"
+          required
+          minLength={6}
+          autoComplete="new-password"
           className={inputClass}
         />
       </label>

@@ -4,7 +4,10 @@ import { CommunityHubList } from "./CommunityHubCard";
 import { useNotifications } from "@/components/NotificationProvider";
 import type { NotificationCounts } from "@/lib/notifications";
 
-type CountKey = keyof Pick<NotificationCounts, "board" | "forum" | "reports">;
+type CountKey = keyof Pick<
+  NotificationCounts,
+  "board" | "forum" | "reports" | "messages"
+>;
 
 export function CommunityHubSection({
   items,

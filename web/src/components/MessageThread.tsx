@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { sendDirectMessage } from "@/actions/messages";
+import { sendDirectMessage, markMessagesRead } from "@/actions/messages";
 import { inputClass, primaryButtonClass } from "@/lib/formStyles";
+import { requestNotificationRefresh } from "@/lib/notificationRefresh";
 import { useTranslations } from "next-intl";
 
 export type MessageRow = {
@@ -27,6 +28,40 @@ export function MessageThread({
   const [messages, setMessages] = useState(initial);
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const lastIdRef = useRef(initial.at(-1)?.id ?? "");
+
+  const pollThread = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `/api/messages/thread?partnerId=${encodeURIComponent(partnerId)}`,
+        { cache: "no-store" },
+      );
+      if (!res.ok) return;
+      const data = (await res.json()) as { messages?: MessageRow[] };
+      if (!Array.isArray(data.messages)) return;
+
+      const latestId = data.messages.at(-1)?.id ?? "";
+      if (latestId !== lastIdRef.current) {
+        const hasIncoming = data.messages.some(
+          (m) => !m.mine && m.id !== lastIdRef.current,
+        );
+        lastIdRef.current = latestId;
+        setMessages(data.messages);
+        if (hasIncoming) {
+          await markMessagesRead(partnerId);
+          requestNotificationRefresh();
+        }
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [partnerId]);
+
+  useEffect(() => {
+    const id = setInterval(pollThread, 4_000);
+    return () => clearInterval(id);
+  }, [pollThread]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -39,16 +74,17 @@ export function MessageThread({
     const res = await sendDirectMessage(partnerId, text);
     setLoading(false);
     if (res && "ok" in res && res.ok) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `tmp-${Date.now()}`,
-          body: text,
-          createdAt: new Date().toISOString(),
-          mine: true,
-        },
-      ]);
+      const optimistic: MessageRow = {
+        id: `tmp-${Date.now()}`,
+        body: text,
+        createdAt: new Date().toISOString(),
+        mine: true,
+      };
+      setMessages((prev) => [...prev, optimistic]);
+      lastIdRef.current = optimistic.id;
       input.value = "";
+      requestNotificationRefresh();
+      await pollThread();
       router.refresh();
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }

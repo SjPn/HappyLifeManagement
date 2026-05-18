@@ -32,6 +32,8 @@ export type NotificationCounts = {
   home: number;
   requests: number;
   community: number;
+  /** Unread direct messages (recipient, readAt is null). */
+  messages: number;
   /** Residents awaiting chair approval (staff only). */
   pendingResidents: number;
 };
@@ -135,7 +137,14 @@ export async function getNotificationCounts(
 
   const forum = forumTopics + forumPosts;
   const requests = tickets;
-  const community = board + forum + reports;
+
+  const messages = await prisma.directMessage.count({
+    where: {
+      ...tenant,
+      recipientId: user.id,
+      readAt: null,
+    },
+  });
 
   let pendingResidents = 0;
   if (user.role === Role.CHAIR || user.role === Role.MODERATOR) {
@@ -149,6 +158,7 @@ export async function getNotificationCounts(
   }
 
   const home = news + votes + tickets + payments + pendingResidents;
+  const community = board + forum + reports + messages;
 
   return {
     news,
@@ -161,6 +171,7 @@ export async function getNotificationCounts(
     home,
     requests,
     community,
+    messages,
     pendingResidents,
   };
 }

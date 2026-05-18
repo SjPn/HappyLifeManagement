@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import type { NotificationCounts } from "@/lib/notifications";
+import { NOTIFICATIONS_REFRESH_EVENT } from "@/lib/notificationRefresh";
 
 const empty: NotificationCounts = {
   news: 0,
@@ -20,6 +21,7 @@ const empty: NotificationCounts = {
   home: 0,
   requests: 0,
   community: 0,
+  messages: 0,
   pendingResidents: 0,
 };
 
@@ -51,12 +53,15 @@ export function NotificationProvider({
 
   useEffect(() => {
     refresh();
-    const id = setInterval(refresh, 45_000);
+    const id = setInterval(refresh, 8_000);
     const onFocus = () => refresh();
+    const onRefresh = () => refresh();
     window.addEventListener("focus", onFocus);
+    window.addEventListener(NOTIFICATIONS_REFRESH_EVENT, onRefresh);
     return () => {
       clearInterval(id);
       window.removeEventListener("focus", onFocus);
+      window.removeEventListener(NOTIFICATIONS_REFRESH_EVENT, onRefresh);
     };
   }, [refresh]);
 

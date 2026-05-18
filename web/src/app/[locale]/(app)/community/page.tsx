@@ -45,6 +45,7 @@ export default async function CommunityHubPage() {
             href: "/messages",
             title: t("messagesTitle"),
             desc: t("messagesDesc"),
+            countKey: "messages",
           },
         ]}
       />

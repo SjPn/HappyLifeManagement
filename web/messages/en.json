@@ -24,7 +24,13 @@
     "badStatus": "Invalid status",
     "audienceDenied": "You don’t have access to this vote or topic for your residency status (owner / tenant).",
     "cannotDeleteSelf": "You cannot delete your own account",
-    "cannotDeleteStaff": "Only resident accounts can be deleted"
+    "cannotDeleteStaff": "Only resident accounts can be deleted",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "wrongPassword": "Incorrect current password",
+    "emailTaken": "This email is already in use",
+    "invalidEmail": "Invalid email address",
+    "emailUnchanged": "Enter a new email"
   },
   "meta": {
     "title": "Happy Life — HOA & cottage community online",
@@ -79,6 +85,7 @@
     "memorandumAcceptPrefix": "I agree with the",
     "memorandumLinkText": "resident memorandum",
     "passwordMin": "Password (min. 6 characters)",
+    "passwordConfirm": "Confirm password",
     "signIn": "Log in",
     "signingIn": "Signing in…",
     "signUp": "Sign up",
@@ -313,6 +320,7 @@
     "title": "Community management",
     "subtitle": "Create, block, and remove HOAs / villages.",
     "communitiesNav": "Communities",
+    "accountNav": "Email & password",
     "createTitle": "New community",
     "communityName": "Name",
     "slug": "Slug (URL)",
@@ -374,6 +382,7 @@
     "chairName": "Your name",
     "email": "Email",
     "password": "Password (min 6)",
+    "passwordConfirm": "Confirm password",
     "submit": "Create",
     "submitting": "Creating…",
     "joinExisting": "Join existing community",
@@ -388,6 +397,7 @@
       "generic": "Error. Please try again.",
       "invalidFields": "Fill in all fields",
       "emailTaken": "Email already in use",
+      "passwordMismatch": "Passwords do not match",
       "slugConflict": "This slug already exists",
       "loginAfterCreate": "Community created but sign-in failed — sign in manually"
     }
@@ -432,6 +442,22 @@
     "empty": "No addresses yet. Add the first home.",
     "residentsCount": "Registered: {count}",
     "backPanel": "← Management"
+  },
+  "credentials": {
+    "accountTitle": "Email & password",
+    "accountSubtitle": "Change your sign-in credentials.",
+    "emailTitle": "Change email",
+    "currentEmail": "Current email",
+    "newEmail": "New email",
+    "currentPassword": "Current password",
+    "saveEmail": "Save email",
+    "emailChanged": "Email updated",
+    "passwordTitle": "Change password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "savePassword": "Save password",
+    "passwordChanged": "Password updated",
+    "saving": "Saving…"
   },
   "profileEdit": {
     "name": "Full name",

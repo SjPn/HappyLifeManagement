@@ -24,7 +24,13 @@
     "badStatus": "Некоректний статус",
     "audienceDenied": "Немає доступу до цього голосування або теми для вашого статусу (власник / орендар).",
     "cannotDeleteSelf": "Не можна видалити власний обліковий запис",
-    "cannotDeleteStaff": "Можна видаляти лише облікові записи мешканців"
+    "cannotDeleteStaff": "Можна видаляти лише облікові записи мешканців",
+    "passwordMismatch": "Паролі не збігаються",
+    "passwordTooShort": "Пароль не коротший за 6 символів",
+    "wrongPassword": "Невірний поточний пароль",
+    "emailTaken": "Цей email уже зайнятий",
+    "invalidEmail": "Некоректний email",
+    "emailUnchanged": "Вкажіть новий email"
   },
   "meta": {
     "title": "Happy Life — онлайн ОСББ / котеджі",
@@ -95,6 +101,7 @@
     "memorandumAcceptPrefix": "Погоджуюсь із",
     "memorandumLinkText": "меморандумом мешканців містечка",
     "passwordMin": "Пароль (мін. 6 символів)",
+    "passwordConfirm": "Підтвердження пароля",
     "signIn": "Увійти",
     "signingIn": "Вхід…",
     "signUp": "Зареєструватися",
@@ -329,6 +336,7 @@
     "title": "Управління поселеннями",
     "subtitle": "Створення, блокування та видалення ОСББ / КГ.",
     "communitiesNav": "Поселення",
+    "accountNav": "Email і пароль",
     "createTitle": "Нове поселення",
     "communityName": "Назва",
     "slug": "Slug (URL)",
@@ -390,6 +398,7 @@
     "chairName": "Ваше ПІБ",
     "email": "Email",
     "password": "Пароль (мін. 6)",
+    "passwordConfirm": "Підтвердження пароля",
     "submit": "Створити",
     "submitting": "Створення…",
     "joinExisting": "Приєднатися до існуючого",
@@ -404,6 +413,7 @@
       "generic": "Помилка. Спробуйте ще раз.",
       "invalidFields": "Заповніть усі поля",
       "emailTaken": "Email вже зайнятий",
+      "passwordMismatch": "Паролі не збігаються",
       "slugConflict": "Такий slug уже існує",
       "loginAfterCreate": "Поселення створено, але вхід не вдався — увійдіть вручну"
     }
@@ -448,6 +458,22 @@
     "empty": "Адрес поки немає. Додайте перший будинок.",
     "residentsCount": "Зареєстровано: {count}",
     "backPanel": "← Управління"
+  },
+  "credentials": {
+    "accountTitle": "Email і пароль",
+    "accountSubtitle": "Зміна входу в систему.",
+    "emailTitle": "Зміна email",
+    "currentEmail": "Поточний email",
+    "newEmail": "Новий email",
+    "currentPassword": "Поточний пароль",
+    "saveEmail": "Зберегти email",
+    "emailChanged": "Email оновлено",
+    "passwordTitle": "Зміна пароля",
+    "newPassword": "Новий пароль",
+    "confirmPassword": "Підтвердження нового пароля",
+    "savePassword": "Зберегти пароль",
+    "passwordChanged": "Пароль оновлено",
+    "saving": "Збереження…"
   },
   "profileEdit": {
     "name": "ПІБ",

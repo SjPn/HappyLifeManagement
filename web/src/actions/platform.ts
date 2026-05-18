@@ -186,10 +186,14 @@ export async function registerCommunitySelfServe(formData: FormData) {
   const chairName = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
+  const passwordConfirm = String(formData.get("passwordConfirm") ?? "");
   const defaultLocale = String(formData.get("defaultLocale") ?? "uk").trim();
 
   if (!communityName || !chairName || !email || password.length < 6) {
     return { error: "invalidFields" };
+  }
+  if (password !== passwordConfirm) {
+    return { error: "passwordMismatch" };
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });

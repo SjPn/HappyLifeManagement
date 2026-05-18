@@ -24,7 +24,13 @@
     "badStatus": "Некорректный статус",
     "audienceDenied": "Нет доступа к этому голосованию или теме для вашего статуса (собственник / арендатор).",
     "cannotDeleteSelf": "Нельзя удалить свою учётную запись",
-    "cannotDeleteStaff": "Можно удалять только учётные записи жителей"
+    "cannotDeleteStaff": "Можно удалять только учётные записи жителей",
+    "passwordMismatch": "Пароли не совпадают",
+    "passwordTooShort": "Пароль не короче 6 символов",
+    "wrongPassword": "Неверный текущий пароль",
+    "emailTaken": "Этот email уже занят",
+    "invalidEmail": "Некорректный email",
+    "emailUnchanged": "Укажите новый email"
   },
   "meta": {
     "title": "Happy Life — ОСББ / коттеджи онлайн",
@@ -79,6 +85,7 @@
     "memorandumAcceptPrefix": "Согласен с",
     "memorandumLinkText": "Меморандумом жителей городка",
     "passwordMin": "Пароль (мин. 6 символов)",
+    "passwordConfirm": "Подтверждение пароля",
     "signIn": "Войти",
     "signingIn": "Вход…",
     "signUp": "Зарегистрироваться",
@@ -313,6 +320,7 @@
     "title": "Управление посёлками",
     "subtitle": "Создание, блокировка и удаление ОСББ / КП.",
     "communitiesNav": "Посёлки",
+    "accountNav": "Email и пароль",
     "createTitle": "Новый посёлок",
     "communityName": "Название",
     "slug": "Slug (URL)",
@@ -374,6 +382,7 @@
     "chairName": "Ваше ФИО",
     "email": "Email",
     "password": "Пароль (мин. 6)",
+    "passwordConfirm": "Подтверждение пароля",
     "submit": "Создать",
     "submitting": "Создание…",
     "joinExisting": "Присоединиться к существующему",
@@ -388,6 +397,7 @@
       "generic": "Ошибка. Попробуйте снова.",
       "invalidFields": "Заполните все поля",
       "emailTaken": "Email уже занят",
+      "passwordMismatch": "Пароли не совпадают",
       "slugConflict": "Такой slug уже существует",
       "loginAfterCreate": "Посёлок создан, но вход не удался — войдите вручную"
     }
@@ -432,6 +442,22 @@
     "empty": "Адресов пока нет. Добавьте первый дом.",
     "residentsCount": "Зарегистрировано: {count}",
     "backPanel": "← Управление"
+  },
+  "credentials": {
+    "accountTitle": "Email и пароль",
+    "accountSubtitle": "Смена входа в систему.",
+    "emailTitle": "Смена email",
+    "currentEmail": "Текущий email",
+    "newEmail": "Новый email",
+    "currentPassword": "Текущий пароль",
+    "saveEmail": "Сохранить email",
+    "emailChanged": "Email обновлён",
+    "passwordTitle": "Смена пароля",
+    "newPassword": "Новый пароль",
+    "confirmPassword": "Подтверждение нового пароля",
+    "savePassword": "Сохранить пароль",
+    "passwordChanged": "Пароль обновлён",
+    "saving": "Сохранение…"
   },
   "profileEdit": {
     "name": "ФИО",

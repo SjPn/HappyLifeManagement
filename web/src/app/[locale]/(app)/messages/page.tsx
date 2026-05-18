@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { PageTitle, ButtonLink } from "@/components/Ui";
-import { MessagesInbox } from "@/components/MessagesInbox";
+import { MessagesInboxLive } from "@/components/MessagesInboxLive";
 import { listConversations } from "@/lib/conversations";
 import { requireCommunityId } from "@/lib/tenant";
 import { getTranslations } from "next-intl/server";
@@ -24,7 +24,7 @@ export default async function MessagesPage() {
       <div className="mb-4">
         <ButtonLink href="/messages/new">{t("newChat")}</ButtonLink>
       </div>
-      <MessagesInbox conversations={conversations} />
+      <MessagesInboxLive initial={conversations} />
     </>
   );
 }

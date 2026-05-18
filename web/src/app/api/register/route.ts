@@ -6,17 +6,24 @@ import { Role, UserStatus } from "@/lib/enums";
 import { TenancyType } from "@/lib/audience";
 import { resolveCommunityAddress } from "@/lib/communityAddresses";
 import { normalizeInviteCode } from "@/lib/tenant";
+import { passwordsMatch } from "@/lib/credentials";
 
-const schema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  name: z.string().min(1),
+const schema = z
+  .object({
+    email: z.string().email(),
+    password: z.string().min(6),
+    passwordConfirm: z.string().min(6),
+    name: z.string().min(1),
   communityAddressId: z.string().min(1),
   phone: z.string().optional(),
   inviteCode: z.string().min(1),
   tenancyType: z.enum([TenancyType.OWNER, TenancyType.TENANT]),
   memorandumAccepted: z.literal(true),
-});
+  })
+  .refine((d) => passwordsMatch(d.password, d.passwordConfirm), {
+    message: "passwordMismatch",
+    path: ["passwordConfirm"],
+  });
 
 export async function POST(req: Request) {
   let body: unknown;
@@ -28,8 +35,9 @@ export async function POST(req: Request) {
 
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
+    const code = parsed.error.issues[0]?.message;
     return NextResponse.json(
-      { error: "Проверьте поля формы" },
+      { error: code === "passwordMismatch" ? "passwordMismatch" : "badData" },
       { status: 400 },
     );
   }

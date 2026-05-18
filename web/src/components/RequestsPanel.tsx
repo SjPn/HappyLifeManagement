@@ -2,8 +2,18 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
-import { X } from "lucide-react";
+import {
+  Construction,
+  Droplets,
+  HelpCircle,
+  Lightbulb,
+  Shield,
+  Trash2,
+  X,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Card } from "@/components/Ui";
+import { TicketCategory } from "@/lib/enums";
 import { TicketStatusForm } from "@/components/TicketStatusForm";
 import { useTranslations } from "next-intl";
 
@@ -25,6 +35,15 @@ function ticketTitle(description: string, maxLen = 72) {
   if (line.length <= maxLen) return line;
   return `${line.slice(0, maxLen)}…`;
 }
+
+const ticketCategoryIcon: Record<string, LucideIcon> = {
+  [TicketCategory.ROADS]: Construction,
+  [TicketCategory.LIGHTING]: Lightbulb,
+  [TicketCategory.SECURITY]: Shield,
+  [TicketCategory.WATER]: Droplets,
+  [TicketCategory.TRASH]: Trash2,
+  [TicketCategory.OTHER]: HelpCircle,
+};
 
 function statusBadgeClass(status: string) {
   switch (status) {
@@ -85,7 +104,7 @@ function TicketDetailModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="ticket-modal-title"
-        className="relative z-10 flex max-h-[min(90vh,720px)] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+        className="hl-glass relative z-10 flex max-h-[min(90vh,720px)] w-full max-w-lg flex-col overflow-hidden rounded-2xl shadow-2xl sm:rounded-3xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-3 border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
@@ -182,6 +201,7 @@ export function RequestsPanel({
   backLabel?: string;
 }) {
   const tst = useTranslations("categories.ticketStatus");
+  const tc = useTranslations("categories.ticket");
   const t = useTranslations("requests");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -200,28 +220,37 @@ export function RequestsPanel({
           </p>
         </Card>
       ) : (
-        <Card className="overflow-hidden p-0">
-          <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
-            {tickets.map((tk) => (
-              <li key={tk.id}>
-                <button
-                  type="button"
-                  onClick={() => setSelectedId(tk.id)}
-                  className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
-                >
-                  <span className="min-w-0 flex-1 font-medium text-slate-900 dark:text-slate-100">
+        <div className="flex flex-col gap-2.5">
+          {tickets.map((tk) => {
+            const Icon =
+              ticketCategoryIcon[tk.category] ?? HelpCircle;
+            return (
+              <button
+                key={tk.id}
+                type="button"
+                onClick={() => setSelectedId(tk.id)}
+                className="hl-glass group flex w-full items-center gap-3 rounded-2xl p-4 text-left transition hover:-translate-y-0.5 hover:border-blue-300/50 hover:shadow-lg"
+              >
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-sky-600 text-white shadow-md shadow-blue-500/25">
+                  <Icon className="h-5 w-5" strokeWidth={2.25} aria-hidden />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-medium text-slate-900 group-hover:text-blue-800 dark:text-slate-100">
                     {ticketTitle(tk.description)}
                   </span>
-                  <span
-                    className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(tk.status)}`}
-                  >
-                    {tst(tk.status as "NEW" | "IN_PROGRESS" | "RESOLVED")}
+                  <span className="mt-0.5 block text-xs text-slate-500">
+                    {tc(tk.category as "ROADS" | "LIGHTING" | "SECURITY" | "WATER" | "TRASH" | "OTHER")}
                   </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </Card>
+                </span>
+                <span
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(tk.status)}`}
+                >
+                  {tst(tk.status as "NEW" | "IN_PROGRESS" | "RESOLVED")}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       )}
 
       {archiveHref != null && (

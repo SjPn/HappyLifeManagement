@@ -56,7 +56,9 @@
     "en": "English",
     "label": "Мова"
   },
-  "currency": { "uah": "₴" },
+  "currency": {
+    "uah": "₴"
+  },
   "landing": {
     "badge": "Котедж / ОСББ",
     "title": "Happy Life",
@@ -168,7 +170,9 @@
       "moderationDesc": "Форум, дошка, скарги",
       "backHome": "На головну",
       "footerEngagement": "{posts} новин · {likes} лайків за тиждень"
-    }
+    },
+    "popularNewsTitle": "Популярна новина",
+    "popularNewsText": "«{title}» — {count} лайків за тиждень"
   },
   "requests": {
     "title": "Заявки",
@@ -192,7 +196,13 @@
     "newTitle": "Нова заявка",
     "newSubtitle": "Опишіть проблему — голова/модератор змінюють статус.",
     "landmark": "Орієнтир на місці (необов’язково)",
-    "landmarkPh": "Наприклад: поворот біля брами"
+    "landmarkPh": "Наприклад: поворот біля брами",
+    "hubStats": {
+      "new": "Нові",
+      "inProgress": "В роботі",
+      "archive": "Архів"
+    },
+    "newDesc": "Опис проблеми та фото"
   },
   "votes": {
     "title": "Голосування",
@@ -211,7 +221,9 @@
     "change": "Змінити",
     "cast": "Голосувати",
     "emptyList": "Голосувань поки не було.",
-    "until": "до"
+    "until": "до",
+    "responsesCount": "{count, plural, one {# голос} few {# голоси} many {# голосів} other {# голоси}}",
+    "voteThanks": "Дякуємо, голос враховано!"
   },
   "community": {
     "title": "Спільнота",
@@ -229,7 +241,14 @@
     "residentsTitle": "Мешканці",
     "residentsDesc": "Підтверджені власники та орендарі з адресами",
     "messagesTitle": "Повідомлення",
-    "messagesDesc": "Особистий чат з мешканцями"
+    "messagesDesc": "Особистий чат з мешканцями",
+    "hubStats": {
+      "messages": "Повід.",
+      "forum": "Форум",
+      "board": "Дошка",
+      "news": "Новини",
+      "sectionLinks": "Розділи"
+    }
   },
   "board": {
     "title": "Дошка оголошень",
@@ -321,7 +340,12 @@
     "chairPeriodSummary": "Оплачено: {paid} з {total} адрес (із нарахуванням: {withCharges}).",
     "historyTitle": "Історія платежів",
     "historyPaid": "Оплачено {date}",
-    "historyUnpaid": "Не оплачено"
+    "historyUnpaid": "Не оплачено",
+    "hubStats": {
+      "households": "Будинки",
+      "paid": "Сплачено",
+      "unpaid": "Не сплачено"
+    }
   },
   "profile": {
     "title": "Ще",
@@ -350,7 +374,13 @@
       "forbidden": "Немає доступу",
       "generic": "Помилка збереження"
     },
-    "downloadApp": "Завантажити додаток (APK)"
+    "downloadApp": "Завантажити додаток (APK)",
+    "hubSectionInfo": "Довідка",
+    "hubSectionApp": "Додаток",
+    "hubSectionAccount": "Акаунт",
+    "memorandumDesc": "Правила взаємодії",
+    "tariffsDesc": "Тарифи поселення",
+    "chairPanelDesc": "Керування та модерація"
   },
   "messages": {
     "title": "Повідомлення",

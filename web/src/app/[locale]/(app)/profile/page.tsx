@@ -1,10 +1,8 @@
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { PageTitle, Card } from "@/components/Ui";
-import { SignOutButton } from "@/components/AppShell";
-import { ApkDownloadLink } from "@/components/ApkDownloadLink";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PageTitle, Card, FormSection } from "@/components/Ui";
+import { ProfileHubLinks } from "@/components/ProfileHubLinks";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
 import { ProfileCredentialsForm } from "@/components/ProfileCredentialsForm";
 import { ChairInviteCodeForm } from "@/components/ChairInviteCodeForm";
@@ -17,6 +15,7 @@ export default async function ProfilePage() {
   const session = await auth();
   const communityId = requireCommunityId(session!.user!);
   const t = await getTranslations("profile");
+  const tCred = await getTranslations("credentials");
   const tr = await getTranslations("categories.roles");
   const tt = await getTranslations("categories.tenancy");
 
@@ -58,21 +57,24 @@ export default async function ProfilePage() {
       </Card>
 
       {isChair && community?.approvedAt && (
-        <Card className="mb-6">
-          <p className="mb-3 text-sm font-semibold">{t("inviteSection")}</p>
-          <ChairInviteCodeForm currentCode={community.inviteCode} />
-        </Card>
+        <FormSection title={t("inviteSection")}>
+          <Card>
+            <ChairInviteCodeForm currentCode={community.inviteCode} />
+          </Card>
+        </FormSection>
       )}
 
       {user && (
-        <Card className="mb-6">
-          <ProfileCredentialsForm currentEmail={user.email} />
-        </Card>
+        <FormSection title={tCred("accountTitle")}>
+          <Card>
+            <ProfileCredentialsForm currentEmail={user.email} />
+          </Card>
+        </FormSection>
       )}
 
       {user && (
-        <Card className="mb-6">
-          <p className="mb-3 text-sm font-semibold">{t("editProfile")}</p>
+        <FormSection title={t("editProfile")}>
+          <Card>
           <ProfileEditForm
             name={user.name}
             communityAddressId={user.communityAddressId}
@@ -80,26 +82,11 @@ export default async function ProfilePage() {
             tenancyType={user.tenancyType ?? "OWNER"}
             addresses={addresses}
           />
-        </Card>
+          </Card>
+        </FormSection>
       )}
 
-      <div className="mb-6 flex justify-center">
-        <LanguageSwitcher />
-      </div>
-
-      <nav className="flex flex-col gap-2">
-        <Link
-          href="/info/memorandum"
-          className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-        >
-          {t("memorandumLink")}
-        </Link>
-      </nav>
-
-      <div className="mt-10 flex flex-col items-center gap-3">
-        <ApkDownloadLink />
-        <SignOutButton />
-      </div>
+      <ProfileHubLinks showChairLinks={isChair} />
     </>
   );
 }

@@ -1,7 +1,11 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { PageTitle, ButtonLink } from "@/components/Ui";
+import { PageTitle } from "@/components/Ui";
+import { HubActionCard } from "@/components/hub/hubUi";
+import { RequestsHubStatsBar } from "@/components/RequestsHubStats";
 import { RequestsPanel, type TicketRow } from "@/components/RequestsPanel";
+import { getRequestsHubStats } from "@/lib/hubStats";
+import { Plus } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
@@ -48,7 +52,7 @@ export default async function RequestsPage() {
     ? communityWhere(communityId)
     : { ...communityWhere(communityId), userId: session!.user!.id };
 
-  const [activeTickets, archiveCount] = await Promise.all([
+  const [activeTickets, archiveCount, hubStats] = await Promise.all([
     prisma.ticket.findMany({
       where: { ...baseWhere, status: { not: "RESOLVED" } },
       orderBy: { createdAt: "desc" },
@@ -60,14 +64,22 @@ export default async function RequestsPage() {
     prisma.ticket.count({
       where: { ...baseWhere, status: "RESOLVED" },
     }),
+    getRequestsHubStats(communityId, staff, session!.user!.id),
   ]);
 
   return (
     <>
       <MarkNotificationsSeen scopes={["tickets"]} />
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
-      <div className="mb-4 flex gap-2">
-        <ButtonLink href="/requests/new">{t("new")}</ButtonLink>
+      <RequestsHubStatsBar stats={hubStats} />
+      <div className="mb-5 mt-2">
+        <HubActionCard
+          href="/requests/new"
+          icon={Plus}
+          title={t("new")}
+          description={t("newDesc")}
+          tone="blue"
+        />
       </div>
       <RequestsPanel
         tickets={toTicketRows(activeTickets)}

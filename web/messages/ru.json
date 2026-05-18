@@ -37,10 +37,28 @@
     "title": "Happy Life — ОСББ / коттеджи онлайн",
     "description": "Новости, заявки, голосования, соседи. Платформа для украинских посёлков."
   },
-  "common": { "back": "Назад", "save": "Сохранить", "send": "Отправить", "loading": "Загрузка…", "sending": "Отправка…" },
-  "nav": { "home": "Главная", "requests": "Заявки", "community": "Сообщество", "more": "Ещё" },
-  "lang": { "uk": "Українська", "ru": "Киевский", "en": "English", "label": "Язык" },
-  "currency": { "uah": "₴" },
+  "common": {
+    "back": "Назад",
+    "save": "Сохранить",
+    "send": "Отправить",
+    "loading": "Загрузка…",
+    "sending": "Отправка…"
+  },
+  "nav": {
+    "home": "Главная",
+    "requests": "Заявки",
+    "community": "Сообщество",
+    "more": "Ещё"
+  },
+  "lang": {
+    "uk": "Українська",
+    "ru": "Киевский",
+    "en": "English",
+    "label": "Язык"
+  },
+  "currency": {
+    "uah": "₴"
+  },
   "landing": {
     "badge": "Коттедж / ОСББ",
     "title": "Happy Life",
@@ -152,7 +170,9 @@
       "moderationDesc": "Форум, доска, жалобы",
       "backHome": "На главную",
       "footerEngagement": "{posts} новостей · {likes} лайков за неделю"
-    }
+    },
+    "popularNewsTitle": "Популярная новость",
+    "popularNewsText": "«{title}» — {count} лайков за неделю"
   },
   "requests": {
     "title": "Заявки",
@@ -176,7 +196,13 @@
     "newTitle": "Новая заявка",
     "newSubtitle": "Опишите проблему — председатель/модератор меняют статус.",
     "landmark": "Ориентир на местности (необязательно)",
-    "landmarkPh": "Например: поворот у калитки"
+    "landmarkPh": "Например: поворот у калитки",
+    "hubStats": {
+      "new": "Новые",
+      "inProgress": "В работе",
+      "archive": "Архив"
+    },
+    "newDesc": "Описание проблемы и фото"
   },
   "votes": {
     "title": "Голосования",
@@ -195,7 +221,9 @@
     "change": "Изменить",
     "cast": "Голосовать",
     "emptyList": "Голосований пока не было.",
-    "until": "до"
+    "until": "до",
+    "responsesCount": "{count, plural, one {# голос} few {# голоса} many {# голосов} other {# голоса}}",
+    "voteThanks": "Спасибо, голос учтён!"
   },
   "community": {
     "title": "Сообщество",
@@ -213,7 +241,14 @@
     "residentsTitle": "Жители",
     "residentsDesc": "Подтверждённые собственники и арендаторы с адресами",
     "messagesTitle": "Сообщения",
-    "messagesDesc": "Личный чат с жителями"
+    "messagesDesc": "Личный чат с жителями",
+    "hubStats": {
+      "messages": "Сообщ.",
+      "forum": "Форум",
+      "board": "Доска",
+      "news": "Новости",
+      "sectionLinks": "Разделы"
+    }
   },
   "board": {
     "title": "Доска объявлений",
@@ -305,7 +340,12 @@
     "chairPeriodSummary": "Оплачено: {paid} из {total} адресов (с начислением: {withCharges}).",
     "historyTitle": "История платежей",
     "historyPaid": "Оплачено {date}",
-    "historyUnpaid": "Не оплачено"
+    "historyUnpaid": "Не оплачено",
+    "hubStats": {
+      "households": "Дома",
+      "paid": "Оплачено",
+      "unpaid": "Не оплачено"
+    }
   },
   "profile": {
     "title": "Ещё",
@@ -334,7 +374,13 @@
       "forbidden": "Нет доступа",
       "generic": "Ошибка сохранения"
     },
-    "downloadApp": "Скачать приложение (APK)"
+    "downloadApp": "Скачать приложение (APK)",
+    "hubSectionInfo": "Справка",
+    "hubSectionApp": "Приложение",
+    "hubSectionAccount": "Аккаунт",
+    "memorandumDesc": "Правила взаимодействия",
+    "tariffsDesc": "Тарифы посёлка",
+    "chairPanelDesc": "Управление и модерация"
   },
   "messages": {
     "title": "Сообщения",

@@ -19,6 +19,8 @@ import {
 } from "@/lib/billing";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
+import { PaymentsHubStatsBar } from "@/components/PaymentsHubStats";
+import { getPaymentsHubStats } from "@/lib/hubStats";
 import {
   formatAddressLine,
   householdAddressKey,
@@ -315,10 +317,7 @@ async function ChairPaymentsManageView({
     ),
   );
 
-  const paidCount = list.filter((h) => h.paidAt != null).length;
-  const withCharges = list.filter(
-    (h) => h.subscriptionFeeUah + h.electricityUah > 0,
-  ).length;
+  const hubStats = await getPaymentsHubStats(communityId, period);
 
   return (
     <>
@@ -330,15 +329,7 @@ async function ChairPaymentsManageView({
 
       <PaymentPeriodNav period={period} />
 
-      <Card className="mb-4 border-zinc-200 bg-zinc-50/80 dark:border-zinc-700 dark:bg-zinc-900/40">
-        <p className="text-sm text-zinc-700 dark:text-zinc-300">
-          {t("chairPeriodSummary", {
-            paid: paidCount,
-            total: list.length,
-            withCharges,
-          })}
-        </p>
-      </Card>
+      <PaymentsHubStatsBar stats={hubStats} />
 
       <div className="flex flex-col gap-3">
         {list.map((h) => {

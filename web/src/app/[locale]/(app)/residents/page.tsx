@@ -1,10 +1,37 @@
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { PageTitle, Card } from "@/components/Ui";
+import { PageTitle } from "@/components/Ui";
+import { AvatarInitials, HubContentCard, HubSection } from "@/components/hub/hubUi";
 import { getTranslations } from "next-intl/server";
 import { TenancyType } from "@/lib/audience";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
+
+function ResidentRow({
+  name,
+  address,
+  tenancyLabel,
+  tone,
+}: {
+  name: string;
+  address: string;
+  tenancyLabel: string;
+  tone: "blue" | "emerald";
+}) {
+  return (
+    <HubContentCard>
+      <div className="flex items-center gap-3">
+        <AvatarInitials name={name} tone={tone} />
+        <span className="min-w-0">
+          <p className="font-semibold text-slate-900 dark:text-slate-100">{name}</p>
+          <p className="mt-0.5 text-sm text-slate-500">
+            {address} · {tenancyLabel}
+          </p>
+        </span>
+      </div>
+    </HubContentCard>
+  );
+}
 
 export default async function ResidentsPage() {
   const session = await auth();
@@ -33,53 +60,47 @@ export default async function ResidentsPage() {
     <>
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
 
-      <h2 className="mb-3 mt-6 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-        {t("owners")}
-      </h2>
-      <div className="flex flex-col gap-2">
+      <HubSection title={t("owners")} className="!mt-4">
         {owners.map((u) => (
-          <Card key={u.id}>
-            <p className="font-medium">{u.name}</p>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              {u.street} {u.houseNumber} · {tt("OWNER")}
-            </p>
-          </Card>
+          <ResidentRow
+            key={u.id}
+            name={u.name}
+            address={`${u.street} ${u.houseNumber}`}
+            tenancyLabel={tt("OWNER")}
+            tone="blue"
+          />
         ))}
         {owners.length === 0 && (
-          <Card>
-            <p className="text-sm text-zinc-600">{t("emptyOwners")}</p>
-          </Card>
+          <HubContentCard>
+            <p className="text-sm text-slate-600 dark:text-slate-400">{t("emptyOwners")}</p>
+          </HubContentCard>
         )}
-      </div>
+      </HubSection>
 
-      <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-        {t("tenants")}
-      </h2>
-      <div className="flex flex-col gap-2">
+      <HubSection title={t("tenants")}>
         {tenants.map((u) => (
-          <Card key={u.id}>
-            <p className="font-medium">{u.name}</p>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              {u.street} {u.houseNumber} · {tt("TENANT")}
-            </p>
-          </Card>
+          <ResidentRow
+            key={u.id}
+            name={u.name}
+            address={`${u.street} ${u.houseNumber}`}
+            tenancyLabel={tt("TENANT")}
+            tone="emerald"
+          />
         ))}
         {tenants.length === 0 && (
-          <Card>
-            <p className="text-sm text-zinc-600">{t("emptyTenants")}</p>
-          </Card>
+          <HubContentCard>
+            <p className="text-sm text-slate-600 dark:text-slate-400">{t("emptyTenants")}</p>
+          </HubContentCard>
         )}
-      </div>
+      </HubSection>
 
-      {session?.user?.role === "MODERATOR" && (
-        <Card className="mt-8 border-blue-200 bg-blue-50/60 dark:border-blue-900 dark:bg-blue-950/30">
-          <p className="text-sm text-blue-900 dark:text-blue-100">
-            {t("moderatorHint")}
-          </p>
-        </Card>
+      {isStaff && (
+        <HubContentCard className="mt-8 border-blue-200/80 bg-blue-50/50 dark:border-blue-900/50 dark:bg-blue-950/30">
+          <p className="text-sm text-blue-900 dark:text-blue-100">{t("moderatorHint")}</p>
+        </HubContentCard>
       )}
 
-      <p className="mt-6 text-center text-sm">
+      <p className="mt-8 text-center text-sm">
         <Link href={backHref} className="text-blue-700 hover:underline">
           {backLabel}
         </Link>
@@ -87,4 +108,3 @@ export default async function ResidentsPage() {
     </>
   );
 }
-

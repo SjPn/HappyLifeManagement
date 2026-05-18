@@ -1,12 +1,14 @@
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { PageTitle, Card, ButtonLink } from "@/components/Ui";
+import { PageTitle, ButtonLink } from "@/components/Ui";
+import { HubContentCard, HubMetaLine } from "@/components/hub/hubUi";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { redirect } from "next/navigation";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
+import { Megaphone } from "lucide-react";
 
 export default async function BoardPage() {
   const session = await auth();
@@ -32,50 +34,57 @@ export default async function BoardPage() {
     <>
       <MarkNotificationsSeen scopes={["board"]} />
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
-      <div className="mb-4">
+      <div className="mb-5">
         <ButtonLink href="/community/board/new">{t("new")}</ButtonLink>
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2.5">
         {posts.map((p) => (
-          <Card key={p.id}>
-            <p className="text-xs font-medium uppercase text-blue-700">
-              {tCat(p.category)}
-            </p>
-            <p className="mt-2 font-medium">{p.title}</p>
-            <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
-              {p.body}
-            </p>
-            {(p.userId === userId || session!.user!.role === "CHAIR") && (
-              <div className="mt-3">
-                <Link
-                  href={`/community/board/${p.id}/edit`}
-                  className="text-xs font-semibold text-blue-700 hover:underline"
-                >
-                  {t("edit")}
-                </Link>
-              </div>
-            )}
-            {p.imageUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={p.imageUrl}
-                alt=""
-                className="mt-3 max-h-72 w-full rounded-xl object-cover ring-1 ring-black/5"
-              />
-            )}
-            <p className="mt-3 text-xs text-zinc-500">
-              {p.user.name} ·{" "}
-              {p.createdAt.toLocaleDateString(dateLocale, {
-                day: "numeric",
-                month: "short",
-              })}
-            </p>
-          </Card>
+          <HubContentCard key={p.id}>
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-md">
+                <Megaphone className="h-5 w-5" strokeWidth={2.25} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <p className="text-xs font-bold uppercase tracking-wide text-blue-600/90 dark:text-blue-400/90">
+                  {tCat(p.category)}
+                </p>
+                <p className="mt-1 font-semibold text-slate-900 dark:text-slate-100">
+                  {p.title}
+                </p>
+                <p className="mt-2 line-clamp-3 whitespace-pre-wrap text-sm text-slate-600 dark:text-slate-400">
+                  {p.body}
+                </p>
+                {p.imageUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={p.imageUrl}
+                    alt=""
+                    className="mt-3 max-h-48 w-full rounded-xl object-cover ring-1 ring-black/5"
+                  />
+                )}
+                <HubMetaLine>
+                  {p.user.name} ·{" "}
+                  {p.createdAt.toLocaleDateString(dateLocale, {
+                    day: "numeric",
+                    month: "short",
+                  })}
+                </HubMetaLine>
+                {(p.userId === userId || session!.user!.role === "CHAIR") && (
+                  <Link
+                    href={`/community/board/${p.id}/edit`}
+                    className="mt-2 inline-block text-xs font-semibold text-blue-700 hover:underline"
+                  >
+                    {t("edit")}
+                  </Link>
+                )}
+              </span>
+            </div>
+          </HubContentCard>
         ))}
         {posts.length === 0 && (
-          <Card>
-            <p className="text-sm text-zinc-600">{t("empty")}</p>
-          </Card>
+          <HubContentCard>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("empty")}</p>
+          </HubContentCard>
         )}
       </div>
       <p className="mt-6 text-center text-sm">

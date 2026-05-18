@@ -37,10 +37,28 @@
     "title": "Happy Life — HOA & cottage community online",
     "description": "News, requests, votes, neighbors. A platform for Ukrainian communities."
   },
-  "common": { "back": "Back", "save": "Save", "send": "Send", "loading": "Loading…", "sending": "Sending…" },
-  "nav": { "home": "Home", "requests": "Requests", "community": "Community", "more": "More" },
-  "lang": { "uk": "Ukrainian", "ru": "Kyiv Russian", "en": "English", "label": "Language" },
-  "currency": { "uah": "₴" },
+  "common": {
+    "back": "Back",
+    "save": "Save",
+    "send": "Send",
+    "loading": "Loading…",
+    "sending": "Sending…"
+  },
+  "nav": {
+    "home": "Home",
+    "requests": "Requests",
+    "community": "Community",
+    "more": "More"
+  },
+  "lang": {
+    "uk": "Ukrainian",
+    "ru": "Kyiv Russian",
+    "en": "English",
+    "label": "Language"
+  },
+  "currency": {
+    "uah": "₴"
+  },
   "landing": {
     "badge": "Cottage / HOA",
     "title": "Happy Life",
@@ -152,7 +170,9 @@
       "moderationDesc": "Forum, board, reports",
       "backHome": "Home",
       "footerEngagement": "{posts} news posts · {likes} likes this week"
-    }
+    },
+    "popularNewsTitle": "Popular news",
+    "popularNewsText": "\"{title}\" — {count} likes this week"
   },
   "requests": {
     "title": "Requests",
@@ -176,7 +196,13 @@
     "newTitle": "New request",
     "newSubtitle": "Describe the problem — chair/moderator updates status.",
     "landmark": "On-site landmark (optional)",
-    "landmarkPh": "e.g. turn by the gate"
+    "landmarkPh": "e.g. turn by the gate",
+    "hubStats": {
+      "new": "New",
+      "inProgress": "In progress",
+      "archive": "Archive"
+    },
+    "newDesc": "Describe the issue and add a photo"
   },
   "votes": {
     "title": "Votes",
@@ -195,7 +221,9 @@
     "change": "Change",
     "cast": "Vote",
     "emptyList": "No votes yet.",
-    "until": "until"
+    "until": "until",
+    "responsesCount": "{count, plural, one {# vote} other {# votes}}",
+    "voteThanks": "Thanks, your vote counts!"
   },
   "community": {
     "title": "Community",
@@ -213,7 +241,14 @@
     "residentsTitle": "Residents",
     "residentsDesc": "Approved owners and tenants with addresses",
     "messagesTitle": "Messages",
-    "messagesDesc": "Direct chat with residents"
+    "messagesDesc": "Direct chat with residents",
+    "hubStats": {
+      "messages": "Msgs",
+      "forum": "Forum",
+      "board": "Board",
+      "news": "News",
+      "sectionLinks": "Sections"
+    }
   },
   "board": {
     "title": "Community board",
@@ -305,7 +340,12 @@
     "chairPeriodSummary": "Paid: {paid} of {total} addresses ({withCharges} with charges).",
     "historyTitle": "Payment history",
     "historyPaid": "Paid on {date}",
-    "historyUnpaid": "Not paid"
+    "historyUnpaid": "Not paid",
+    "hubStats": {
+      "households": "Homes",
+      "paid": "Paid",
+      "unpaid": "Unpaid"
+    }
   },
   "profile": {
     "title": "More",
@@ -334,7 +374,13 @@
       "forbidden": "Access denied",
       "generic": "Could not save"
     },
-    "downloadApp": "Download app (APK)"
+    "downloadApp": "Download app (APK)",
+    "hubSectionInfo": "Info",
+    "hubSectionApp": "App",
+    "hubSectionAccount": "Account",
+    "memorandumDesc": "Community rules",
+    "tariffsDesc": "Tariffs",
+    "chairPanelDesc": "Management tools"
   },
   "messages": {
     "title": "Messages",

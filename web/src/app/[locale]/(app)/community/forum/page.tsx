@@ -1,7 +1,8 @@
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { PageTitle, Card, ButtonLink } from "@/components/Ui";
+import { PageTitle, ButtonLink } from "@/components/Ui";
+import { HubContentCard, HubMetaLine } from "@/components/hub/hubUi";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { forumTopicAudienceWhere } from "@/lib/audience";
@@ -9,6 +10,7 @@ import { redirect } from "next/navigation";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 import { forumTopicAuthorLabel } from "@/lib/forumDisplay";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
+import { MessagesSquare } from "lucide-react";
 
 export default async function ForumListPage() {
   const session = await auth();
@@ -41,30 +43,42 @@ export default async function ForumListPage() {
     <>
       <MarkNotificationsSeen scopes={["forum"]} />
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
-      <div className="mb-4">
+      <div className="mb-5">
         <ButtonLink href="/community/forum/new">{t("newTopic")}</ButtonLink>
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2.5">
         {topics.map((topic) => (
-          <Link key={topic.id} href={`/community/forum/${topic.id}`}>
-            <Card className="transition hover:border-blue-300">
-              <p className="font-medium">{topic.title}</p>
-              <p className="mt-2 text-xs text-zinc-500">
-                {forumTopicAuthorLabel(topic, session!.user!.role, t("anonymousAuthor"))}{" "}
-                · {t("postCount", { count: topic.posts.length })}{" "}
-                ·{" "}
-                {topic.createdAt.toLocaleDateString(dateLocale, {
-                  day: "numeric",
-                  month: "short",
-                })}
-              </p>
-            </Card>
-          </Link>
+          <HubContentCard key={topic.id} href={`/community/forum/${topic.id}`}>
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-md">
+                <MessagesSquare className="h-5 w-5" strokeWidth={2.25} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <p className="font-semibold text-slate-900 dark:text-slate-100">
+                  {topic.title}
+                </p>
+                <HubMetaLine>
+                  {forumTopicAuthorLabel(
+                    topic,
+                    session!.user!.role,
+                    t("anonymousAuthor"),
+                  )}{" "}
+                  · {t("postCount", { count: topic.posts.length })} ·{" "}
+                  {topic.createdAt.toLocaleDateString(dateLocale, {
+                    day: "numeric",
+                    month: "short",
+                  })}
+                </HubMetaLine>
+              </span>
+            </div>
+          </HubContentCard>
         ))}
         {topics.length === 0 && (
-          <Card>
-            <p className="text-sm text-zinc-600">{t("empty")}</p>
-          </Card>
+          <HubContentCard>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              {t("empty")}
+            </p>
+          </HubContentCard>
         )}
       </div>
       <p className="mt-6 text-center text-sm">

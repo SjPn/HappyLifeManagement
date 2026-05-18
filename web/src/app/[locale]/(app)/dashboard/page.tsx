@@ -17,6 +17,8 @@ import { DashboardSectionLink } from "@/components/DashboardSectionLink";
 import { PaymentsReminderCard } from "@/components/PaymentsReminderCard";
 import { ChairDashboardActions } from "@/components/ChairDashboardActions";
 import { getChairDashboardStats } from "@/lib/chairDashboard";
+import { getPopularNewsId } from "@/lib/hubStats";
+import { Link } from "@/i18n/navigation";
 import { NewsPostCard } from "@/components/NewsPostCard";
 import { newsPostCardProps, newsPostListInclude } from "@/lib/newsPosts";
 
@@ -59,8 +61,11 @@ export default async function DashboardPage() {
   const chairStatsPromise = isChair
     ? getChairDashboardStats(communityId)
     : Promise.resolve(null);
+  const popularNewsPromise = !isChair
+    ? getPopularNewsId(communityId)
+    : Promise.resolve(null);
 
-  const [news, votes, user, chairStats] = await Promise.all([
+  const [news, votes, user, chairStats, popularNews] = await Promise.all([
     isChair
       ? Promise.resolve([])
       : prisma.newsPost.findMany({
@@ -99,6 +104,7 @@ export default async function DashboardPage() {
       },
     }),
     chairStatsPromise,
+    popularNewsPromise,
   ]);
 
   const billingPeriod = currentBillingPeriod();
@@ -187,6 +193,23 @@ export default async function DashboardPage() {
             {t("paymentsLink")}
           </p>
         </PaymentsReminderCard>
+      )}
+
+      {!isChair && popularNews && (
+        <Link
+          href="/community/news"
+          className="mb-5 block rounded-2xl border border-rose-200/80 bg-gradient-to-r from-rose-50/90 to-amber-50/80 px-4 py-3.5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-rose-900/50 dark:from-rose-950/40 dark:to-amber-950/30"
+        >
+          <p className="text-sm font-semibold text-rose-900 dark:text-rose-100">
+            🔥 {t("popularNewsTitle")}
+          </p>
+          <p className="mt-1 text-sm text-rose-800/90 dark:text-rose-200/90">
+            {t("popularNewsText", {
+              title: popularNews.title,
+              count: popularNews.likeCount,
+            })}
+          </p>
+        </Link>
       )}
 
       {!isChair && (

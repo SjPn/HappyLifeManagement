@@ -62,6 +62,25 @@ export function Card({
   );
 }
 
+export function FormSection({
+  title,
+  children,
+  className = "",
+}: {
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={`mb-6 ${className}`}>
+      <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-blue-600/90 dark:text-blue-400/90">
+        {title}
+      </h2>
+      {children}
+    </section>
+  );
+}
+
 export function ButtonLink({
   href,
   children,

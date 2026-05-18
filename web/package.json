@@ -6,7 +6,7 @@
     "predev": "prisma generate",
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "vercel-build": "prisma generate && tsx scripts/prisma-migrate-deploy.ts && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",

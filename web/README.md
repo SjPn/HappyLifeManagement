@@ -62,9 +62,14 @@ npm start
 
 ## Деплой (Vercel + Neon)
 
-1. `DATABASE_URL` у Vercel (runtime може бути pooler; для міграцій локально — **direct** endpoint).
-2. Build на Vercel: `npm run vercel-build` (`prisma migrate deploy` + Next build).
-3. Нові зміни схеми: `npx prisma migrate dev` → commit `prisma/migrations/` → deploy.
+1. **Дві змінні в Vercel** (обовʼязково для збірки з міграціями):
+   - `DATABASE_URL` — **pooler** (для роботи застосунку на Vercel).
+   - `DIRECT_URL` — **direct** connection string з Neon (без `-pooler` у хості).  
+     Без `DIRECT_URL` збірка падає з `P1002` / `pg_advisory_lock` на pooler.
+2. Build: `npm run vercel-build` → `scripts/prisma-migrate-deploy.ts` + Next build.
+3. Нові зміни схеми: `npx prisma migrate dev` (локально з direct URL у `.env`) → commit `prisma/migrations/` → redeploy.
+4. Якщо таймаут на cold start Neon — **Redeploy** один раз; або виконайте локально:  
+   `set DIRECT_URL=...` (direct) і `npx prisma migrate deploy`.
 4. Завантаження фото: `public/uploads/` (на Vercel ефемерно — винести в S3 згодом).
 
 ### Поселок «Щасливе Життя» (production)

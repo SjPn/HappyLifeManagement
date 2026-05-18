@@ -17,7 +17,7 @@ export async function markSeen(scope: string) {
   }
   await markNotificationSeen(session.user.id, scope as Scope);
   const paths: Record<string, string[]> = {
-    news: ["/dashboard"],
+    news: ["/dashboard", "/community/news"],
     votes: ["/dashboard", "/votes"],
     tickets: ["/dashboard", "/requests"],
     payments: ["/dashboard", "/payments"],

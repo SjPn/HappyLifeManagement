@@ -190,6 +190,14 @@ export default async function DashboardPage() {
             {news.map((n) => (
               <Card key={n.id}>
                 <p className="font-medium">{n.title}</p>
+                {n.imageUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={n.imageUrl}
+                    alt=""
+                    className="mt-3 max-h-72 w-full rounded-xl object-cover ring-1 ring-black/5"
+                  />
+                )}
                 <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
                   {n.body}
                 </p>

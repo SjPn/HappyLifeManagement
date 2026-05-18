@@ -6,7 +6,7 @@ import type { NotificationCounts } from "@/lib/notifications";
 
 type CountKey = keyof Pick<
   NotificationCounts,
-  "board" | "forum" | "messages"
+  "news" | "board" | "forum" | "messages"
 >;
 
 export function CommunityHubSection({

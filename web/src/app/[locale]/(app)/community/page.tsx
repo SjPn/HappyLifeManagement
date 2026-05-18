@@ -19,6 +19,12 @@ export default async function CommunityHubPage() {
       <CommunityHubSection
         items={[
           {
+            href: "/community/news",
+            title: t("newsTitle"),
+            desc: t("newsDesc"),
+            countKey: "news",
+          },
+          {
             href: "/community/board",
             title: t("boardTitle"),
             desc: t("boardDesc"),

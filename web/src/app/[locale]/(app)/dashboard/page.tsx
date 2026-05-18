@@ -39,7 +39,7 @@ export default async function DashboardPage() {
               {t("quickReport")}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <ButtonLink href="/chair/reports">{tn("community")}</ButtonLink>
+              <ButtonLink href="/chair/moderation">{tn("community")}</ButtonLink>
               <ButtonLink href="/chair/users" variant="secondary">
                 {tn("more")}
               </ButtonLink>

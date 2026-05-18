@@ -26,6 +26,7 @@ export async function createForumTopic(formData: FormData) {
   const body = String(formData.get("body") || "").trim();
   const img = formData.get("image");
   const audience = parseAudienceScope(String(formData.get("audience") || ""));
+  const isAnonymous = formData.get("isAnonymous") === "on";
 
   if (!title || !body) return { error: "topicRequired" as const };
 
@@ -43,6 +44,7 @@ export async function createForumTopic(formData: FormData) {
       communityId,
       title,
       audience,
+      isAnonymous,
       userId: session.user.id,
       posts: {
         create: {

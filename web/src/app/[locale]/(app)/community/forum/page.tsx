@@ -7,6 +7,7 @@ import { dateLocaleForUi } from "@/lib/dateLocale";
 import { forumTopicAudienceWhere } from "@/lib/audience";
 import { redirect } from "next/navigation";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
+import { forumTopicAuthorLabel } from "@/lib/forumDisplay";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function ForumListPage() {
@@ -49,7 +50,8 @@ export default async function ForumListPage() {
             <Card className="transition hover:border-blue-300">
               <p className="font-medium">{topic.title}</p>
               <p className="mt-2 text-xs text-zinc-500">
-                {topic.user.name} · {t("postCount", { count: topic.posts.length })}{" "}
+                {forumTopicAuthorLabel(topic, session!.user!.role, t("anonymousAuthor"))}{" "}
+                · {t("postCount", { count: topic.posts.length })}{" "}
                 ·{" "}
                 {topic.createdAt.toLocaleDateString(dateLocale, {
                   day: "numeric",

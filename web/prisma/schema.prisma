@@ -171,6 +171,7 @@ model ForumTopic {
   community   Community   @relation(fields: [communityId], references: [id], onDelete: Cascade)
   title       String
   audience    String      @default("ALL")
+  isAnonymous Boolean     @default(false)
   userId      String
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime    @default(now())

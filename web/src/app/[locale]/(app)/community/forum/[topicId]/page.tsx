@@ -7,6 +7,11 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { auth } from "@/auth";
 import { userMatchesAudience } from "@/lib/audience";
+import {
+  canSeeForumTopicAuthor,
+  forumPostAuthorLabel,
+  forumTopicAuthorLabel,
+} from "@/lib/forumDisplay";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function ForumTopicPage({
@@ -51,10 +56,25 @@ export default async function ForumTopicPage({
     <>
       <PageTitle title={topic.title} />
       <p className="mb-6 text-xs text-zinc-500">
-        {t("authorTopic")} {topic.user.name} ·{" "}
+        {t("authorTopic")}{" "}
+        {forumTopicAuthorLabel(
+          topic,
+          session!.user!.role,
+          t("anonymousAuthor"),
+        )}
+        {topic.isAnonymous &&
+          canSeeForumTopicAuthor(topic.isAnonymous, session!.user!.role) && (
+            <span className="text-amber-700 dark:text-amber-300">
+              {" "}
+              ({t("anonymousStaffNote")})
+            </span>
+          )}
+        {" · "}
         {topic.createdAt.toLocaleString(dateLocale)}
       </p>
-      {(topic.userId === session!.user!.id || session!.user!.role === "CHAIR") && (
+      {(topic.userId === session!.user!.id ||
+        session!.user!.role === "CHAIR" ||
+        session!.user!.role === "MODERATOR") && (
         <p className="mb-4">
           <Link
             href={`/community/forum/${topic.id}/edit`}
@@ -68,7 +88,14 @@ export default async function ForumTopicPage({
       <div className="flex flex-col gap-4">
         {topic.posts.map((p) => (
           <Card key={p.id}>
-            <p className="text-xs text-zinc-500">{p.user.name}</p>
+            <p className="text-xs text-zinc-500">
+              {forumPostAuthorLabel(
+                topic,
+                p,
+                session!.user!.role,
+                t("anonymousAuthor"),
+              )}
+            </p>
             <p className="mt-2 whitespace-pre-wrap text-sm">{p.body}</p>
             {p.imageUrl && (
               // eslint-disable-next-line @next/next/no-img-element

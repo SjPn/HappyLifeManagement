@@ -1,9 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import {
-  forumTopicAudienceWhere,
-  isStaffRole,
-  voteAudienceWhere,
-} from "@/lib/audience";
+import { forumTopicAudienceWhere, voteAudienceWhere } from "@/lib/audience";
 import { Role, UserStatus } from "@/lib/enums";
 import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
 import { communityWhere } from "@/lib/tenant";
@@ -86,7 +82,7 @@ export async function getNotificationCounts(
   const now = new Date();
   const tenant = communityWhere(user.communityId);
 
-  const [news, votes, tickets, payments, board, forumTopics, forumPosts, reports] =
+  const [news, votes, tickets, payments, board, forumTopics, forumPosts] =
     await Promise.all([
       prisma.newsPost.count({
         where: { ...tenant, createdAt: { gt: seen.newsAt } },
@@ -132,7 +128,6 @@ export async function getNotificationCounts(
           },
         },
       }),
-      countReports(user, seen.reportsAt),
     ]);
 
   const forum = forumTopics + forumPosts;
@@ -158,7 +153,8 @@ export async function getNotificationCounts(
   }
 
   const home = news + votes + tickets + payments + pendingResidents;
-  const community = board + forum + reports + messages;
+  const community = board + forum + messages;
+  const reports = 0;
 
   return {
     news,
@@ -206,20 +202,3 @@ async function countPayments(user: SessionUser, since: Date) {
   });
 }
 
-async function countReports(user: SessionUser, since: Date) {
-  const tenant = communityWhere(user.communityId);
-  if (isStaffRole(user.role)) {
-    return prisma.confidentialReport.count({
-      where: { ...tenant, createdAt: { gt: since } },
-    });
-  }
-  return prisma.confidentialReport.count({
-    where: {
-      ...tenant,
-      OR: [
-        { published: true, createdAt: { gt: since } },
-        { authorId: user.id, createdAt: { gt: since } },
-      ],
-    },
-  });
-}

@@ -57,6 +57,19 @@ export function ForumNewForm() {
           <option value={AudienceScope.TENANTS_ONLY}>{ta("TENANTS_ONLY")}</option>
         </select>
       </label>
+      <label className="flex items-start gap-2 rounded-xl border border-zinc-200 p-3 text-sm dark:border-zinc-700">
+        <input
+          type="checkbox"
+          name="isAnonymous"
+          className="mt-0.5 h-4 w-4"
+        />
+        <span className="text-zinc-700 dark:text-zinc-300">
+          <span className="font-medium">{t("anonymousLabel")}</span>
+          <span className="mt-1 block text-xs text-zinc-500">
+            {t("anonymousHint")}
+          </span>
+        </span>
+      </label>
       <label className="flex flex-col gap-1 text-sm">
         <span className={labelClass}>{t("image")}</span>
         <input

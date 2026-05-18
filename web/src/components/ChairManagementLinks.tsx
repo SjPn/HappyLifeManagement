@@ -55,9 +55,6 @@ export function ChairManagementLinks({
           </span>
         )}
       </span>
-      <Link href="/chair/reports" className={chairNavLinkClass}>
-        {t("reports")}
-      </Link>
       <Link href="/chair/moderation" className={chairNavLinkClass}>
         {t("moderation")}
       </Link>

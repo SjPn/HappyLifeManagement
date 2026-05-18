@@ -31,12 +31,6 @@ export default async function CommunityHubPage() {
             countKey: "forum",
           },
           {
-            href: "/community/reports",
-            title: t("reportsTitle"),
-            desc: t("reportsDesc"),
-            countKey: "reports",
-          },
-          {
             href: "/residents",
             title: t("residentsTitle"),
             desc: t("residentsDesc"),

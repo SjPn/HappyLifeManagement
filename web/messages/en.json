@@ -231,7 +231,11 @@
     "editTitle": "Edit topic",
     "editSubtitle": "Update the title, first message, and audience.",
     "saveEdit": "Save changes",
-    "back": "← Back to community"
+    "back": "← Back to community",
+    "anonymousLabel": "Post anonymously",
+    "anonymousHint": "Residents and tenants will not see the author. Chair and moderator can.",
+    "anonymousAuthor": "Anonymous",
+    "anonymousStaffNote": "anonymous to residents"
   },
   "reports": {
     "title": "Confidential reports",
@@ -543,6 +547,7 @@
     "subtitle": "Delete topics, board posts, and votes.",
     "board": "Board",
     "forum": "Forum",
+    "anonymousTopic": "anonymous topic",
     "votes": "Votes",
     "by": "Author: {name}",
     "posts": "{count} posts",

@@ -28,7 +28,10 @@ export default async function ChairModerationPage() {
       where: tenant,
       orderBy: { createdAt: "desc" },
       take: 30,
-      include: { user: { select: { name: true } }, posts: { select: { id: true } } },
+      include: {
+        user: { select: { name: true } },
+        posts: { select: { id: true } },
+      },
     }),
     prisma.vote.findMany({
       where: tenant,
@@ -74,7 +77,9 @@ export default async function ChairModerationPage() {
               <div className="min-w-0">
                 <p className="truncate font-medium">{x.title}</p>
                 <p className="mt-1 text-xs text-zinc-500">
-                  {t("by", { name: x.user.name })} · {t("posts", { count: x.posts.length })}
+                  {t("by", { name: x.user.name })}
+                  {x.isAnonymous ? ` · ${t("anonymousTopic")}` : ""} ·{" "}
+                  {t("posts", { count: x.posts.length })}
                 </p>
               </div>
               <DeleteForumTopicButton topicId={x.id} />

@@ -16,6 +16,7 @@ import { NewsSectionHeader } from "@/components/NewsSectionHeader";
 import { DashboardSectionLink } from "@/components/DashboardSectionLink";
 import { PaymentsReminderCard } from "@/components/PaymentsReminderCard";
 import { ChairDashboardActions } from "@/components/ChairDashboardActions";
+import { getChairDashboardStats } from "@/lib/chairDashboard";
 import { NewsPostCard } from "@/components/NewsPostCard";
 import { newsPostCardProps, newsPostListInclude } from "@/lib/newsPosts";
 
@@ -55,7 +56,11 @@ export default async function DashboardPage() {
     );
   }
 
-  const [news, votes, user] = await Promise.all([
+  const chairStatsPromise = isChair
+    ? getChairDashboardStats(communityId)
+    : Promise.resolve(null);
+
+  const [news, votes, user, chairStats] = await Promise.all([
     isChair
       ? Promise.resolve([])
       : prisma.newsPost.findMany({
@@ -93,6 +98,7 @@ export default async function DashboardPage() {
         houseNumber: true,
       },
     }),
+    chairStatsPromise,
   ]);
 
   const billingPeriod = currentBillingPeriod();
@@ -124,13 +130,18 @@ export default async function DashboardPage() {
     <>
       {!isChair && <MarkNotificationsSeen scopes={["news"]} />}
       <PageTitle
+        eyebrow={isChair ? t("eyebrow") : undefined}
         title={
           <DashboardGreeting hello={t("greetingHello")} name={displayName} />
         }
-        subtitle={t("addressLine", {
-          street: user?.street ?? "",
-          house: user?.houseNumber ?? "",
-        })}
+        subtitle={
+          isChair
+            ? t("chairHub.subtitle")
+            : t("addressLine", {
+                street: user?.street ?? "",
+                house: user?.houseNumber ?? "",
+              })
+        }
       />
 
       {(user?.balanceUah ?? 0) > 0 && (
@@ -146,8 +157,11 @@ export default async function DashboardPage() {
         </Card>
       )}
 
-      {isChair && (
-        <ChairDashboardActions paymentsLabel={t("chairPaymentsButton")} />
+      {isChair && chairStats && (
+        <ChairDashboardActions
+          stats={chairStats}
+          paymentsLabel={t("chairPaymentsButton")}
+        />
       )}
 
       {!isChair && showResidentPaymentsCard && (

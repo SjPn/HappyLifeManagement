@@ -129,7 +129,30 @@
     "paymentsReminderText": "Сумма к оплате за текущий период: {amount}.",
     "paymentsReminderZero": "Начисления за текущий период ещё не внесены или равны нулю.",
     "paymentsPaidOnHome": "За текущий период отмечено как оплачено.",
-    "paymentsLink": "Перейти к моим платежам →"
+    "paymentsLink": "Перейти к моим платежам →",
+    "chairHub": {
+      "subtitle": "Сводка посёлка и быстрые действия",
+      "statPending": "Ожидают",
+      "statVotes": "Голоса",
+      "statTickets": "Заявки",
+      "statLikes": "Лайки",
+      "pulseTitle": "Нужно внимание",
+      "pulseText": "Ожидают подтверждения: {pending}. Открытых заявок: {tickets}.",
+      "sectionContent": "Контент",
+      "sectionResidents": "Жители и финансы",
+      "sectionManage": "Настройки посёлка",
+      "sectionSafety": "Модерация",
+      "newsDesc": "Публикации на главную и в Сообщество",
+      "votesDesc": "Создать или посмотреть голосования",
+      "paymentsDesc": "Начисления и оплаты по домам",
+      "usersDesc": "Подтверждение регистраций и статусы",
+      "addressesDesc": "Список домов и участков",
+      "tariffsDesc": "Тарифы для жителей",
+      "memorandumDesc": "Правила и меморандум",
+      "moderationDesc": "Форум, доска, жалобы",
+      "backHome": "На главную",
+      "footerEngagement": "{posts} новостей · {likes} лайков за неделю"
+    }
   },
   "requests": {
     "title": "Заявки",

@@ -145,7 +145,30 @@
     "paymentsReminderText": "Сума до сплати за поточний період: {amount}.",
     "paymentsReminderZero": "Нарахування за поточний період ще не внесені або дорівнюють нулю.",
     "paymentsPaidOnHome": "За поточний період відмічено як оплачено.",
-    "paymentsLink": "Перейти до моїх платежів →"
+    "paymentsLink": "Перейти до моїх платежів →",
+    "chairHub": {
+      "subtitle": "Зведення поселення та швидкі дії",
+      "statPending": "Очікують",
+      "statVotes": "Голоси",
+      "statTickets": "Заявки",
+      "statLikes": "Лайки",
+      "pulseTitle": "Потрібна увага",
+      "pulseText": "Очікують підтвердження: {pending}. Відкритих заявок: {tickets}.",
+      "sectionContent": "Контент",
+      "sectionResidents": "Мешканці та фінанси",
+      "sectionManage": "Налаштування поселення",
+      "sectionSafety": "Модерація",
+      "newsDesc": "Публікації на головну та в Спільноту",
+      "votesDesc": "Створити або переглянути голосування",
+      "paymentsDesc": "Нарахування та оплати по будинках",
+      "usersDesc": "Підтвердження реєстрацій і статуси",
+      "addressesDesc": "Список будинків і ділянок",
+      "tariffsDesc": "Тарифи для мешканців",
+      "memorandumDesc": "Правила та меморандум",
+      "moderationDesc": "Форум, дошка, скарги",
+      "backHome": "На головну",
+      "footerEngagement": "{posts} новин · {likes} лайків за тиждень"
+    }
   },
   "requests": {
     "title": "Заявки",

@@ -129,7 +129,30 @@
     "paymentsReminderText": "Amount due for the current period: {amount}.",
     "paymentsReminderZero": "No charges for this period yet, or the total is zero.",
     "paymentsPaidOnHome": "Marked as paid for the current period.",
-    "paymentsLink": "Go to my payments →"
+    "paymentsLink": "Go to my payments →",
+    "chairHub": {
+      "subtitle": "Community snapshot and quick actions",
+      "statPending": "Pending",
+      "statVotes": "Votes",
+      "statTickets": "Requests",
+      "statLikes": "Likes",
+      "pulseTitle": "Needs attention",
+      "pulseText": "Awaiting approval: {pending}. Open requests: {tickets}.",
+      "sectionContent": "Content",
+      "sectionResidents": "Residents & finance",
+      "sectionManage": "Community settings",
+      "sectionSafety": "Moderation",
+      "newsDesc": "Posts for home and Community",
+      "votesDesc": "Create or review votes",
+      "paymentsDesc": "Billing and household payments",
+      "usersDesc": "Approvals and resident statuses",
+      "addressesDesc": "Homes and plot list",
+      "tariffsDesc": "Tariffs for residents",
+      "memorandumDesc": "Rules and memorandum",
+      "moderationDesc": "Forum, board, reports",
+      "backHome": "Home",
+      "footerEngagement": "{posts} news posts · {likes} likes this week"
+    }
   },
   "requests": {
     "title": "Requests",

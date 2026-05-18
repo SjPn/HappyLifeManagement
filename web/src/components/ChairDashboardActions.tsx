@@ -1,15 +1,22 @@
 "use client";
 
-import { ChairManagementLinks } from "@/components/ChairManagementLinks";
+import { ChairDashboardHub } from "@/components/ChairDashboardHub";
+import type { ChairDashboardStats } from "@/lib/chairDashboard";
 
 export function ChairDashboardActions({
+  stats,
   paymentsLabel,
+  isChair = true,
 }: {
-  paymentsLabel: string;
+  stats: ChairDashboardStats;
+  paymentsLabel?: string;
+  isChair?: boolean;
 }) {
   return (
-    <div className="mt-3">
-      <ChairManagementLinks isChair paymentsLabel={paymentsLabel} />
-    </div>
+    <ChairDashboardHub
+      stats={stats}
+      isChair={isChair}
+      paymentsLabel={paymentsLabel}
+    />
   );
 }

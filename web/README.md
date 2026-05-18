@@ -66,8 +66,8 @@ npm start
    - `DATABASE_URL` — **pooler** (для роботи застосунку на Vercel).
    - `DIRECT_URL` — **direct** connection string з Neon (рекомендовано).  
      Якщо є лише pooler URL, збірка спробує автоматично прибрати `-pooler` з хоста Neon.
-2. Build: `npm run vercel-build` → `scripts/prisma-migrate-deploy.ts` + Next build.
-3. Нові зміни схеми: `npx prisma migrate dev` (локально з direct URL у `.env`) → commit `prisma/migrations/` → redeploy.
+2. Build: `npm run vercel-build` → `prisma db push` (direct URL) + Next build. Не `migrate deploy` — прод і CI історично на `db push`.
+3. Нові поля в `schema.prisma` → commit → redeploy (build сам зробить `db push`). Файли в `prisma/migrations/` — для документації / майбутнього baseline.
 4. Якщо таймаут на cold start Neon — **Redeploy** один раз; або виконайте локально:  
    `set DIRECT_URL=...` (direct) і `npx prisma migrate deploy`.
 4. Завантаження фото: `public/uploads/` (на Vercel ефемерно — винести в S3 згодом).

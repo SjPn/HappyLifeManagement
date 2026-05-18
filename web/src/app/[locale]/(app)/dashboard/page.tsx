@@ -1,4 +1,3 @@
-import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PageTitle, Card, ButtonLink, DashboardGreeting } from "@/components/Ui";
@@ -27,7 +26,6 @@ export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
   const tChair = await getTranslations("chair");
   const tn = await getTranslations("nav");
-  const tc = await getTranslations("categories.ticketStatus");
   const dateLocale = dateLocaleForUi(locale);
 
   if (session!.user!.role === "MODERATOR") {
@@ -51,7 +49,7 @@ export default async function DashboardPage() {
     );
   }
 
-  const [news, votes, myTickets, user] = await Promise.all([
+  const [news, votes, user] = await Promise.all([
     isChair
       ? Promise.resolve([])
       : prisma.newsPost.findMany({
@@ -78,11 +76,6 @@ export default async function DashboardPage() {
             responses: { where: { userId } },
           },
         }),
-    prisma.ticket.findMany({
-      where: { userId, status: { not: "RESOLVED" } },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }),
     prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -254,37 +247,6 @@ export default async function DashboardPage() {
           </div>
         </>
       )}
-
-      <DashboardSectionLink
-        href="/requests"
-        countKey="tickets"
-        className={sectionLinkClass}
-      >
-        {t("ticketsSection")} →
-      </DashboardSectionLink>
-      <div className="flex flex-col gap-2">
-        {myTickets.length === 0 && (
-          <Card>
-            <p className="text-sm text-zinc-600">{t("noTickets")}</p>
-            <div className="mt-3">
-              <ButtonLink href="/requests/new">{t("createTicket")}</ButtonLink>
-            </div>
-          </Card>
-        )}
-        {myTickets.map((tk) => (
-          <Link key={tk.id} href="/requests">
-            <Card className="transition hover:border-blue-300">
-              <p className="text-sm font-medium">
-                {tk.description.slice(0, 80)}
-                {tk.description.length > 80 ? "…" : ""}
-              </p>
-              <p className="mt-2 text-xs text-zinc-500">
-                {tc(tk.status as "NEW" | "IN_PROGRESS" | "RESOLVED")}
-              </p>
-            </Card>
-          </Link>
-        ))}
-      </div>
     </>
   );
 }

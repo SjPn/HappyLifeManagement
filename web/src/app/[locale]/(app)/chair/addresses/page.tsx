@@ -1,4 +1,3 @@
-import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -60,12 +59,6 @@ export default async function ChairAddressesPage() {
           </Card>
         )}
       </div>
-
-      <p className="mt-8 text-center text-sm">
-        <Link href="/chair" className="text-blue-700 hover:underline">
-          {t("backPanel")}
-        </Link>
-      </p>
     </>
   );
 }

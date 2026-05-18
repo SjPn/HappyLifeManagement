@@ -11,10 +11,8 @@ export default async function ResidentsPage() {
   const tt = await getTranslations("categories.tenancy");
   const isStaff =
     session?.user?.role === "MODERATOR" || session?.user?.role === "CHAIR";
-  const backHref = isStaff ? "/chair" : "/community";
-  const backLabel = isStaff
-    ? (await getTranslations("chair"))("backPanel")
-    : (await getTranslations("board"))("back");
+  const backHref = "/community";
+  const backLabel = (await getTranslations("board"))("back");
 
   const users = await prisma.user.findMany({
     where: { status: "APPROVED", role: "RESIDENT" },

@@ -6,6 +6,7 @@ import { PageTitle, Card } from "@/components/Ui";
 import { UserApproveSelect } from "@/components/UserApproveSelect";
 import { BalanceEditForm } from "@/components/BalanceEditForm";
 import { UserEditForm } from "@/components/UserEditForm";
+import { DeleteUserButton } from "@/components/DeleteUserButton";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Role } from "@/lib/enums";
 import { listCommunityAddresses } from "@/lib/communityAddresses";
@@ -85,14 +86,12 @@ export default async function ChairUsersPage() {
                 addresses={addresses}
               />
             )}
+            {u.role === Role.RESIDENT && (
+              <DeleteUserButton userId={u.id} userName={u.name} />
+            )}
           </Card>
         ))}
       </div>
-      <p className="mt-8 text-center text-sm">
-        <Link href="/chair" className="text-blue-700 hover:underline">
-          {t("backPanel")}
-        </Link>
-      </p>
     </>
   );
 }

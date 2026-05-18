@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { UserStatus } from "@/lib/enums";
+import { Role, UserStatus } from "@/lib/enums";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
 import { TenancyType } from "@/lib/audience";
 import { resolveCommunityAddress } from "@/lib/communityAddresses";
@@ -217,5 +217,32 @@ export async function updateUserProfile(formData: FormData) {
   revalidateAllLocales("/profile");
   revalidateAllLocales("/dashboard");
   revalidateAllLocales("/payments");
+  return { ok: true as const };
+}
+
+export async function deleteUser(userId: string) {
+  const session = await auth();
+  if (!staff(session)) return { error: "forbidden" as const };
+  if (!userId) return { error: "badData" as const };
+  if (session!.user!.id === userId) {
+    return { error: "cannotDeleteSelf" as const };
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
+  if (!user) return { error: "badData" as const };
+  if (user.role !== Role.RESIDENT) {
+    return { error: "cannotDeleteStaff" as const };
+  }
+
+  await prisma.user.delete({ where: { id: userId } });
+
+  revalidateAllLocales("/chair");
+  revalidateAllLocales("/chair/users");
+  revalidateAllLocales("/residents");
+  revalidateAllLocales("/community");
+  revalidateAllLocales("/dashboard");
   return { ok: true as const };
 }

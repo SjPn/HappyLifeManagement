@@ -16,11 +16,11 @@ import { PaymentsReminderCard } from "@/components/PaymentsReminderCard";
 import { ChairDashboardActions } from "@/components/ChairDashboardActions";
 import { ResidentDashboardHub } from "@/components/ResidentDashboardHub";
 import { getChairDashboardStats } from "@/lib/chairDashboard";
-import { getPopularNewsId, getResidentDashboardStats } from "@/lib/hubStats";
+import { getResidentDashboardStats } from "@/lib/hubStats";
 import { NewsPostCard } from "@/components/NewsPostCard";
 import { newsPostCardProps, newsPostListInclude } from "@/lib/newsPosts";
 import { HubActionCard, HubContentCard, HubSection } from "@/components/hub/hubUi";
-import { CreditCard, Newspaper, Shield, Vote } from "lucide-react";
+import { Shield, Vote } from "lucide-react";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -62,9 +62,6 @@ export default async function DashboardPage() {
   const chairStatsPromise = isChair
     ? getChairDashboardStats(communityId)
     : Promise.resolve(null);
-  const popularNewsPromise = !isChair
-    ? getPopularNewsId(communityId)
-    : Promise.resolve(null);
   const residentStatsPromise = !isChair
     ? getResidentDashboardStats(communityId, userId, {
         role: session!.user!.role,
@@ -72,49 +69,47 @@ export default async function DashboardPage() {
       })
     : Promise.resolve(null);
 
-  const [news, votes, user, chairStats, popularNews, residentStats] =
-    await Promise.all([
-      isChair
-        ? Promise.resolve([])
-        : prisma.newsPost.findMany({
-            where: communityWhere(communityId),
-            orderBy: { createdAt: "desc" },
-            take: 4,
-            include: newsPostListInclude(userId),
-          }),
-      isChair
-        ? Promise.resolve([])
-        : prisma.vote.findMany({
-            where: {
-              ...communityWhere(communityId),
-              AND: [
-                { OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }] },
-                voteAudienceWhere({
-                  role: session!.user!.role,
-                  tenancyType: session!.user!.tenancyType,
-                }),
-              ],
-            },
-            orderBy: { createdAt: "desc" },
-            take: 5,
-            include: {
-              options: { orderBy: { sortOrder: "asc" } },
-              responses: { where: { userId } },
-            },
-          }),
-      prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-          name: true,
-          balanceUah: true,
-          street: true,
-          houseNumber: true,
-        },
-      }),
-      chairStatsPromise,
-      popularNewsPromise,
-      residentStatsPromise,
-    ]);
+  const [news, votes, user, chairStats, residentStats] = await Promise.all([
+    isChair
+      ? Promise.resolve([])
+      : prisma.newsPost.findMany({
+          where: communityWhere(communityId),
+          orderBy: { createdAt: "desc" },
+          take: 4,
+          include: newsPostListInclude(userId),
+        }),
+    isChair
+      ? Promise.resolve([])
+      : prisma.vote.findMany({
+          where: {
+            ...communityWhere(communityId),
+            AND: [
+              { OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }] },
+              voteAudienceWhere({
+                role: session!.user!.role,
+                tenancyType: session!.user!.tenancyType,
+              }),
+            ],
+          },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+          include: {
+            options: { orderBy: { sortOrder: "asc" } },
+            responses: { where: { userId } },
+          },
+        }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        name: true,
+        balanceUah: true,
+        street: true,
+        houseNumber: true,
+      },
+    }),
+    chairStatsPromise,
+    residentStatsPromise,
+  ]);
 
   const billingPeriod = currentBillingPeriod();
   const householdBilling =
@@ -145,7 +140,7 @@ export default async function DashboardPage() {
     <>
       {!isChair && <MarkNotificationsSeen scopes={["news"]} />}
       <PageTitle
-        eyebrow={isChair ? t("eyebrow") : t("eyebrow")}
+        eyebrow={t("eyebrow")}
         title={
           <DashboardGreeting hello={t("greetingHello")} name={displayName} />
         }
@@ -158,20 +153,6 @@ export default async function DashboardPage() {
               })
         }
       />
-
-      {(user?.balanceUah ?? 0) > 0 && !isChair && (
-        <div className="mt-2">
-          <HubActionCard
-            href="/payments"
-            icon={CreditCard}
-            title={t("reminderDues")}
-            description={t("duesText", {
-              amount: formatUah(user!.balanceUah, locale),
-            })}
-            tone="amber"
-          />
-        </div>
-      )}
 
       {isChair && chairStats && (
         <ChairDashboardActions
@@ -188,35 +169,29 @@ export default async function DashboardPage() {
         />
       )}
 
-      {!isChair && showResidentPaymentsCard && (
+      {!isChair && (showResidentPaymentsCard || (user?.balanceUah ?? 0) > 0) && (
         <PaymentsReminderCard
           title={t("paymentsReminderTitle")}
           periodLabel={paymentPeriodLabel}
-          description={
-            paymentPaid
-              ? t("paymentsPaidOnHome")
-              : paymentTotal > 0
-                ? t("paymentsReminderText", {
-                    amount: formatUah(paymentTotal, locale),
-                  })
-                : t("paymentsReminderZero")
-          }
+          description={[
+            showResidentPaymentsCard
+              ? paymentPaid
+                ? t("paymentsPaidOnHome")
+                : paymentTotal > 0
+                  ? t("paymentsReminderText", {
+                      amount: formatUah(paymentTotal, locale),
+                    })
+                  : t("paymentsReminderZero")
+              : null,
+            (user?.balanceUah ?? 0) > 0
+              ? t("duesText", {
+                  amount: formatUah(user!.balanceUah, locale),
+                })
+              : null,
+          ]
+            .filter(Boolean)
+            .join(" ")}
         />
-      )}
-
-      {!isChair && popularNews && (
-        <div className="mt-5">
-          <HubActionCard
-            href="/community/news"
-            icon={Newspaper}
-            title={t("popularNewsTitle")}
-            description={t("popularNewsText", {
-              title: popularNews.title,
-              count: popularNews.likeCount,
-            })}
-            tone="rose"
-          />
-        </div>
       )}
 
       {!isChair && (

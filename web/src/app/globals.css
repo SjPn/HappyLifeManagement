@@ -111,3 +111,9 @@ body {
       linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
   }
 }
+
+/* Hide bottom tabs while a full-screen modal is open (mobile WebView / Capacitor). */
+body.hl-modal-open .hl-bottom-nav {
+  opacity: 0;
+  pointer-events: none;
+}

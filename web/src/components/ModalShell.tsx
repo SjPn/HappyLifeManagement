@@ -2,6 +2,7 @@
 
 import { X } from "lucide-react";
 import { useEffect } from "react";
+import { bindModalOverlay, bottomNavClearanceClass } from "@/lib/modalOverlay";
 
 export function ModalShell({
   title,
@@ -19,17 +20,16 @@ export function ModalShell({
       if (e.key === "Escape") onClose();
     }
     document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const release = bindModalOverlay();
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
+      release();
     };
   }, [onClose]);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center"
+      className="fixed inset-0 z-[60] flex items-end justify-center p-4 pb-0 sm:items-center sm:pb-4"
       role="presentation"
     >
       <button
@@ -61,7 +61,11 @@ export function ModalShell({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="overflow-y-auto px-4 py-4">{children}</div>
+        <div
+          className={`overflow-y-auto px-4 py-4 ${bottomNavClearanceClass} sm:pb-4`}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

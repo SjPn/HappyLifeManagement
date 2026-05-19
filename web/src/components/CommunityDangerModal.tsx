@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
 import { useTranslations } from "next-intl";
+import { bindModalOverlay } from "@/lib/modalOverlay";
 
 export type CommunityDangerAction =
   | "block"
@@ -65,11 +66,10 @@ export function CommunityDangerModal({
       if (e.key === "Escape" && !loading) onClose();
     }
     document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const release = bindModalOverlay();
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
+      release();
     };
   }, [onClose, loading]);
 
@@ -105,7 +105,7 @@ export function CommunityDangerModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center"
+      className="fixed inset-0 z-[60] flex items-end justify-center p-4 pb-0 sm:items-center sm:pb-4"
       role="presentation"
     >
       <button

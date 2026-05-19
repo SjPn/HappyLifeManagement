@@ -20,6 +20,7 @@ import { TicketCommentForm } from "@/components/TicketCommentForm";
 import { TicketTimeline } from "@/components/TicketTimeline";
 import { TicketRatingForm } from "@/components/TicketRatingForm";
 import { useTranslations } from "next-intl";
+import { bindModalOverlay, bottomNavClearanceClass } from "@/lib/modalOverlay";
 
 export type TicketCommentRow = {
   id: string;
@@ -103,17 +104,16 @@ function TicketDetailModal({
       if (e.key === "Escape") onClose();
     }
     document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const release = bindModalOverlay();
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
+      release();
     };
   }, [onClose]);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center"
+      className="fixed inset-0 z-[60] flex items-end justify-center p-4 pb-0 sm:items-center sm:pb-4"
       role="presentation"
     >
       <button
@@ -151,7 +151,9 @@ function TicketDetailModal({
           </button>
         </div>
 
-        <div className="overflow-y-auto px-4 py-4">
+        <div
+          className={`overflow-y-auto px-4 py-4 ${bottomNavClearanceClass} sm:pb-4`}
+        >
           <span
             className={`inline-block rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(ticket.status)}`}
           >

@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect } from "react";
+import { bindModalOverlay, bottomNavClearanceClass } from "@/lib/modalOverlay";
 import { CheckCircle2 } from "lucide-react";
 import { primaryButtonClass } from "@/lib/formStyles";
 
@@ -20,18 +21,22 @@ export function PublishSuccessModal({
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    const release = bindModalOverlay();
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      release();
+    };
   }, [onClose]);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 p-4 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/45 p-4 pb-0 backdrop-blur-sm sm:items-center sm:pb-4"
       role="dialog"
       aria-modal="true"
       onClick={onClose}
     >
       <div
-        className="hl-glass w-full max-w-sm rounded-2xl p-6 shadow-2xl sm:rounded-3xl"
+        className={`hl-glass w-full max-w-sm rounded-2xl p-6 shadow-2xl sm:rounded-3xl ${bottomNavClearanceClass} sm:pb-6`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col items-center text-center">

@@ -59,7 +59,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen flex-col pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))]">
-      <main className="relative z-0 mx-auto w-full min-w-0 max-w-lg flex-1 px-4 pb-2 pt-5 sm:px-5">
+      <main className="relative mx-auto w-full min-w-0 max-w-lg flex-1 px-4 pb-2 pt-5 sm:px-5">
         {communityName ? (
           <p className="mb-3 truncate text-center text-xs font-semibold uppercase tracking-wide text-blue-700/90 dark:text-blue-300/90">
             {communityName}
@@ -68,7 +68,7 @@ export function AppShell({
         {children}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-blue-900/10 bg-[color-mix(in_oklab,var(--hl-bg-elevated)_88%,transparent)] px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_32px_-12px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-blue-400/10 dark:shadow-[0_-12px_40px_-16px_rgba(0,0,0,0.55)]">
+      <nav className="hl-bottom-nav fixed bottom-0 left-0 right-0 z-40 border-t border-blue-900/10 bg-[color-mix(in_oklab,var(--hl-bg-elevated)_88%,transparent)] px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_32px_-12px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-blue-400/10 dark:shadow-[0_-12px_40px_-16px_rgba(0,0,0,0.55)]">
         <div className="mx-auto flex max-w-lg items-end justify-between gap-1">
           {visibleTabs.map((tab) => {
             const active =

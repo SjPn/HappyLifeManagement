@@ -10,6 +10,7 @@ import { formatAddressLine } from "@/lib/household";
 import { Role, UserStatus } from "@/lib/enums";
 import type { AddressOption } from "@/lib/communityAddresses";
 import { useTranslations } from "next-intl";
+import { bindModalOverlay, bottomNavClearanceClass } from "@/lib/modalOverlay";
 
 export type ChairUserRow = {
   id: string;
@@ -48,17 +49,16 @@ function UserDetailModal({
       if (e.key === "Escape") onClose();
     }
     document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const release = bindModalOverlay();
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
+      release();
     };
   }, [onClose]);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center"
+      className="fixed inset-0 z-[60] flex items-end justify-center p-4 pb-0 sm:items-center sm:pb-4"
       role="presentation"
     >
       <button
@@ -91,7 +91,9 @@ function UserDetailModal({
           </button>
         </div>
 
-        <div className="overflow-y-auto px-4 py-4">
+        <div
+          className={`overflow-y-auto px-4 py-4 ${bottomNavClearanceClass} sm:pb-4`}
+        >
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
               <p className="text-sm text-zinc-600 dark:text-zinc-400">

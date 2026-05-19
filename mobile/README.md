@@ -2,22 +2,22 @@
 
 Оболочка открывает продакшен-сайт в WebView (`https://hlm-nu.vercel.app` по умолчанию).
 
-## Иконка и брендинг (TODO)
+## Иконка приложения
 
-Сейчас в APK стоят **стандартные иконки Capacitor** (зелёный «C»). Перед пилотом для жителей нужно:
+**Мастер:** `mobile/icon/icon-1024.png` (синий градиент, дом — бренд Happy Life).
 
-1. **Придумать иконку** Happy Life (узнаваемый символ, читается в 48×48 dp).
-2. Подготовить **мастер** 1024×1024 PNG (без прозрачности для adaptive foreground — или отдельно foreground + фон).
-3. Заменить ресурсы в Android-проекте:
-   - `android/app/src/main/res/mipmap-*/ic_launcher.png`
-   - `android/app/src/main/res/mipmap-*/ic_launcher_round.png`
-   - `android/app/src/main/res/mipmap-*/ic_launcher_foreground.png` (adaptive)
-   - `android/app/src/main/res/drawable/ic_launcher_background.xml` или цвет в `values/ic_launcher_background.xml`
-   - splash: `android/app/src/main/res/drawable*/splash.png` (опционально)
-4. Удобно: Android Studio → **File → New → Image Asset** (тип *Launcher Icons*), выбрать PNG/SVG, сгенерировать все плотности.
-5. Поднять версию в `android/app/build.gradle` (`versionCode`, `versionName`), затем пересобрать APK и опубликовать (см. ниже).
+Пересобрать все `mipmap-*` после замены мастера:
 
-После смены иконки **обязательно** новый APK в `web/public/downloads/happylife.apk` (или R2) и деплой — иначе на сайте останется старый файл.
+```bash
+cd mobile
+npm run icons
+```
+
+Фон adaptive icon: `#2563EB` (`values/ic_launcher_background.xml`).
+
+Дальше: **Build APK** (ниже) → скопировать в `web/public/downloads/happylife.apk` или R2.
+
+Опционально: splash в `res/drawable*/splash.png`, своя иконка через Android Studio → **Image Asset**.
 
 ## Сборка APK
 

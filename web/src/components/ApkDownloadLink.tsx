@@ -3,18 +3,9 @@
 import { Download } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
+import { isCapacitorNative } from "@/lib/capacitorNative";
 
 const APK_DOWNLOAD = "/api/download/apk";
-
-function isCapacitorNative(): boolean {
-  if (typeof window === "undefined") return false;
-  const cap = (
-    window as unknown as {
-      Capacitor?: { isNativePlatform?: () => boolean };
-    }
-  ).Capacitor;
-  return cap?.isNativePlatform?.() ?? false;
-}
 
 export function ApkDownloadLink() {
   const t = useTranslations("profile");

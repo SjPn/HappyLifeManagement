@@ -7,6 +7,10 @@ import { revalidateAllLocales } from "@/lib/revalidateI18n";
 import { savePublicUpload } from "@/lib/upload";
 import { mapUploadError } from "@/lib/uploadErrors";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
+import {
+  notifyChairsNewTicket,
+  notifyResidentTicketStatus,
+} from "@/lib/push/notify";
 
 const allowedCategories = new Set<string>(Object.values(TicketCategory));
 
@@ -52,6 +56,22 @@ export async function createTicket(formData: FormData) {
     },
   });
 
+  const [author, community] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true },
+    }),
+    prisma.community.findUnique({
+      where: { id: communityId },
+      select: { defaultLocale: true },
+    }),
+  ]);
+  void notifyChairsNewTicket({
+    communityId,
+    authorName: author?.name ?? "мешканець",
+    locale: community?.defaultLocale ?? "uk",
+  }).catch((e) => console.error("[push] new ticket", e));
+
   revalidateAllLocales("/requests");
   revalidateAllLocales("/dashboard");
   return { ok: true as const };
@@ -79,6 +99,16 @@ export async function updateTicketStatus(ticketId: string, status: string) {
     where: { id: ticketId },
     data: { status, statusChangedAt: now, updatedAt: now },
   });
+
+  const community = await prisma.community.findUnique({
+    where: { id: communityId },
+    select: { defaultLocale: true },
+  });
+  void notifyResidentTicketStatus({
+    userId: ticket.userId,
+    status,
+    locale: community?.defaultLocale ?? "uk",
+  }).catch((e) => console.error("[push] ticket status", e));
 
   revalidateAllLocales("/requests");
   revalidateAllLocales("/dashboard");

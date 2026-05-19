@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { NotificationProvider } from "@/components/NotificationProvider";
+import { PushNotificationsProvider } from "@/components/PushNotificationsProvider";
 import { Role } from "@/lib/enums";
 import { getCommunityForSession } from "@/lib/tenant";
 
@@ -39,7 +40,9 @@ export default async function AppGroupLayout({
 
   return (
     <NotificationProvider>
-      <AppShell communityName={community.name}>{children}</AppShell>
+      <PushNotificationsProvider>
+        <AppShell communityName={community.name}>{children}</AppShell>
+      </PushNotificationsProvider>
     </NotificationProvider>
   );
 }

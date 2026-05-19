@@ -469,7 +469,15 @@
     "hubSectionAccount": "Account",
     "memorandumDesc": "Community rules",
     "tariffsDesc": "Tariffs",
-    "chairPanelDesc": "Management tools"
+    "chairPanelDesc": "Management tools",
+    "push": {
+      "title": "In-app notifications",
+      "hint": "Works in the installed APK. Allow notifications on first launch.",
+      "newTickets": "New requests (chair)",
+      "ticketStatus": "My request status updates",
+      "news": "News from the chair",
+      "debt": "Debt reminders"
+    }
   },
   "messages": {
     "title": "Messages",

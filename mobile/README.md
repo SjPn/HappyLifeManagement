@@ -60,3 +60,21 @@ CAPACITOR_SERVER_URL=http://10.0.2.2:3000 npm run sync
 ```
 
 (эмулятор Android → хост `10.0.2.2`)
+
+## Push-уведомления (FCM)
+
+1. [Firebase Console](https://console.firebase.google.com/) → проект → **Add app** → Android, package `ua.happylife.app`.
+2. Скачайте `google-services.json` → положите в `mobile/android/app/google-services.json` (не коммитьте секреты в публичный репо при необходимости).
+3. **Project settings → Service accounts** → Generate new private key → содержимое JSON одной строкой в Vercel: `FIREBASE_SERVICE_ACCOUNT_JSON`.
+4. На Vercel также: `NEXT_PUBLIC_APP_URL=https://hlm-nu.vercel.app`.
+5. После добавления плагина:
+
+```bash
+cd mobile
+npm install
+npx cap sync android
+```
+
+Пересоберите APK и опубликуйте. В приложении: **Ще →** разрешить уведомления; настройки типов — в блоке «Сповіщення в додатку».
+
+**События:** новая заявка → голова; смена статуса → автор; новость → жители с opt-in «Новини».

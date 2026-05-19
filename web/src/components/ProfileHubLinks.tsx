@@ -5,12 +5,22 @@ import { useTranslations } from "next-intl";
 import { FileText, ScrollText, User } from "lucide-react";
 import { SignOutButton } from "@/components/AppShell";
 import { ApkDownloadLink } from "@/components/ApkDownloadLink";
+import { PushNotificationsSettings } from "@/components/PushNotificationsSettings";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export function ProfileHubLinks({
   showChairLinks,
+  role,
+  pushPrefs,
 }: {
   showChairLinks: boolean;
+  role: string;
+  pushPrefs: {
+    pushNotifyNewTickets: boolean;
+    pushNotifyTicketStatus: boolean;
+    pushNotifyNews: boolean;
+    pushNotifyDebt: boolean;
+  };
 }) {
   const t = useTranslations("profile");
 
@@ -43,9 +53,12 @@ export function ProfileHubLinks({
       </HubSection>
 
       <HubSection title={t("hubSectionApp")}>
-        <div className="hl-glass flex flex-col items-center gap-4 rounded-2xl p-4">
-          <LanguageSwitcher />
-          <ApkDownloadLink />
+        <div className="flex flex-col gap-3">
+          <PushNotificationsSettings role={role} prefs={pushPrefs} />
+          <div className="hl-glass flex flex-col items-center gap-4 rounded-2xl p-4">
+            <LanguageSwitcher />
+            <ApkDownloadLink />
+          </div>
         </div>
       </HubSection>
 

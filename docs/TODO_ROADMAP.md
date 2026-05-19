@@ -89,7 +89,7 @@
 5. (Опционально позже) Web Push для браузера — ниже приоритет.
 
 - [ ] **5a** Telegram-бот (см. детали в «Фаза 5» ниже).
-- [ ] **5b** Push FCM в Capacitor + единый `notifyUser`.
+- [~] **5b** Push FCM в Capacitor + `notifyUser` (код есть; нужны Firebase + `google-services.json` + пересборка APK).
 
 ## Фаза 4: качество и запуск
 
@@ -131,7 +131,7 @@
 
 **Рекомендация для пилота:** сначала Telegram (быстрее, как у конкурентов). Push в APK — **фаза 5b**, если поселок настаивает «только из иконки приложения»: Capacitor + FCM + хранение `devicePushToken` рядом с `telegramChatId` (можно оба канала).
 
-- [ ] Push (FCM): плагин Capacitor, регистрация токена, те же события, что в таблице Telegram.
+- [~] Push (FCM): плагин Capacitor, регистрация токена, события заявок/новостей (нужен Firebase на Vercel + APK).
 - [ ] Web Push для PWA/браузера (опционально, ниже приоритет чем FCM в APK).
 
 ---

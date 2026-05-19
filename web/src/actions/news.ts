@@ -6,6 +6,7 @@ import { revalidateAllLocales } from "@/lib/revalidateI18n";
 import { requireCommunityId } from "@/lib/tenant";
 import { savePublicUpload } from "@/lib/upload";
 import { mapUploadError } from "@/lib/uploadErrors";
+import { notifyResidentsNews } from "@/lib/push/notify";
 
 export async function createNewsPost(formData: FormData) {
   const session = await auth();
@@ -39,6 +40,17 @@ export async function createNewsPost(formData: FormData) {
       authorId: session.user.id,
     },
   });
+
+  const community = await prisma.community.findUnique({
+    where: { id: communityId },
+    select: { defaultLocale: true },
+  });
+  void notifyResidentsNews({
+    communityId,
+    title,
+    authorId: session.user.id,
+    locale: community?.defaultLocale ?? "uk",
+  }).catch((e) => console.error("[push] news", e));
 
   revalidateAllLocales("/dashboard");
   revalidateAllLocales("/chair");

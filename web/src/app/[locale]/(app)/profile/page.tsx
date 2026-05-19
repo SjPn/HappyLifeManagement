@@ -64,7 +64,16 @@ export default async function ProfilePage() {
         />
       )}
 
-      <ProfileHubLinks showChairLinks={isChair} />
+      <ProfileHubLinks
+        showChairLinks={isChair}
+        role={session!.user!.role}
+        pushPrefs={{
+          pushNotifyNewTickets: user?.pushNotifyNewTickets ?? true,
+          pushNotifyTicketStatus: user?.pushNotifyTicketStatus ?? true,
+          pushNotifyNews: user?.pushNotifyNews ?? false,
+          pushNotifyDebt: user?.pushNotifyDebt ?? true,
+        }}
+      />
     </>
   );
 }

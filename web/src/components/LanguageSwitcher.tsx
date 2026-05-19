@@ -4,10 +4,10 @@ import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
-const labels: Record<string, Record<string, string>> = {
-  uk: { uk: "УК", ru: "Київ", en: "EN" },
-  ru: { uk: "УК", ru: "Киев", en: "EN" },
-  en: { uk: "UK", ru: "Kyiv", en: "EN" },
+const localeLabels: Record<string, string> = {
+  uk: "UA",
+  ru: "RU",
+  en: "EN",
 };
 
 export function LanguageSwitcher({ compact }: { compact?: boolean }) {
@@ -24,7 +24,7 @@ export function LanguageSwitcher({ compact }: { compact?: boolean }) {
     >
       {routing.locales.map((loc) => {
         const active = locale === loc;
-        const short = labels[locale]?.[loc] ?? loc.toUpperCase();
+        const short = localeLabels[loc] ?? loc.toUpperCase();
         return (
           <button
             key={loc}

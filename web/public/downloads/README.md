@@ -1,6 +1,8 @@
 # APK downloads
 
-1. Build APK from `mobile/` (see `mobile/README.md`).
+Після зміни **іконки** або `versionCode` у `mobile/android` — знову скопіювати APK сюди й задеплоїти (або `npm run upload:apk` → R2).
+
+1. Build APK from `mobile/` (see `mobile/README.md` — розділ «Іконка и брендинг»).
 2. Copy to `happylife.apk` in this folder **or** upload to R2:
 
 ```bash

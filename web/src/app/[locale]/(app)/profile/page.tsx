@@ -4,8 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { PageTitle, Card, FormSection } from "@/components/Ui";
 import { ProfileIdentityCard } from "@/components/ProfileIdentityCard";
 import { ProfileHubLinks } from "@/components/ProfileHubLinks";
-import { ProfileEditForm } from "@/components/ProfileEditForm";
-import { ProfileCredentialsForm } from "@/components/ProfileCredentialsForm";
+import { ProfileSettingsSection } from "@/components/ProfileSettingsSection";
 import { ChairInviteCodeForm } from "@/components/ChairInviteCodeForm";
 import { getTranslations } from "next-intl/server";
 import { Role } from "@/lib/enums";
@@ -16,7 +15,6 @@ export default async function ProfilePage() {
   const session = await auth();
   const communityId = requireCommunityId(session!.user!);
   const t = await getTranslations("profile");
-  const tCred = await getTranslations("credentials");
   const tr = await getTranslations("categories.roles");
   const tt = await getTranslations("categories.tenancy");
 
@@ -56,25 +54,14 @@ export default async function ProfilePage() {
       )}
 
       {user && (
-        <FormSection title={tCred("accountTitle")}>
-          <Card>
-            <ProfileCredentialsForm currentEmail={user.email} />
-          </Card>
-        </FormSection>
-      )}
-
-      {user && (
-        <FormSection title={t("editProfile")}>
-          <Card>
-          <ProfileEditForm
-            name={user.name}
-            communityAddressId={user.communityAddressId}
-            phone={user.phone ?? null}
-            tenancyType={user.tenancyType ?? "OWNER"}
-            addresses={addresses}
-          />
-          </Card>
-        </FormSection>
+        <ProfileSettingsSection
+          email={user.email}
+          name={user.name}
+          communityAddressId={user.communityAddressId}
+          phone={user.phone ?? null}
+          tenancyType={user.tenancyType ?? "OWNER"}
+          addresses={addresses}
+        />
       )}
 
       <ProfileHubLinks showChairLinks={isChair} />

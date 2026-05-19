@@ -6,9 +6,9 @@
 
 > **Назначение:** срез состояния, который актуализируется в конце каждой сессии. Если что-то ниже устарело — сначала обнови этот блок и `TODO_ROADMAP.md`, потом продолжай.
 
-**Последняя дата апдейта:** 2026-05-19 · Ветка: `main` @ `14ee329` · Репозиторий: `SjPn/HappyLifeManagement` · Прод: Vercel `hlm-nu.vercel.app` + Neon.
+**Последняя дата апдейта:** 2026-05-19 · Ветка: `main` @ `094db19` · Репозиторий: `SjPn/HappyLifeManagement` · Прод: Vercel `hlm-nu.vercel.app` + Neon.
 
-**Последние коммиты (`git log -5`):** `14ee329` · `aad4557` · `f471bb0` · `93826bd` · `c1a6757`.
+**Последние коммиты (`git log -5`):** `094db19` · `6cc4da9` · `ef01aaf` · `c84b032` · `4932629`.
 
 ### Архитектура (актуально)
 
@@ -44,7 +44,7 @@
 - Загрузки в `public/uploads/` — эфемерны на Vercel → нужен S3.
 - Нет push / SMS / онлайн-оплаты.
 - `middleware.ts` deprecated → позже `proxy.ts` + проверка `next-intl`.
-- Capacitor skeleton в `mobile/` — APK-ссылка в профиле, не store-ready.
+- Capacitor в `mobile/android`: debug APK на проде (`web/public/downloads/happylife.apk`, `/api/download/apk`). **Иконка — заглушка Capacitor**, нужен бренд + пересборка (см. `mobile/README.md`). Release/store — позже.
 - Тесты: Vitest (`src/lib/*.test.ts`), Playwright e2e (`e2e/`) — базовое покрытие, не полный регресс.
 
 ### Паттерны UI

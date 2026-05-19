@@ -80,7 +80,7 @@ export function HubActionCard({
   tone,
   onClick,
 }: {
-  href: string;
+  href?: string;
   icon: LucideIcon;
   title: string;
   description?: string;
@@ -125,6 +125,10 @@ export function HubActionCard({
         {inner}
       </button>
     );
+  }
+
+  if (!href) {
+    return <div className="group block">{inner}</div>;
   }
 
   return (

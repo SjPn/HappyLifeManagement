@@ -15,6 +15,7 @@ export function ProfileEditForm(props: {
   phone: string | null;
   tenancyType: string;
   addresses: AddressOption[];
+  onSaved?: () => void;
 }) {
   const router = useRouter();
   const t = useTranslations("profileEdit");
@@ -34,6 +35,7 @@ export function ProfileEditForm(props: {
       setError(te(res.error));
       return;
     }
+    props.onSaved?.();
     router.refresh();
   }
 

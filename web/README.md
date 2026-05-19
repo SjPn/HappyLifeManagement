@@ -93,10 +93,15 @@ npm start
 
 **Публічно:** `/info/memorandum`, `/info/tariffs`. Старий `/meters` → `/payments`.
 
+## Android APK і push
+
+- APK для завантаження: `public/downloads/happylife.apk` → `/api/download/apk`.
+- Збірка: `mobile/README.md`.
+- **Push (FCM):** код у `lib/push/`, `DevicePushToken`; у APK **вимкнено** (`NEXT_PUBLIC_ENABLE_NATIVE_PUSH` ≠ `true`) до `google-services.json` — інакше виліт після дозволу сповіщень.
+
 ## Документація репозиторію
 
-- `docs/PROJECT_OVERVIEW.md` — продукт  
+- `docs/TESTER_GUIDE.md` — гайд для тестувальників (RU)  
 - `docs/DEVELOPMENT_CONTEXT.md` — **старт наступної сесії (ІІ)**  
+- `docs/PROJECT_OVERVIEW.md` — продукт  
 - `docs/TODO_ROADMAP.md` — дорожня карта  
-
-Транскрипти чатів: `agent-transcripts/` у workspace Cursor.

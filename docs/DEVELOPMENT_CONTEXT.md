@@ -1,108 +1,106 @@
 # Happy Life — внутренний контекст (для преемственности в разработке и ИИ)
 
-Этот файл — **не пользовательская документация**, а рабочая память: решения, риски, расхождения с исходным DOC. Обновлять по мере изменений.
+Этот файл — **не пользовательская документация**, а рабочая память: решения, риски, расхождения с исходным DOC. **Обновлять в конце каждой сессии.**
 
 ## Старт следующей сессии (читать первым)
 
-> **Назначение:** срез состояния, который актуализируется в конце каждой сессии. Если что-то ниже устарело — сначала обнови этот блок и `TODO_ROADMAP.md`, потом продолжай.
+**Последняя дата апдейта:** 2026-05-19 · Ветка: `main` @ `0b3cef5` · Репо: [SjPn/HappyLifeManagement](https://github.com/SjPn/HappyLifeManagement) · Прод: [hlm-nu.vercel.app](https://hlm-nu.vercel.app) (Vercel + Neon).
 
-**Последняя дата апдейта:** 2026-05-19 · Ветка: `main` @ `094db19` · Репозиторий: `SjPn/HappyLifeManagement` · Прод: Vercel `hlm-nu.vercel.app` + Neon.
-
-**Последние коммиты (`git log -5`):** `094db19` · `6cc4da9` · `ef01aaf` · `c84b032` · `4932629`.
+**Последние коммиты (`git log -5`):** `0b3cef5` · `3460380` · `bebf269` · `e345407` · `1f4ac97`.
 
 ### Архитектура (актуально)
 
-- **Multi-tenant SaaS:** модель `Community`, у сущностей `communityId`. Один деплой — много поселков/ОСББ.
-- **Роли:** `RESIDENT`, `MODERATOR`, `CHAIR`, `PLATFORM_ADMIN` (`communityId: null` у суперадмина).
-- **Онбординг поселка:** `/register-community` → поселок + председатель в статусе ожидания (`Community.approvedAt = null`, chair `PENDING`) → суперадмин **«Схвалити»** в `/platform/communities`.
-- **Регистрация жителя:** только с **кодом приглашения** поселка (обязательное поле, без «необязательно»). Код генерируется при создании поселка; **председатель меняет** в профиле (`ChairInviteCodeForm`). Регистрация не работает для неодобренных/заблокированных поселков.
-- **Суперадмин** (`/platform/communities`): CRUD поселков, одобрение, блокировка/удаление (подтверждение **кодом приглашения** поселка); управление **председателями** (приостановить / восстановить / удалить — тоже с кодом).
-- **Prod-откат:** тег `stable/pre-multitenant-2026-05-18` → `6f73ef6` (до multi-tenant). Не откатывать БД без явного запроса.
-- **Пилот на проде:** поселок «Щасливе Життя», `inviteCode` из env (`HAPPY2026`), миграция данных `scripts/migrate_shchaslyve_zhyttya.ts`. Суперадмин: `scripts/ensure_platform_admin.ts`.
+- **Multi-tenant SaaS:** `Community`, `communityId`. Один деплой — много КГ.
+- **Роли:** `RESIDENT`, `MODERATOR`, `CHAIR`, `PLATFORM_ADMIN`.
+- **Онбординг КГ:** `/register-community` → апрув суперадмином (`Community.approvedAt`).
+- **Регистрация жителя:** только с **кодом приглашения**; код меняет глава в **Ещё**.
+- **Суперадмин:** `/platform/communities` — CRUD КГ, блокировка, председатели (подтверждение кодом поселка).
 
 ### Что работает (функционально)
 
-| Область | Маршруты / заметки |
-|--------|---------------------|
-| Локали | `/uk` (default), `/ru`, `/en`; `next-intl`, `revalidateAllLocales` |
-| Auth | Auth.js v5, JWT + refresh `communityId`/status из БД |
-| Житель | dashboard, заявки (list+modal+archive), голосования, платежи, сообщество, ЛС `/messages` |
-| Голова | `/chair/*`, биллинг `/payments`, адреса, пользователи (list+modal), модерация |
-| Модератор | упрощённый UX, конфиденциальные обращения, без ЛС |
-| Платформа | `/platform/communities` |
-| Платежи | `HouseholdBilling` по месяцу+дому; не уровень ДАХ/квитанций |
-| Чат | **Личные сообщения** 1-на-1 (не групповой Threads) |
+| Область | Заметки |
+|--------|---------|
+| Локали | `/uk`, `/ru`, `/en`; переключатель **UA / RU / EN** |
+| Главная | `DashboardGlance` («Сейчас важно»), баннер долга, новости |
+| Заявки | CRUD, модалка, таймлайн, оценка 1–5 после «Решено», push-хуки на сервере |
+| Платежи | `HouseholdBilling` по месяцу/дому, реквизиты КГ, копирование с прошлого месяца |
+| Сообщество | новости, доска, форум, документы, жители, ЛС 1-на-1 |
+| Профиль | модалки «логин/пароль» и «редактировать»; APK в **Ещё** |
+| Android | Capacitor WebView → прод; APK `web/public/downloads/happylife.apk` |
+| Аналитика | Vercel Speed Insights в `layout.tsx` |
+
+### Push (FCM) — важно
+
+- **Код готов:** `DevicePushToken`, `/api/push/register`, `lib/push/notify.ts`, события в `tickets.ts` / `news.ts`.
+- **В APK сейчас выключено:** `NEXT_PUBLIC_ENABLE_NATIVE_PUSH` не `true` → без запроса разрешений (иначе **вылет** без `google-services.json`).
+- **Включение:** Firebase → `google-services.json` в `mobile/android/app/` + `FIREBASE_SERVICE_ACCOUNT_JSON` на Vercel + `NEXT_PUBLIC_ENABLE_NATIVE_PUSH=true` + пересборка APK.
+- **Telegram-бот:** не реализован; в roadmap (`docs/TODO_ROADMAP.md`).
+
+### Android / APK
+
+- Иконка: `mobile/icon/icon-1024.png`, `npm run icons` в `mobile/`.
+- Опубликованный APK: `3460380` (бренд-иконка, ~5 МБ).
+- `capacitor.config.ts` → `https://hlm-nu.vercel.app` (исправления UI подтягиваются **без** пересборки APK).
 
 ### Схема и деплой
 
-- **Prisma:** `web/prisma/schema.prisma`; миграции в `prisma/migrations/` (в т.ч. `20260519120000_community_approval` — поле `approvedAt`).
-- **Vercel build:** `npm run vercel-build` = `prisma migrate deploy` + `next build` (`web/vercel.json`).
-- **Сборка локально:** `cd web && npm run build` — должна проходить (warning: `middleware` → `proxy` в Next 16).
+- Prisma + миграции, в т.ч. `20260525120000_push_notifications`.
+- Vercel: `vercel-build` = migrate + `next build`.
+- Фото: R2 (env в `.env.example`); `public/uploads` эфемерен на Vercel.
 
 ### Известные не-блокеры
 
-- Загрузки в `public/uploads/` — эфемерны на Vercel → нужен S3.
-- Нет push / SMS / онлайн-оплаты.
-- `middleware.ts` deprecated → позже `proxy.ts` + проверка `next-intl`.
-- Capacitor в `mobile/android`: debug APK на проде (`web/public/downloads/happylife.apk`, `/api/download/apk`). **Иконка — заглушка Capacitor**, нужен бренд + пересборка (см. `mobile/README.md`). Release/store — позже.
-- Тесты: Vitest (`src/lib/*.test.ts`), Playwright e2e (`e2e/`) — базовое покрытие, не полный регресс.
+- Нет онлайн-оплаты, SMS, Telegram-бота.
+- `middleware.ts` → позже `proxy.ts` (Next 16 warning).
+- Release APK (keystore) — в бэклоге.
+- `docs/PROJECT_EVALUATION.md` — обновлять дату/коммит после крупных релизов.
 
 ### Паттерны UI
 
-- Список → **модалка** (заявки, жители у головы).
-- Архив завершённого (`/requests/archive`).
-- Опасные действия суперадмина → **модалка + код приглашения** (`CommunityDangerModal`).
+- Список → модалка; при модалке `body.hl-modal-open` скрывает нижний таб-бар (`modalOverlay.ts`).
+- Опасные действия суперадмина → модалка + код приглашения.
 
 ### Быстрые команды (PowerShell)
 
 ```powershell
 cd e:\MyPyPro\HappyLife\web
 npm run build
+cd ..\mobile
+npm run icons
 git -C .. log --oneline -5
-git -C .. status
 ```
 
 ### Источники истины
 
-- Видение — `docs/PROJECT_OVERVIEW.md`
-- **Оценка vs ДАХ** — `docs/PROJECT_EVALUATION.md`
-- Дорожная карта — `docs/TODO_ROADMAP.md`
-- Запуск — `web/README.md`
+| Документ | Назначение |
+|----------|------------|
+| `docs/TESTER_GUIDE.md` | Гайд для внешних тестировщиков (RU) |
+| `docs/PROJECT_OVERVIEW.md` | Видение продукта |
+| `docs/PROJECT_EVALUATION.md` | Сравнение с рынком / ДАХ |
+| `docs/TODO_ROADMAP.md` | Бэклог |
+| `mobile/README.md` | APK, Firebase, иконка |
+| `web/README.md` | Локальный запуск |
 
 ---
 
 ## Источник видения
 
-Файл `e:\MVP_happyLife.docx`. Ключевые модули: Dashboard, счётчики, заявки, голосования, конфиденциальные обращения, доска, чат; роли: житель, модератор, председатель; flow: регистрация → подтверждение → главная.
+`e:\MVP_happyLife.docx` — Dashboard, заявки, голосования, доска, форум; роли житель / модератор / председатель.
 
-## Зафиксированные противоречия / уточнения
+## Зафиксированные уточнения
 
-1. **Нижнее меню:** 4 таба (Главная | Сообщество | Заявки | Ещё); голосования и платежи — с главной.
-2. **Чат MVP:** форум + **личные сообщения**, не клон Threads и не замена Telegram-группы посёлка.
-3. **Счётчики/начисления:** ручной ввод головой; без интеграции с УК/ДАХ.
-4. **Конфиденциальные обращения:** автора видит только модератор.
-5. **Модератор:** служебная роль, без публикаций и голосований.
-6. **Верификация жителя:** код приглашения + выбор адреса из справочника + апрув головой (`PENDING` → `APPROVED`).
-7. **Верификация поселка:** апрув суперадмина (`approvedAt`) до открытия регистрации жителей.
+1. Нижнее меню: **Главная | Заявки | Сообщество | Ещё**.
+2. Чат MVP: форум + ЛС, не замена Telegram-чата КГ.
+3. Конфиденциальные обращения: автора видит только модератор.
+4. Верификация: invite + адрес из справочника + апрув главы.
 
 ## Технические риски
 
-- Подделка адреса без списка от головы — частично снято `CommunityAddress`.
-- Геометки на заявках — PII.
-- Смена invite-кода головой — старый код сразу недействителен (ожидаемо).
-- Удаление единственного председателя — поселок без главы (суперадмин может назначить нового только через новую регистрацию / ручное вмешательство в БД).
+- Push без Firebase → краш нативного слоя (обход: флаг `NEXT_PUBLIC_ENABLE_NATIVE_PUSH`).
+- Смена invite-кода → старый сразу недействителен.
+- JWT: `AUTH_URL` = фактический origin.
 
-## Реализованный MVP (код) — справочник
+## Деплой
 
-- Каталог: `web/` — Next.js 16 + Prisma 5 + Postgres + Auth.js + next-intl.
-- Мульти-тенант: `web/src/lib/tenant.ts`, `Community`, scope в экшенах.
-- Платформа: `web/src/actions/platform.ts`, `PlatformCommunitiesPanel`.
-- Регистрация: `RegisterForm`, `RegisterCommunityForm`, `api/register`, `api/addresses`.
-- i18n: `web/messages/{uk,ru,en}.json`.
-- Биллинг: `HouseholdBilling`, `web/src/lib/billing.ts`, `/payments`.
-
-### Деплой
-
-- Postgres (Neon); на Vercel — `prisma migrate deploy` в build.
-- `AUTH_URL` / `NEXTAUTH_URL` = фактический origin (иначе redirect loop / ClientFetchError).
-- JWT callback обновляет `communityId` из БД (фикс redirect loop для старых сессий).
+- `AUTH_URL` / `NEXTAUTH_URL` = origin (иначе Auth.js ClientFetchError).
+- Git push с Windows: `git -c http.sslBackend=schannel push` при ошибках SSL.

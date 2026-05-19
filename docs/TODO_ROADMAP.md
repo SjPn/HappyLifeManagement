@@ -16,7 +16,8 @@
 - [ ] Мобильный **first** wireframe: главная, заявки, голосования, сообщество (доска + чат).
 - [x] Мобильный UX: модалки не перекрываются нижним меню (`hl-modal-open`, `z-[60]`, отступ под таб-бар).
 - [ ] Редакционный гайд: **типографика, пустые состояния**, язык уведомлений.
-- [x] **Иконка Android-приложения:** мастер `mobile/icon/icon-1024.png`, `npm run icons` → `mipmap-*` (см. `mobile/README.md`). Осталось: пересобрать APK и выложить на сайт.
+- [x] **Иконка Android-приложения:** `mobile/icon/icon-1024.png`, `npm run icons` → `mipmap-*`.
+- [x] **APK на сайте:** `web/public/downloads/happylife.apk` (бренд-иконка, `3460380`).
 
 ## Фаза 2: архитектура (без кода в первой итерации — только решения)
 
@@ -69,7 +70,7 @@
 - [ ] Вынести загрузки из `public/uploads` в S3-совместимое хранилище (на Vercel `public/uploads/` эфемерный).
 - [ ] Next.js 16: переименовать `web/src/middleware.ts` → `web/src/proxy.ts` (deprecation warning в `next build`), проверить совместимость с `next-intl`.
 - [x] Capacitor Android: проект в `mobile/android`, debug APK на проде (`/api/download/apk`).
-- [ ] Кастомная **иконка и splash** приложения + release-сборка (подпись keystore) перед массовой раздачей жителям.
+- [ ] **Splash** при запуске APK + **release**-сборка (keystore) перед массовой раздачей.
 
 ### Уведомления (запланировано: две итерации подряд)
 
@@ -84,12 +85,12 @@
 
 1. Firebase + `@capacitor/push-notifications`, `google-services.json`.
 2. Prisma: `DevicePushToken` (userId, token, platform, updatedAt).
-3. API регистрации токена из WebView; запрос разрешения при первом входе в APK.
+3. API регистрации токена из WebView; включение через `NEXT_PUBLIC_ENABLE_NATIVE_PUSH=true` только после `google-services.json`.
 4. Общий слой `notifyUser(userId, event, payload)` — шлёт в Telegram и/или FCM по настройкам пользователя.
 5. (Опционально позже) Web Push для браузера — ниже приоритет.
 
 - [ ] **5a** Telegram-бот (см. детали в «Фаза 5» ниже).
-- [~] **5b** Push FCM в Capacitor + `notifyUser` (код есть; нужны Firebase + `google-services.json` + пересборка APK).
+- [~] **5b** Push FCM: сервер и UI готовы; **выкл. в APK** до Firebase (`0b3cef5` — фикс вылета после разрешения).
 
 ## Фаза 4: качество и запуск
 
@@ -131,7 +132,8 @@
 
 **Рекомендация для пилота:** сначала Telegram (быстрее, как у конкурентов). Push в APK — **фаза 5b**, если поселок настаивает «только из иконки приложения»: Capacitor + FCM + хранение `devicePushToken` рядом с `telegramChatId` (можно оба канала).
 
-- [~] Push (FCM): плагин Capacitor, регистрация токена, события заявок/новостей (нужен Firebase на Vercel + APK).
+- [~] Push (FCM): плагин + события заявок/новостей; включить: Firebase, env, флаг, новый APK.
+- [x] Vercel Speed Insights (`@vercel/speed-insights`).
 - [ ] Web Push для PWA/браузера (опционально, ниже приоритет чем FCM в APK).
 
 ---

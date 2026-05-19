@@ -1,9 +1,37 @@
 # Happy Life
 
-Проєкт: веб-застосунок у каталозі **`web/`** (див. [web/README.md](web/README.md)).
+Веб-платформа и Android-оболочка для **КГ / ОСМД** (Украина, UAH). Код в **`web/`**, APK в **`mobile/`**.
 
-**Документація:** [гайд для тестувальників](docs/TESTER_GUIDE.md) · [огляд продукту](docs/PROJECT_OVERVIEW.md) · [контекст розробки](docs/DEVELOPMENT_CONTEXT.md) · [оцінка vs ДАХ](docs/PROJECT_EVALUATION.md) · [дорожня карта](docs/TODO_ROADMAP.md) · [Android APK](mobile/README.md).
+**Прод:** [hlm-nu.vercel.app](https://hlm-nu.vercel.app) · **Репо:** [github.com/SjPn/HappyLifeManagement](https://github.com/SjPn/HappyLifeManagement) · ветка `main` @ `0b3cef5`
 
-**Прод:** [hlm-nu.vercel.app](https://hlm-nu.vercel.app) · multi-tenant SaaS для КГ/ОСББ (платформа + поселки + invite-коди). Android: debug APK у профілі (іконка — TODO, див. `mobile/README.md`).
+## Документация
 
-**Репозиторій:** [github.com/SjPn/HappyLifeManagement](https://github.com/SjPn/HappyLifeManagement)
+| Документ | Для кого |
+|----------|----------|
+| [Гайд для тестировщиков](docs/TESTER_GUIDE.md) | Внешние тесты, бизнес-логика |
+| [Контекст разработки](docs/DEVELOPMENT_CONTEXT.md) | ИИ / следующая сессия |
+| [Обзор продукта](docs/PROJECT_OVERVIEW.md) | Видение |
+| [Дорожная карта](docs/TODO_ROADMAP.md) | Бэклог |
+| [Оценка vs рынок](docs/PROJECT_EVALUATION.md) | ДАХ, конкуренты |
+| [Android APK](mobile/README.md) | Сборка, Firebase, иконка |
+| [Запуск web](web/README.md) | Локальная разработка |
+
+## Сейчас в проде (кратко)
+
+- Multi-tenant: несколько КГ, invite-коды, роли житель / глава / модератор / суперадмин.
+- Заявки, голосования, платежи по дому, документы, форум, доска, ЛС.
+- Главная: блок **«Сейчас важно»**, реквизиты оплаты.
+- **APK** с бренд-иконкой: скачивание в **Ещё** → `/api/download/apk`.
+- **Push в APK:** код на сервере есть, в приложении **выключен** до настройки Firebase (см. `mobile/README.md`).
+- **Telegram-бот:** в планах, не в коде.
+
+## Быстрый старт (разработка)
+
+```powershell
+cd web
+npm install
+cp .env.example .env
+npx prisma db push
+npm run db:seed
+npm run dev
+```

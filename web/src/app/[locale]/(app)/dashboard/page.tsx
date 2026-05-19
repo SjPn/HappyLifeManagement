@@ -20,6 +20,8 @@ import { getResidentDashboardStats } from "@/lib/hubStats";
 import { NewsPostCard } from "@/components/NewsPostCard";
 import { newsPostCardProps, newsPostListInclude } from "@/lib/newsPosts";
 import { HubActionCard, HubContentCard, HubSection } from "@/components/hub/hubUi";
+import { DashboardGlance } from "@/components/DashboardGlance";
+import { DebtReminderBanner } from "@/components/DebtReminderBanner";
 import { Shield, Vote } from "lucide-react";
 
 export default async function DashboardPage() {
@@ -69,7 +71,10 @@ export default async function DashboardPage() {
       })
     : Promise.resolve(null);
 
-  const [news, votes, user, chairStats, residentStats] = await Promise.all([
+  const billingPeriod = currentBillingPeriod();
+
+  const [news, votes, user, chairStats, residentStats, glanceTickets, glanceVote] =
+    await Promise.all([
     isChair
       ? Promise.resolve([])
       : prisma.newsPost.findMany({
@@ -109,9 +114,42 @@ export default async function DashboardPage() {
     }),
     chairStatsPromise,
     residentStatsPromise,
+    !isChair
+      ? prisma.ticket.findMany({
+          where: {
+            ...communityWhere(communityId),
+            userId,
+            status: { not: "RESOLVED" },
+          },
+          orderBy: { updatedAt: "desc" },
+          take: 3,
+          select: {
+            id: true,
+            category: true,
+            description: true,
+            status: true,
+          },
+        })
+      : Promise.resolve([]),
+    !isChair
+      ? prisma.vote.findFirst({
+          where: {
+            ...communityWhere(communityId),
+            AND: [
+              { OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }] },
+              voteAudienceWhere({
+                role: session!.user!.role,
+                tenancyType: session!.user!.tenancyType,
+              }),
+              { responses: { none: { userId } } },
+            ],
+          },
+          orderBy: { createdAt: "desc" },
+          select: { id: true, title: true },
+        })
+      : Promise.resolve(null),
   ]);
 
-  const billingPeriod = currentBillingPeriod();
   const householdBilling =
     !isChair && user?.street && user?.houseNumber
       ? await prisma.householdBilling.findUnique({
@@ -158,6 +196,26 @@ export default async function DashboardPage() {
         <ChairDashboardActions
           stats={chairStats}
           paymentsLabel={t("chairPaymentsButton")}
+        />
+      )}
+
+      {!isChair && showPaymentsPulse && paymentTotal > 0 && (
+        <DebtReminderBanner
+          amountLabel={formatUah(paymentTotal, locale)}
+          periodLabel={paymentPeriodLabel}
+        />
+      )}
+
+      {!isChair && (
+        <DashboardGlance
+          tickets={glanceTickets}
+          payment={{
+            periodLabel: paymentPeriodLabel,
+            totalLabel: formatUah(paymentTotal, locale),
+            paid: paymentPaid,
+            show: showResidentPaymentsCard,
+          }}
+          vote={glanceVote}
         />
       )}
 

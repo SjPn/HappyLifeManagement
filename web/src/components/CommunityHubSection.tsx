@@ -17,6 +17,7 @@ import {
   Newspaper,
   Megaphone,
   Users,
+  FileText,
 } from "lucide-react";
 import type { HubAccentTone } from "@/components/hub/hubUi";
 
@@ -26,7 +27,7 @@ type CountKey = keyof Pick<
 >;
 
 const itemMeta: Record<
-  CountKey | "residents",
+  CountKey | "residents" | "documents",
   { icon: LucideIcon; tone: HubAccentTone }
 > = {
   news: { icon: Newspaper, tone: "blue" },
@@ -34,6 +35,7 @@ const itemMeta: Record<
   forum: { icon: MessagesSquare, tone: "violet" },
   messages: { icon: MessageCircle, tone: "cyan" },
   residents: { icon: Users, tone: "emerald" },
+  documents: { icon: FileText, tone: "slate" },
 };
 
 export function CommunityHubSection({

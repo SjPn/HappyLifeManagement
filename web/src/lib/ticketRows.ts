@@ -17,7 +17,10 @@ type TicketWithRelations = {
   photoUrl: string | null;
   locationNote: string | null;
   status: string;
+  statusChangedAt: Date;
+  rating: number | null;
   createdAt: Date;
+  updatedAt: Date;
   userId: string;
   user: { name: string; street: string; houseNumber: string };
   comments: {
@@ -37,6 +40,9 @@ export function toTicketRows(tickets: TicketWithRelations[]): TicketRow[] {
     photoUrl: tk.photoUrl,
     locationNote: tk.locationNote,
     status: tk.status,
+    statusChangedAt: tk.statusChangedAt.toISOString(),
+    updatedAt: tk.updatedAt.toISOString(),
+    rating: tk.rating,
     createdAt: tk.createdAt.toISOString(),
     userName: tk.user.name,
     userStreet: tk.user.street,

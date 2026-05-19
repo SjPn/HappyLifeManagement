@@ -18,6 +18,7 @@ model Community {
   memorandumBody    String?
   memorandumVersion String    @default("MVP-2026-05-05")
   tariffsBody       String?
+  paymentRequisites String?
   blockedAt         DateTime?
   approvedAt        DateTime?
   createdAt         DateTime  @default(now())
@@ -34,6 +35,7 @@ model Community {
   reports            ConfidentialReport[]
   householdBillings  HouseholdBilling[]
   directMessages     DirectMessage[]
+  documents          CommunityDocument[]
 }
 
 model User {
@@ -77,6 +79,7 @@ model User {
   seenState         UserSeenState?
   messagesSent      DirectMessage[]      @relation("SentMessages")
   messagesReceived  DirectMessage[]      @relation("ReceivedMessages")
+  documentsUploaded CommunityDocument[]
 }
 
 model UserSeenState {
@@ -125,12 +128,28 @@ model Ticket {
   description  String
   photoUrl     String?
   locationNote String?
-  status       String          @default("NEW")
-  userId       String
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  comments     TicketComment[]
+  status           String          @default("NEW")
+  statusChangedAt  DateTime        @default(now())
+  rating           Int?
+  ratedAt          DateTime?
+  userId           String
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  comments         TicketComment[]
+}
+
+model CommunityDocument {
+  id          String    @id @default(cuid())
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  title       String
+  fileUrl     String
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@index([communityId])
 }
 
 model TicketComment {

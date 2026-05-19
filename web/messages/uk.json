@@ -11,6 +11,10 @@
     "voteClosed": "Голосування завершено",
     "votePick": "Не обрано варіант",
     "generic": "Помилка. Спробуйте ще раз.",
+    "badRating": "Оцінка від 1 до 5",
+    "noTitle": "Вкажіть назву документа",
+    "noFile": "Оберіть файл",
+    "noSourceMonth": "Немає нарахувань за попередній місяць",
     "invalidAddress": "Оберіть адресу зі списку",
     "invalidInvite": "Невірний код запрошення",
     "addressExists": "Така адреса вже є в списку",
@@ -174,6 +178,13 @@
     },
     "popularNewsTitle": "Популярна новина",
     "popularNewsText": "«{title}» — {count} лайків за тиждень",
+    "glance": {
+      "title": "Зараз важливо",
+      "paymentPaid": "Оплачено за цей період",
+      "paymentDue": "До сплати: {amount}",
+      "voteAction": "Потрібен ваш голос →",
+      "allRequests": "Усі заявки →"
+    },
     "residentHub": {
       "pulseTitle": "Зверніть увагу",
       "pulseText": "Відкритих заявок: {tickets}. Непрочитаних повідомлень: {messages}.",
@@ -232,7 +243,13 @@
     "commentBody": "Текст",
     "commentPhoto": "Фото (необов’язково)",
     "commentSend": "Надіслати",
-    "commentSending": "Надсилання…"
+    "commentSending": "Надсилання…",
+    "timelineTitle": "Статус заявки",
+    "updatedAt": "оновлено {date}",
+    "ratingTitle": "Оцініть виконання",
+    "ratingHint": "1 — погано, 5 — відмінно",
+    "ratingStar": "{n} зірок",
+    "ratingThanks": "Дякуємо! Ваша оцінка: {rating}/5"
   },
   "votes": {
     "title": "Голосування",
@@ -272,6 +289,8 @@
     "residentsDesc": "Підтверджені власники та орендарі з адресами",
     "messagesTitle": "Повідомлення",
     "messagesDesc": "Особистий чат з мешканцями",
+    "documentsTitle": "Документи",
+    "documentsDesc": "Протоколи, кошториси, PDF",
     "hubStats": {
       "messages": "Повід.",
       "forum": "Форум",
@@ -380,7 +399,35 @@
       "subscription": "Абонплата",
       "electricity": "Світло",
       "total": "Разом"
-    }
+    },
+    "requisitesLabel": "Реквізити для оплати",
+    "requisitesHint": "Ці реквізити бачать усі мешканці на сторінці «Мої платежі».",
+    "requisitesPlaceholder": "IBAN, отримувач, призначення платежу…",
+    "requisitesSave": "Зберегти реквізити",
+    "requisitesSaving": "Збереження…",
+    "requisitesSaved": "Реквізити збережено",
+    "copyRequisites": "Скопіювати реквізити",
+    "requisitesCopied": "Скопійовано",
+    "copyPrevMonth": "Скопіювати нарахування з минулого місяця",
+    "copyPrevConfirm": "Скопіювати суми з попереднього місяця на поточний? Позначки «Оплачено» скинуться.",
+    "copyPrevLoading": "Копіювання…",
+    "copyPrevDone": "Скопійовано для {count} адрес",
+    "debtReminderTitle": "Є заборгованість",
+    "debtReminderText": "За {period} до сплати: {amount}.",
+    "debtReminderLink": "Перейти до платежів →",
+    "debtReminderDismiss": "Закрити"
+  },
+  "documents": {
+    "title": "Документи поселення",
+    "subtitle": "Протоколи, кошториси та інші файли від голови.",
+    "uploadTitle": "Завантажити документ",
+    "docTitle": "Назва",
+    "docFile": "Файл (PDF або зображення)",
+    "uploadBtn": "Опублікувати",
+    "uploading": "Завантаження…",
+    "empty": "Документів поки немає.",
+    "delete": "Видалити",
+    "deleteConfirm": "Видалити цей документ?"
   },
   "profile": {
     "title": "Ще",

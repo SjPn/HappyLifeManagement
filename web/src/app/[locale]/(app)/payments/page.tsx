@@ -22,6 +22,9 @@ import {
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 import { PaymentsHubStatsBar } from "@/components/PaymentsHubStats";
+import { CopyRequisitesButton } from "@/components/CopyRequisitesButton";
+import { ChairPaymentRequisitesForm } from "@/components/ChairPaymentRequisitesForm";
+import { CopyBillingFromPrevMonth } from "@/components/CopyBillingFromPrevMonth";
 import { getPaymentsHubStats } from "@/lib/hubStats";
 import {
   formatAddressLine,
@@ -46,11 +49,13 @@ async function ResidentPaymentsView({
   userId,
   locale,
   period,
+  paymentRequisites,
 }: {
   communityId: string;
   userId: string;
   locale: string;
   period: BillingPeriod;
+  paymentRequisites: string | null;
 }) {
   const t = await getTranslations("payments");
   const tp = await getTranslations("profile");
@@ -131,6 +136,20 @@ async function ResidentPaymentsView({
         </div>
       )}
 
+      {!isPaid && total > 0 && paymentRequisites && (
+        <Card className="mt-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+            {t("requisitesLabel")}
+          </p>
+          <pre className="mt-2 whitespace-pre-wrap font-sans text-sm text-zinc-800 dark:text-zinc-200">
+            {paymentRequisites}
+          </pre>
+          <div className="mt-3">
+            <CopyRequisitesButton text={paymentRequisites} />
+          </div>
+        </Card>
+      )}
+
       {total === 0 && !isPaid && (
         <Card className="mt-4">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -209,9 +228,11 @@ type HouseholdRow = {
 async function ChairPaymentsManageView({
   communityId,
   period,
+  paymentRequisites,
 }: {
   communityId: string;
   period: BillingPeriod;
+  paymentRequisites: string | null;
 }) {
   const locale = await getLocale();
   const t = await getTranslations("payments");
@@ -303,6 +324,15 @@ async function ChairPaymentsManageView({
 
       <PaymentPeriodNav period={period} />
 
+      <CopyBillingFromPrevMonth
+        periodYear={period.year}
+        periodMonth={period.month}
+      />
+
+      <Card className="mb-4">
+        <ChairPaymentRequisitesForm initialRequisites={paymentRequisites} />
+      </Card>
+
       <PaymentsHubStatsBar stats={hubStats} />
 
       <div className="flex flex-col gap-3">
@@ -386,8 +416,20 @@ export default async function PaymentsPage({
   const userId = session!.user!.id;
   const isChair = session!.user!.role === "CHAIR";
 
+  const community = await prisma.community.findUnique({
+    where: { id: communityId },
+    select: { paymentRequisites: true },
+  });
+  const paymentRequisites = community?.paymentRequisites ?? null;
+
   if (isChair) {
-    return <ChairPaymentsManageView communityId={communityId} period={period} />;
+    return (
+      <ChairPaymentsManageView
+        communityId={communityId}
+        period={period}
+        paymentRequisites={paymentRequisites}
+      />
+    );
   }
 
   return (
@@ -396,6 +438,7 @@ export default async function PaymentsPage({
       userId={userId}
       locale={locale}
       period={period}
+      paymentRequisites={paymentRequisites}
     />
   );
 }

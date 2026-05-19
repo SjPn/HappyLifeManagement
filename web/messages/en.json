@@ -11,6 +11,10 @@
     "voteClosed": "This vote is closed",
     "votePick": "Pick an option",
     "generic": "Something went wrong. Try again.",
+    "badRating": "Rating must be 1 to 5",
+    "noTitle": "Enter a document title",
+    "noFile": "Choose a file",
+    "noSourceMonth": "No charges for the previous month",
     "invalidAddress": "Please select an address from the list",
     "invalidInvite": "Invalid invitation code",
     "addressExists": "This address is already in the list",
@@ -174,6 +178,13 @@
     },
     "popularNewsTitle": "Popular news",
     "popularNewsText": "\"{title}\" — {count} likes this week",
+    "glance": {
+      "title": "Important now",
+      "paymentPaid": "Paid for this period",
+      "paymentDue": "Due: {amount}",
+      "voteAction": "Your vote needed →",
+      "allRequests": "All requests →"
+    },
     "residentHub": {
       "pulseTitle": "Needs attention",
       "pulseText": "Open requests: {tickets}. Unread messages: {messages}.",
@@ -232,7 +243,13 @@
     "commentBody": "Message",
     "commentPhoto": "Photo (optional)",
     "commentSend": "Send",
-    "commentSending": "Sending…"
+    "commentSending": "Sending…",
+    "timelineTitle": "Request status",
+    "updatedAt": "updated {date}",
+    "ratingTitle": "Rate the resolution",
+    "ratingHint": "1 — poor, 5 — excellent",
+    "ratingStar": "{n} stars",
+    "ratingThanks": "Thank you! Your rating: {rating}/5"
   },
   "votes": {
     "title": "Votes",
@@ -272,6 +289,8 @@
     "residentsDesc": "Approved owners and tenants with addresses",
     "messagesTitle": "Messages",
     "messagesDesc": "Direct chat with residents",
+    "documentsTitle": "Documents",
+    "documentsDesc": "Protocols, budgets, PDFs",
     "hubStats": {
       "messages": "Msgs",
       "forum": "Forum",
@@ -380,7 +399,35 @@
       "subscription": "Subscription",
       "electricity": "Electricity",
       "total": "Total"
-    }
+    },
+    "requisitesLabel": "Payment details",
+    "requisitesHint": "All residents see these on My payments.",
+    "requisitesPlaceholder": "IBAN, payee, payment reference…",
+    "requisitesSave": "Save payment details",
+    "requisitesSaving": "Saving…",
+    "requisitesSaved": "Payment details saved",
+    "copyRequisites": "Copy payment details",
+    "requisitesCopied": "Copied",
+    "copyPrevMonth": "Copy charges from previous month",
+    "copyPrevConfirm": "Copy amounts from the previous month to the current one? Paid flags will reset.",
+    "copyPrevLoading": "Copying…",
+    "copyPrevDone": "Copied for {count} households",
+    "debtReminderTitle": "Payment due",
+    "debtReminderText": "For {period} you owe: {amount}.",
+    "debtReminderLink": "Go to payments →",
+    "debtReminderDismiss": "Dismiss"
+  },
+  "documents": {
+    "title": "Community documents",
+    "subtitle": "Protocols, budgets, and other files from the chair.",
+    "uploadTitle": "Upload document",
+    "docTitle": "Title",
+    "docFile": "File (PDF or image)",
+    "uploadBtn": "Publish",
+    "uploading": "Uploading…",
+    "empty": "No documents yet.",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this document?"
   },
   "profile": {
     "title": "More",

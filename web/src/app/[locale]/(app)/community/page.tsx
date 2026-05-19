@@ -57,6 +57,12 @@ export default async function CommunityHubPage() {
             desc: t("messagesDesc"),
             countKey: "messages",
           },
+          {
+            id: "documents",
+            href: "/community/documents",
+            title: t("documentsTitle"),
+            desc: t("documentsDesc"),
+          },
         ]}
       />
     </>

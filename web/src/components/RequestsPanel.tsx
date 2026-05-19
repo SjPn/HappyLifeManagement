@@ -17,6 +17,8 @@ import { TicketCategory } from "@/lib/enums";
 import { ticketCategoryLabel } from "@/lib/ticketDisplay";
 import { TicketStatusForm } from "@/components/TicketStatusForm";
 import { TicketCommentForm } from "@/components/TicketCommentForm";
+import { TicketTimeline } from "@/components/TicketTimeline";
+import { TicketRatingForm } from "@/components/TicketRatingForm";
 import { useTranslations } from "next-intl";
 
 export type TicketCommentRow = {
@@ -35,6 +37,9 @@ export type TicketRow = {
   photoUrl: string | null;
   locationNote: string | null;
   status: string;
+  statusChangedAt: string;
+  updatedAt: string;
+  rating: number | null;
   createdAt: string;
   userName: string;
   userStreet: string;
@@ -153,6 +158,13 @@ function TicketDetailModal({
             {tst(ticket.status as "NEW" | "IN_PROGRESS" | "RESOLVED")}
           </span>
 
+          <TicketTimeline
+            status={ticket.status}
+            createdAt={ticket.createdAt}
+            statusChangedAt={ticket.statusChangedAt}
+            updatedAt={ticket.updatedAt}
+          />
+
           <p className="mt-4 whitespace-pre-wrap text-sm text-zinc-800 dark:text-zinc-200">
             {ticket.description}
           </p>
@@ -229,6 +241,14 @@ function TicketDetailModal({
           )}
 
           {canReply && <TicketCommentForm ticketId={ticket.id} />}
+
+          {ticket.status === "RESOLVED" &&
+            ticket.ownerId === currentUserId && (
+              <TicketRatingForm
+                ticketId={ticket.id}
+                initialRating={ticket.rating}
+              />
+            )}
         </div>
       </div>
     </div>
@@ -296,6 +316,10 @@ export function RequestsPanel({
                     {tk.comments.length > 0
                       ? ` · ${t("commentsCount", { count: tk.comments.length })}`
                       : ""}
+                    {" · "}
+                    {t("updatedAt", {
+                      date: new Date(tk.updatedAt).toLocaleDateString(),
+                    })}
                   </span>
                 </span>
                 <span

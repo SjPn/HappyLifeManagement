@@ -74,13 +74,46 @@ export async function updateTicketStatus(ticketId: string, status: string) {
   });
   if (!ticket) return { error: "generic" as const };
 
+  const now = new Date();
   await prisma.ticket.update({
     where: { id: ticketId },
-    data: { status },
+    data: { status, statusChangedAt: now, updatedAt: now },
   });
 
   revalidateAllLocales("/requests");
   revalidateAllLocales("/dashboard");
   revalidateAllLocales("/chair");
   return { ok: true };
+}
+
+export async function rateTicket(ticketId: string, rating: number) {
+  const session = await auth();
+  if (!session?.user?.id || session.user.status !== "APPROVED") {
+    return { error: "noAccess" as const };
+  }
+
+  const communityId = requireCommunityId(session.user);
+  if (rating < 1 || rating > 5 || !Number.isInteger(rating)) {
+    return { error: "badRating" as const };
+  }
+
+  const ticket = await prisma.ticket.findFirst({
+    where: {
+      id: ticketId,
+      ...communityWhere(communityId),
+      userId: session.user.id,
+      status: "RESOLVED",
+    },
+  });
+  if (!ticket) return { error: "generic" as const };
+
+  await prisma.ticket.update({
+    where: { id: ticketId },
+    data: { rating, ratedAt: new Date() },
+  });
+
+  revalidateAllLocales("/requests");
+  revalidateAllLocales("/requests/archive");
+  revalidateAllLocales("/dashboard");
+  return { ok: true as const };
 }

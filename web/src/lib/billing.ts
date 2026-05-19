@@ -41,6 +41,10 @@ export function shiftBillingPeriod(
   return { year: d.getFullYear(), month: d.getMonth() + 1 };
 }
 
+export function previousBillingPeriod(p: BillingPeriod): BillingPeriod {
+  return shiftBillingPeriod(p, -1);
+}
+
 export function formatBillingPeriodLabel(
   locale: string,
   p: BillingPeriod,

@@ -11,6 +11,10 @@
     "voteClosed": "Голосование завершено",
     "votePick": "Не выбран вариант",
     "generic": "Ошибка. Попробуйте снова.",
+    "badRating": "Оценка от 1 до 5",
+    "noTitle": "Укажите название документа",
+    "noFile": "Выберите файл",
+    "noSourceMonth": "Нет начислений за прошлый месяц",
     "invalidAddress": "Выберите адрес из списка",
     "invalidInvite": "Неверный код приглашения",
     "addressExists": "Такой адрес уже есть в списке",
@@ -174,6 +178,13 @@
     },
     "popularNewsTitle": "Популярная новость",
     "popularNewsText": "«{title}» — {count} лайков за неделю",
+    "glance": {
+      "title": "Сейчас важно",
+      "paymentPaid": "Оплачено за этот период",
+      "paymentDue": "К оплате: {amount}",
+      "voteAction": "Нужен ваш голос →",
+      "allRequests": "Все заявки →"
+    },
     "residentHub": {
       "pulseTitle": "Обратите внимание",
       "pulseText": "Открытых заявок: {tickets}. Непрочитанных сообщений: {messages}.",
@@ -232,7 +243,13 @@
     "commentBody": "Текст",
     "commentPhoto": "Фото (необязательно)",
     "commentSend": "Отправить",
-    "commentSending": "Отправка…"
+    "commentSending": "Отправка…",
+    "timelineTitle": "Статус заявки",
+    "updatedAt": "обновлено {date}",
+    "ratingTitle": "Оцените выполнение",
+    "ratingHint": "1 — плохо, 5 — отлично",
+    "ratingStar": "{n} звёзд",
+    "ratingThanks": "Спасибо! Ваша оценка: {rating}/5"
   },
   "votes": {
     "title": "Голосования",
@@ -272,6 +289,8 @@
     "residentsDesc": "Подтверждённые собственники и арендаторы с адресами",
     "messagesTitle": "Сообщения",
     "messagesDesc": "Личный чат с жителями",
+    "documentsTitle": "Документы",
+    "documentsDesc": "Протоколы, сметы, PDF",
     "hubStats": {
       "messages": "Сообщ.",
       "forum": "Форум",
@@ -380,7 +399,35 @@
       "subscription": "Абонплата",
       "electricity": "Свет",
       "total": "Итого"
-    }
+    },
+    "requisitesLabel": "Реквизиты для оплаты",
+    "requisitesHint": "Эти реквизиты видят все жители на странице «Мои платежи».",
+    "requisitesPlaceholder": "IBAN, получатель, назначение платежа…",
+    "requisitesSave": "Сохранить реквизиты",
+    "requisitesSaving": "Сохранение…",
+    "requisitesSaved": "Реквизиты сохранены",
+    "copyRequisites": "Скопировать реквизиты",
+    "requisitesCopied": "Скопировано",
+    "copyPrevMonth": "Скопировать начисления с прошлого месяца",
+    "copyPrevConfirm": "Скопировать суммы с прошлого месяца на текущий? Отметки «Оплачено» сбросятся.",
+    "copyPrevLoading": "Копирование…",
+    "copyPrevDone": "Скопировано для {count} адресов",
+    "debtReminderTitle": "Есть задолженность",
+    "debtReminderText": "За {period} к оплате: {amount}.",
+    "debtReminderLink": "Перейти к платежам →",
+    "debtReminderDismiss": "Закрыть"
+  },
+  "documents": {
+    "title": "Документы посёлка",
+    "subtitle": "Протоколы, сметы и другие файлы от председателя.",
+    "uploadTitle": "Загрузить документ",
+    "docTitle": "Название",
+    "docFile": "Файл (PDF или изображение)",
+    "uploadBtn": "Опубликовать",
+    "uploading": "Загрузка…",
+    "empty": "Документов пока нет.",
+    "delete": "Удалить",
+    "deleteConfirm": "Удалить этот документ?"
   },
   "profile": {
     "title": "Ещё",

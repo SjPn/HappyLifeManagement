@@ -2,6 +2,7 @@
 
 import { updatePushPreferences } from "@/actions/pushPreferences";
 import { isCapacitorNative } from "@/lib/capacitorNative";
+import { isNativePushEnabled } from "@/lib/push/nativePushEnabled";
 import { Bell } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useTransition } from "react";
@@ -25,6 +26,7 @@ export function PushNotificationsSettings({
 
   if (!isCapacitorNative()) return null;
 
+  const pushActive = isNativePushEnabled();
   const isChair = role === "CHAIR";
 
   function onToggle(name: keyof Prefs, checked: boolean) {
@@ -46,8 +48,9 @@ export function PushNotificationsSettings({
             {t("title")}
           </p>
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-            {t("hint")}
+            {pushActive ? t("hint") : t("unavailable")}
           </p>
+          {pushActive && (
           <ul className="mt-3 space-y-2.5">
             {isChair && (
               <ToggleRow
@@ -76,6 +79,7 @@ export function PushNotificationsSettings({
               onChange={(c) => onToggle("pushNotifyDebt", c)}
             />
           </ul>
+          )}
         </div>
       </div>
     </div>

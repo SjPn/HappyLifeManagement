@@ -2,16 +2,9 @@
 
 import { useRouter } from "@/i18n/navigation";
 import { isCapacitorNative } from "@/lib/capacitorNative";
+import { isNativePushEnabled } from "@/lib/push/nativePushEnabled";
+import { setupNativePush } from "@/lib/push/setupNativePush";
 import { useEffect, useRef } from "react";
-
-async function registerToken(token: string) {
-  await fetch("/api/push/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ token, platform: "android" }),
-  });
-}
 
 async function unregisterToken(token: string) {
   await fetch("/api/push/register", {
@@ -29,48 +22,23 @@ export function PushNotificationsProvider({
 }) {
   const router = useRouter();
   const tokenRef = useRef<string | null>(null);
+  const teardownRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    if (!isCapacitorNative()) return;
+    if (!isCapacitorNative() || !isNativePushEnabled()) return;
 
     let cancelled = false;
-    const listeners: { remove: () => void }[] = [];
 
     (async () => {
       try {
-        const { PushNotifications } = await import(
-          "@capacitor/push-notifications"
-        );
-
-        const perm = await PushNotifications.requestPermissions();
-        if (perm.receive !== "granted" || cancelled) return;
-
-        listeners.push(
-          await PushNotifications.addListener("registration", (ev) => {
-            tokenRef.current = ev.value;
-            void registerToken(ev.value);
-          }),
-        );
-
-        listeners.push(
-          await PushNotifications.addListener("registrationError", (err) => {
-            console.warn("[push] registrationError", err);
-          }),
-        );
-
-        listeners.push(
-          await PushNotifications.addListener(
-            "pushNotificationActionPerformed",
-            (action) => {
-              const path = action.notification.data?.path;
-              if (typeof path === "string" && path.startsWith("/")) {
-                router.push(path);
-              }
-            },
-          ),
-        );
-
-        await PushNotifications.register();
+        const teardown = await setupNativePush(router, (token) => {
+          tokenRef.current = token;
+        });
+        if (cancelled) {
+          teardown();
+          return;
+        }
+        teardownRef.current = teardown;
       } catch (e) {
         console.warn("[push] setup failed", e);
       }
@@ -78,7 +46,8 @@ export function PushNotificationsProvider({
 
     return () => {
       cancelled = true;
-      for (const l of listeners) l.remove();
+      teardownRef.current?.();
+      teardownRef.current = null;
       const t = tokenRef.current;
       if (t) void unregisterToken(t);
     };

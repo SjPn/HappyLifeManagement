@@ -476,7 +476,8 @@
       "newTickets": "New requests (chair)",
       "ticketStatus": "My request status updates",
       "news": "News from the chair",
-      "debt": "Debt reminders"
+      "debt": "Debt reminders",
+      "unavailable": "Push is temporarily off (Firebase must be configured in the APK). The app works without it."
     }
   },
   "messages": {

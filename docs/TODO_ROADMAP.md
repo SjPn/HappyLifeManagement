@@ -17,7 +17,7 @@
 - [x] Мобильный UX: модалки не перекрываются нижним меню (`hl-modal-open`, `z-[60]`, отступ под таб-бар).
 - [ ] Редакционный гайд: **типографика, пустые состояния**, язык уведомлений.
 - [x] **Иконка Android-приложения:** `mobile/icon/icon-1024.png`, `npm run icons` → `mipmap-*`.
-- [x] **APK на сайте:** `web/public/downloads/happylife.apk` (бренд-иконка, `3460380`).
+- [x] **APK на сайте:** `web/public/downloads/happylife.apk` (актуально `4df7e07`, back button + `@capacitor/app`).
 
 ## Фаза 2: архитектура (без кода в первой итерации — только решения)
 
@@ -45,6 +45,11 @@
 - [x] **Конфиденциальные обращения** + экран модератора.
 - [x] **Мои платежи** (бывш. счётчики): абонплата + электроэнергия по **дому** (`HouseholdBilling`), не по пользователю. Показания счётчиков жителем убраны; `/meters` → `/payments`.
 - [x] **Биллинг по месяцам:** `periodYear`/`periodMonth`, переключатель месяца для головы, история для жителя, отметка «Оплачено» (`paidAt`).
+- [x] **Счётчики день/ночь (голова):** показания по дому, тарифы на `Community`, авторасчёт `electricityUah`, синхронизация в форму.
+- [x] **«Отправить» жителю:** `paymentSentAt`, модалка подтверждения, бейдж на карточке дома.
+- [x] **Тарифы и реквизиты:** сворачиваемый блок на `/payments` (не отдельная страница `/payments/settings`).
+- [x] **Навигация «Назад»:** `PageBackLink` на вложенных экранах; `/info/*` в `(app)` с нижним меню.
+- [x] **Android hardware back:** `AndroidBackButtonHandler` + `@capacitor/app` в APK (`12d7248`, `4df7e07`).
 - [x] **Справочник адресов** `CommunityAddress` + выбор при регистрации (`/chair/addresses`).
 - [x] **Навигация UX:** дубли убраны из «Ще» (в т.ч. «Управление» для головы); мешканці в хабе «Сообщество»; тарифы — с `/payments`.
 - [x] **Список+модалка:** заявки (`RequestsPanel`), жители у головы (`ChairUsersPanel`).
@@ -69,7 +74,7 @@
 - [~] Расширить покрытие тестами (Vitest + Playwright e2e — база есть).
 - [ ] Вынести загрузки из `public/uploads` в S3-совместимое хранилище (на Vercel `public/uploads/` эфемерный).
 - [ ] Next.js 16: переименовать `web/src/middleware.ts` → `web/src/proxy.ts` (deprecation warning в `next build`), проверить совместимость с `next-intl`.
-- [x] Capacitor Android: проект в `mobile/android`, debug APK на проде (`/api/download/apk`).
+- [x] Capacitor Android: проект в `mobile/android`, debug APK на проде (`/api/download/apk`); `cap sync` после добавления плагинов.
 - [ ] **Splash** при запуске APK + **release**-сборка (keystore) перед массовой раздачей.
 
 ### Уведомления (запланировано: две итерации подряд)

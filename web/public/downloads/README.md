@@ -1,6 +1,8 @@
 # APK downloads
 
-Після зміни **іконки** або `versionCode` у `mobile/android` — знову скопіювати APK сюди й задеплоїти (або `npm run upload:apk` → R2).
+Після зміни **іконки**, **плагінів Capacitor** (`cap sync`) або `versionCode` — знову скопіювати APK сюди й задеплоїти (або `npm run upload:apk` → R2).
+
+**Остання публікація в репо:** `4df7e07` (кнопка «Назад» Android + `@capacitor/app`).
 
 1. Build APK from `mobile/` (see `mobile/README.md` — розділ «Іконка и брендинг»).
 2. Copy to `happylife.apk` in this folder **or** upload to R2:

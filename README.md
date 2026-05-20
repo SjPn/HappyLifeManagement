@@ -2,7 +2,7 @@
 
 Веб-платформа и Android-оболочка для **КГ / ОСМД** (Украина, UAH). Код в **`web/`**, APK в **`mobile/`**.
 
-**Прод:** [hlm-nu.vercel.app](https://hlm-nu.vercel.app) · **Репо:** [github.com/SjPn/HappyLifeManagement](https://github.com/SjPn/HappyLifeManagement) · ветка `main` @ `0b3cef5`
+**Прод:** [hlm-nu.vercel.app](https://hlm-nu.vercel.app) · **Репо:** [github.com/SjPn/HappyLifeManagement](https://github.com/SjPn/HappyLifeManagement) · ветка `main` @ `4df7e07`
 
 ## Документация
 
@@ -13,16 +13,18 @@
 | [Обзор продукта](docs/PROJECT_OVERVIEW.md) | Видение |
 | [Дорожная карта](docs/TODO_ROADMAP.md) | Бэклог |
 | [Оценка vs рынок](docs/PROJECT_EVALUATION.md) | ДАХ, конкуренты |
-| [Android APK](mobile/README.md) | Сборка, Firebase, иконка |
+| [Android APK](mobile/README.md) | Сборка, Firebase, кнопка «Назад» |
 | [Запуск web](web/README.md) | Локальная разработка |
 
 ## Сейчас в проде (кратко)
 
 - Multi-tenant: несколько КГ, invite-коды, роли житель / глава / модератор / суперадмин.
 - Заявки, голосования, платежи по дому, документы, форум, доска, ЛС.
+- **Платежи (голова):** счётчик день/ночь, тарифы КГ (один раз), **«Отправить»** жителю, бейдж «Отправлено»; тарифы и реквизиты — сворачиваемый блок на `/payments`.
+- **Навигация:** кнопка «← Назад» на вложенных экранах; тарифы/меморандум с нижним меню; в **новом APK** — системная кнопка «Назад» Android.
 - Главная: блок **«Сейчас важно»**, реквизиты оплаты.
-- **APK** с бренд-иконкой: скачивание в **Ещё** → `/api/download/apk`.
-- **Push в APK:** код на сервере есть, в приложении **выключен** до настройки Firebase (см. `mobile/README.md`).
+- **APK** (`4df7e07`): бренд-иконка, `@capacitor/app` — скачивание в **Ещё** → `/api/download/apk`.
+- **Push в APK:** код на сервере есть, в приложении **выключен** до Firebase (см. `mobile/README.md`).
 - **Telegram-бот:** в планах, не в коде.
 
 ## Быстрый старт (разработка)

@@ -25,6 +25,8 @@ export default async function ChairHomePage() {
       <PageTitle
         title={t("title")}
         subtitle={isChair ? t("subtitleChair") : t("subtitleModerator")}
+        backHref="/profile"
+        backLabel={t("backProfile")}
       />
 
       <ChairDashboardActions stats={stats} isChair={isChair} />

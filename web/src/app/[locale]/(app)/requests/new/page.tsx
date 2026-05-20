@@ -6,7 +6,12 @@ export default async function NewTicketPage() {
   const t = await getTranslations("requests");
   return (
     <>
-      <PageTitle title={t("newTitle")} subtitle={t("newSubtitle")} />
+      <PageTitle
+        title={t("newTitle")}
+        subtitle={t("newSubtitle")}
+        backHref="/requests"
+        backLabel={t("title")}
+      />
       <TicketNewForm />
     </>
   );

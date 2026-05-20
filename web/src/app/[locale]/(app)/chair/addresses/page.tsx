@@ -17,6 +17,7 @@ export default async function ChairAddressesPage() {
   }
 
   const t = await getTranslations("addresses");
+  const tc = await getTranslations("chair");
 
   const addresses = await prisma.communityAddress.findMany({
     where: communityWhere(communityId),
@@ -28,7 +29,12 @@ export default async function ChairAddressesPage() {
 
   return (
     <>
-      <PageTitle title={t("title")} subtitle={t("subtitle")} />
+      <PageTitle
+        title={t("title")}
+        subtitle={t("subtitle")}
+        backHref="/chair"
+        backLabel={tc("backPanel")}
+      />
 
       <Card className="mb-8">
         <h2 className="mb-3 text-sm font-semibold">{t("addHeading")}</h2>

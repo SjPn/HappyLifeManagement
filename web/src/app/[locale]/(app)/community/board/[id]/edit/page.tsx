@@ -33,7 +33,12 @@ export default async function BoardEditPage({
   const t = await getTranslations("board");
   return (
     <>
-      <PageTitle title={t("editTitle")} subtitle={t("editSubtitle")} />
+      <PageTitle
+        title={t("editTitle")}
+        subtitle={t("editSubtitle")}
+        backHref="/community/board"
+        backLabel={t("title")}
+      />
       <Card>
         <BoardEditForm
           id={post.id}

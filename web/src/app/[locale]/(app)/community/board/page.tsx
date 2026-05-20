@@ -33,7 +33,12 @@ export default async function BoardPage() {
   return (
     <>
       <MarkNotificationsSeen scopes={["board"]} />
-      <PageTitle title={t("title")} subtitle={t("subtitle")} />
+      <PageTitle
+        title={t("title")}
+        subtitle={t("subtitle")}
+        backHref="/community"
+        backLabel={t("back")}
+      />
       <div className="mb-5">
         <ButtonLink href="/community/board/new">{t("new")}</ButtonLink>
       </div>

@@ -40,7 +40,12 @@ export default async function CommunityNewsPage() {
   return (
     <>
       <MarkNotificationsSeen scopes={["news"]} />
-      <PageTitle title={t("newsTitle")} subtitle={t("newsSubtitle")} />
+      <PageTitle
+        title={t("newsTitle")}
+        subtitle={t("newsSubtitle")}
+        backHref="/community"
+        backLabel={t("title")}
+      />
 
       {isChair && (
         <Card className="mb-6">

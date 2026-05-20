@@ -14,7 +14,11 @@ export default async function BoardNewPage() {
   const t = await getTranslations("board");
   return (
     <>
-      <PageTitle title={t("newTitle")} />
+      <PageTitle
+        title={t("newTitle")}
+        backHref="/community/board"
+        backLabel={t("title")}
+      />
       <BoardNewForm />
     </>
   );

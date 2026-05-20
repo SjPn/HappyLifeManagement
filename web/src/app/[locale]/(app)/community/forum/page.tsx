@@ -42,7 +42,12 @@ export default async function ForumListPage() {
   return (
     <>
       <MarkNotificationsSeen scopes={["forum"]} />
-      <PageTitle title={t("title")} subtitle={t("subtitle")} />
+      <PageTitle
+        title={t("title")}
+        subtitle={t("subtitle")}
+        backHref="/community"
+        backLabel={t("back")}
+      />
       <div className="mb-5">
         <ButtonLink href="/community/forum/new">{t("newTopic")}</ButtonLink>
       </div>

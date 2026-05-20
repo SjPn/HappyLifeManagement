@@ -3,18 +3,23 @@ import { CommunityContentDisplay } from "@/components/CommunityContentDisplay";
 import { getCommunityContentForViewer } from "@/lib/communityContent";
 import { getTranslations } from "next-intl/server";
 
-export default async function MemorandumPage() {
-  const t = await getTranslations("memorandum");
+export default async function TariffsPage() {
+  const t = await getTranslations("tariffs");
+  const tp = await getTranslations("profile");
   const community = await getCommunityContentForViewer();
 
   return (
     <>
-      <PageTitle title={t("title")} subtitle={t("subtitle")} />
+      <PageTitle
+        title={t("title")}
+        subtitle={t("subtitle")}
+        backHref="/profile"
+        backLabel={tp("title")}
+      />
       <Card>
         <CommunityContentDisplay
-          body={community?.memorandumBody}
-          version={community?.memorandumVersion}
-          namespace="memorandum"
+          body={community?.tariffsBody}
+          namespace="tariffs"
         />
       </Card>
     </>

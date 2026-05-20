@@ -1,16 +1,22 @@
 import { Link } from "@/i18n/navigation";
+import { PageBackLink } from "@/components/PageBackLink";
 
 export function PageTitle({
   title,
   subtitle,
   eyebrow,
+  backHref,
+  backLabel,
 }: {
   title: React.ReactNode;
   subtitle?: string;
   eyebrow?: string;
+  backHref?: string;
+  backLabel?: string;
 }) {
   return (
     <header className="mb-7 min-w-0 max-w-full">
+      {backHref ? <PageBackLink href={backHref} label={backLabel} /> : null}
       {eyebrow && (
         <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-blue-600/90 dark:text-blue-400/90">
           {eyebrow}

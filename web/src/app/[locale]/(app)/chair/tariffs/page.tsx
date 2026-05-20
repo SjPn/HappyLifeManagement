@@ -1,4 +1,3 @@
-import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { PageTitle, Card } from "@/components/Ui";
@@ -23,12 +22,12 @@ export default async function ChairTariffsEditPage() {
 
   return (
     <>
-      <PageTitle title={tt("title")} subtitle={t("tariffsEditSubtitle")} />
-      <p className="mb-4 text-sm">
-        <Link href="/chair" className="text-blue-700 hover:underline">
-          {t("backPanel")}
-        </Link>
-      </p>
+      <PageTitle
+        title={tt("title")}
+        subtitle={t("tariffsEditSubtitle")}
+        backHref="/chair"
+        backLabel={t("backPanel")}
+      />
       <Card>
         <CommunityContentEditor
           kind="tariffs"

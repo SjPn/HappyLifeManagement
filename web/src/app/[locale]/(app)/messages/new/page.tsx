@@ -28,7 +28,11 @@ export default async function NewMessagePage() {
 
   return (
     <>
-      <PageTitle title={t("pickResident")} />
+      <PageTitle
+        title={t("pickResident")}
+        backHref="/messages"
+        backLabel={t("title")}
+      />
       <Card className="overflow-hidden p-0">
         <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {residents.map((u) => (

@@ -15,6 +15,7 @@ export default async function ChairModerationPage() {
   }
 
   const t = await getTranslations("moderation");
+  const tc = await getTranslations("chair");
 
   const tenant = communityWhere(communityId);
   const [board, topics, votes] = await Promise.all([
@@ -43,7 +44,12 @@ export default async function ChairModerationPage() {
 
   return (
     <>
-      <PageTitle title={t("title")} subtitle={t("subtitle")} />
+      <PageTitle
+        title={t("title")}
+        subtitle={t("subtitle")}
+        backHref="/chair"
+        backLabel={tc("backPanel")}
+      />
 
       <h2 className="mb-3 mt-6 text-sm font-semibold uppercase tracking-wide text-zinc-500">
         {t("board")}

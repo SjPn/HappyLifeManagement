@@ -59,7 +59,12 @@ export default async function VoteDetailPage({
 
   return (
     <>
-      <PageTitle title={vote.title} subtitle={vote.description ?? undefined} />
+      <PageTitle
+        title={vote.title}
+        subtitle={vote.description ?? undefined}
+        backHref="/votes"
+        backLabel={t("title")}
+      />
       {!active && (
         <Card className="mb-4">
           <p className="text-sm text-zinc-600">{t("closed")}</p>

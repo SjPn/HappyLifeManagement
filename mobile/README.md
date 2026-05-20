@@ -80,3 +80,15 @@ npx cap sync android
 **События:** новая заявка → голова; смена статуса → автор; новость → жители с opt-in «Новини».
 
 **Важно:** без `google-services.json` включение push **ломает APK** (вылет после разрешения). Пока Firebase не настроен, на Vercel **не** ставьте `NEXT_PUBLIC_ENABLE_NATIVE_PUSH=true`. После добавления `google-services.json` — пересобрать APK и включить переменную.
+
+## Кнопка «Назад» Android
+
+В `package.json` есть `@capacitor/app`. После обновления веб-кода:
+
+```bash
+cd mobile
+npm install
+npx cap sync android
+```
+
+Пересоберите APK. В приложении системная «Назад» идёт на предыдущий экран (или на логичный родительский, если истории нет).

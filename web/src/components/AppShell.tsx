@@ -11,6 +11,7 @@ import {
   UsersRound,
   LayoutGrid,
 } from "lucide-react";
+import { AndroidBackButtonHandler } from "@/components/AndroidBackButtonHandler";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { useNotifications } from "@/components/NotificationProvider";
 import type { NotificationCounts } from "@/lib/notifications";
@@ -59,6 +60,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen flex-col pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))]">
+      <AndroidBackButtonHandler />
       <main className="relative mx-auto w-full min-w-0 max-w-lg flex-1 px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top,0px))] sm:px-5">
         {communityName ? (
           <p

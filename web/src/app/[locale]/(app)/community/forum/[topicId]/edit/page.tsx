@@ -36,7 +36,12 @@ export default async function ForumTopicEditPage({
 
   return (
     <>
-      <PageTitle title={t("editTitle")} subtitle={t("editSubtitle")} />
+      <PageTitle
+        title={t("editTitle")}
+        subtitle={t("editSubtitle")}
+        backHref={`/community/forum/${topicId}`}
+        backLabel={t("title")}
+      />
       <Card>
         <ForumTopicEditForm
           topicId={topicId}

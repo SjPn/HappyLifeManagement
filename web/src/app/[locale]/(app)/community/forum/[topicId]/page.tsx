@@ -54,7 +54,11 @@ export default async function ForumTopicPage({
 
   return (
     <>
-      <PageTitle title={topic.title} />
+      <PageTitle
+        title={topic.title}
+        backHref="/community/forum"
+        backLabel={t("backList")}
+      />
       <p className="mb-6 text-xs text-zinc-500">
         {t("authorTopic")}{" "}
         {forumTopicAuthorLabel(

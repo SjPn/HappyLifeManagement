@@ -14,7 +14,11 @@ export default async function ForumNewPage() {
   const t = await getTranslations("forum");
   return (
     <>
-      <PageTitle title={t("newTitle")} />
+      <PageTitle
+        title={t("newTitle")}
+        backHref="/community/forum"
+        backLabel={t("title")}
+      />
       <ForumNewForm />
     </>
   );

@@ -48,7 +48,12 @@ export default async function ChairUsersPage() {
 
   return (
     <>
-      <PageTitle title={t("usersTitle")} subtitle={t("usersSubtitle")} />
+      <PageTitle
+        title={t("usersTitle")}
+        subtitle={t("usersSubtitle")}
+        backHref="/chair"
+        backLabel={t("backPanel")}
+      />
       {isChair && (
         <p className="mb-4 text-sm">
           <Link href="/payments" className="font-semibold text-blue-700 hover:underline">

@@ -11,6 +11,7 @@ export default async function CommunityDocumentsPage() {
   const communityId = requireCommunityId(session!.user!);
   const isChair = session!.user!.role === Role.CHAIR;
   const t = await getTranslations("documents");
+  const tc = await getTranslations("community");
 
   const documents = await prisma.communityDocument.findMany({
     where: communityWhere(communityId),
@@ -20,7 +21,12 @@ export default async function CommunityDocumentsPage() {
 
   return (
     <>
-      <PageTitle title={t("title")} subtitle={t("subtitle")} />
+      <PageTitle
+        title={t("title")}
+        subtitle={t("subtitle")}
+        backHref="/community"
+        backLabel={tc("title")}
+      />
       <CommunityDocumentsPanel
         isChair={isChair}
         documents={documents.map((d) => ({

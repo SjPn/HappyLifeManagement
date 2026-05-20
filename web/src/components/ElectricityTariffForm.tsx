@@ -6,13 +6,9 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export function ElectricityTariffForm({
-  periodYear,
-  periodMonth,
   dayRateUah,
   nightRateUah,
 }: {
-  periodYear: number;
-  periodMonth: number;
   dayRateUah: number;
   nightRateUah: number;
 }) {
@@ -35,8 +31,6 @@ export function ElectricityTariffForm({
         {t("tariffTitle")}
       </p>
       <p className="text-xs text-slate-600 dark:text-slate-400">{t("tariffHint")}</p>
-      <input type="hidden" name="periodYear" value={periodYear} />
-      <input type="hidden" name="periodMonth" value={periodMonth} />
       <div className="flex flex-wrap gap-3">
         <label className="flex flex-col gap-1 text-xs">
           {t("dayRate")}

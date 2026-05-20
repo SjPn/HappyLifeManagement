@@ -24,6 +24,7 @@ import { PaymentsHubStatsBar } from "@/components/PaymentsHubStats";
 import { CopyRequisitesButton } from "@/components/CopyRequisitesButton";
 import { CopyBillingFromPrevMonth } from "@/components/CopyBillingFromPrevMonth";
 import { HouseholdPaymentEditor } from "@/components/HouseholdPaymentEditor";
+import { PaymentsTariffsRequisitesPanel } from "@/components/PaymentsTariffsRequisitesPanel";
 import { computeElectricityCharge } from "@/lib/electricity";
 import { getPaymentsHubStats } from "@/lib/hubStats";
 import {
@@ -75,7 +76,7 @@ async function ResidentPaymentsView({
 
   const prevPeriod = previousBillingPeriod(period);
 
-  const [billing, history, meterReading, prevMeter, tariff] = user
+  const [billing, history, meterReading, prevMeter, communityRates] = user
     ? await Promise.all([
         getBillingForAddress(communityId, user.street, user.houseNumber, period),
         prisma.householdBilling.findMany({
@@ -99,13 +100,11 @@ async function ResidentPaymentsView({
             prevPeriod,
           ),
         }),
-        prisma.communityElectricityTariff.findUnique({
-          where: {
-            communityId_periodYear_periodMonth: {
-              communityId,
-              periodYear: period.year,
-              periodMonth: period.month,
-            },
+        prisma.community.findUnique({
+          where: { id: communityId },
+          select: {
+            electricityDayRateUah: true,
+            electricityNightRateUah: true,
           },
         }),
       ])
@@ -119,11 +118,13 @@ async function ResidentPaymentsView({
   const electricity = billing?.electricityUah ?? 0;
   const total = subscription + electricity;
 
+  const dayRateUah = communityRates?.electricityDayRateUah ?? 0;
+  const nightRateUah = communityRates?.electricityNightRateUah ?? 0;
+
   const meterBreakdown =
     meterReading?.dayReading != null &&
     meterReading?.nightReading != null &&
-    tariff &&
-    (tariff.dayRateUah > 0 || tariff.nightRateUah > 0)
+    (dayRateUah > 0 || nightRateUah > 0)
       ? computeElectricityCharge(
           {
             day: meterReading.dayReading,
@@ -132,10 +133,7 @@ async function ResidentPaymentsView({
           prevMeter?.dayReading != null && prevMeter?.nightReading != null
             ? { day: prevMeter.dayReading, night: prevMeter.nightReading }
             : null,
-          {
-            dayRateUah: tariff.dayRateUah,
-            nightRateUah: tariff.nightRateUah,
-          },
+          { dayRateUah, nightRateUah },
         )
       : null;
   const isPaid = billing?.paidAt != null;
@@ -300,9 +298,15 @@ type HouseholdRow = {
 async function ChairPaymentsManageView({
   communityId,
   period,
+  dayRateUah,
+  nightRateUah,
+  paymentRequisites,
 }: {
   communityId: string;
   period: BillingPeriod;
+  dayRateUah: number;
+  nightRateUah: number;
+  paymentRequisites: string | null;
 }) {
   const locale = await getLocale();
   const t = await getTranslations("payments");
@@ -310,38 +314,28 @@ async function ChairPaymentsManageView({
 
   const prevPeriod = previousBillingPeriod(period);
 
-  const [residents, billings, tariff, meterReadings, prevMeters] =
-    await Promise.all([
-      prisma.user.findMany({
-        where: { ...communityWhere(communityId), role: Role.RESIDENT },
-        orderBy: [{ street: "asc" }, { houseNumber: "asc" }, { name: "asc" }],
-        select: {
-          name: true,
-          street: true,
-          houseNumber: true,
-          tenancyType: true,
-          status: true,
-        },
-      }),
-      prisma.householdBilling.findMany({
-        where: billingPeriodWhere(communityId, period),
-      }),
-      prisma.communityElectricityTariff.findUnique({
-        where: {
-          communityId_periodYear_periodMonth: {
-            communityId,
-            periodYear: period.year,
-            periodMonth: period.month,
-          },
-        },
-      }),
-      prisma.householdMeterReading.findMany({
-        where: billingPeriodWhere(communityId, period),
-      }),
-      prisma.householdMeterReading.findMany({
-        where: billingPeriodWhere(communityId, prevPeriod),
-      }),
-    ]);
+  const [residents, billings, meterReadings, prevMeters] = await Promise.all([
+    prisma.user.findMany({
+      where: { ...communityWhere(communityId), role: Role.RESIDENT },
+      orderBy: [{ street: "asc" }, { houseNumber: "asc" }, { name: "asc" }],
+      select: {
+        name: true,
+        street: true,
+        houseNumber: true,
+        tenancyType: true,
+        status: true,
+      },
+    }),
+    prisma.householdBilling.findMany({
+      where: billingPeriodWhere(communityId, period),
+    }),
+    prisma.householdMeterReading.findMany({
+      where: billingPeriodWhere(communityId, period),
+    }),
+    prisma.householdMeterReading.findMany({
+      where: billingPeriodWhere(communityId, prevPeriod),
+    }),
+  ]);
 
   const billingByKey = new Map(
     billings.map((p) => [
@@ -363,9 +357,6 @@ async function ChairPaymentsManageView({
       m,
     ]),
   );
-
-  const dayRateUah = tariff?.dayRateUah ?? 0;
-  const nightRateUah = tariff?.nightRateUah ?? 0;
 
   const households = new Map<string, HouseholdRow>();
 
@@ -423,7 +414,6 @@ async function ChairPaymentsManageView({
   );
 
   const hubStats = await getPaymentsHubStats(communityId, period);
-  const periodQuery = `?y=${period.year}&m=${period.month}`;
 
   return (
     <>
@@ -440,11 +430,11 @@ async function ChairPaymentsManageView({
         periodMonth={period.month}
       />
 
-      <div className="mb-4">
-        <ButtonLink href={`/payments/settings${periodQuery}`} variant="secondary">
-          {t("tariffsAndRequisitesLink")}
-        </ButtonLink>
-      </div>
+      <PaymentsTariffsRequisitesPanel
+        dayRateUah={dayRateUah}
+        nightRateUah={nightRateUah}
+        paymentRequisites={paymentRequisites}
+      />
 
       <PaymentsHubStatsBar stats={hubStats} />
 
@@ -546,13 +536,25 @@ export default async function PaymentsPage({
 
   const community = await prisma.community.findUnique({
     where: { id: communityId },
-    select: { paymentRequisites: true },
+    select: {
+      paymentRequisites: true,
+      electricityDayRateUah: true,
+      electricityNightRateUah: true,
+    },
   });
   const paymentRequisites = community?.paymentRequisites ?? null;
+  const dayRateUah = community?.electricityDayRateUah ?? 0;
+  const nightRateUah = community?.electricityNightRateUah ?? 0;
 
   if (isChair) {
     return (
-      <ChairPaymentsManageView communityId={communityId} period={period} />
+      <ChairPaymentsManageView
+        communityId={communityId}
+        period={period}
+        dayRateUah={dayRateUah}
+        nightRateUah={nightRateUah}
+        paymentRequisites={paymentRequisites}
+      />
     );
   }
 

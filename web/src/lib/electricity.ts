@@ -9,6 +9,11 @@ import { prisma } from "@/lib/prisma";
 
 export type MeterValues = { day: number; night: number };
 
+export type ElectricityRates = {
+  dayRateUah: number;
+  nightRateUah: number;
+};
+
 export function parseMeterReading(raw: string): number | null {
   const n = Number(String(raw).trim().replace(",", "."));
   if (!Number.isFinite(n) || n < 0) return null;
@@ -22,7 +27,7 @@ export function roundMoneyUah(n: number): number {
 export function computeElectricityCharge(
   current: MeterValues,
   previous: MeterValues | null,
-  rates: { dayRateUah: number; nightRateUah: number },
+  rates: ElectricityRates,
 ): {
   deltaDay: number;
   deltaNight: number;
@@ -55,19 +60,21 @@ export function meterUniqueWhere(
   };
 }
 
-export async function getElectricityTariff(
-  communityId: string,
-  period: BillingPeriod,
-) {
-  return prisma.communityElectricityTariff.findUnique({
-    where: {
-      communityId_periodYear_periodMonth: {
-        communityId,
-        periodYear: period.year,
-        periodMonth: period.month,
-      },
+export async function getCommunityElectricityRates(communityId: string) {
+  const community = await prisma.community.findUnique({
+    where: { id: communityId },
+    select: {
+      electricityDayRateUah: true,
+      electricityNightRateUah: true,
     },
   });
+  if (!community) {
+    return { dayRateUah: 0, nightRateUah: 0 };
+  }
+  return {
+    dayRateUah: community.electricityDayRateUah,
+    nightRateUah: community.electricityNightRateUah,
+  };
 }
 
 export async function getPreviousMeterReading(
@@ -114,25 +121,4 @@ export async function applyElectricityToBilling(
       ...(amountsChanged ? { paidAt: null, paymentSentAt: null } : {}),
     },
   });
-}
-
-export async function loadMeterContext(
-  communityId: string,
-  period: BillingPeriod,
-) {
-  const [tariff, readings] = await Promise.all([
-    getElectricityTariff(communityId, period),
-    prisma.householdMeterReading.findMany({
-      where: billingPeriodWhere(communityId, period),
-    }),
-  ]);
-
-  const readingByKey = new Map(
-    readings.map((r) => [
-      `${normalizeStreet(r.street)}|${normalizeHouseNumber(r.houseNumber)}`,
-      r,
-    ]),
-  );
-
-  return { tariff, readingByKey };
 }

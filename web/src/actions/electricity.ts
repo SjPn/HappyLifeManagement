@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import {
   applyElectricityToBilling,
   computeElectricityCharge,
-  getElectricityTariff,
+  getCommunityElectricityRates,
   getPreviousMeterReading,
   meterUniqueWhere,
   parseMeterReading,
@@ -34,34 +34,19 @@ export async function saveElectricityTariff(formData: FormData) {
   }
 
   const communityId = requireCommunityId(session.user);
-  const period = parsePeriodFromForm(formData);
   const dayRateUah = parseRate(String(formData.get("dayRateUah") || ""));
   const nightRateUah = parseRate(String(formData.get("nightRateUah") || ""));
 
-  if (!period || dayRateUah === null || nightRateUah === null) {
+  if (dayRateUah === null || nightRateUah === null) {
     return { error: "badData" as const };
   }
 
-  await prisma.communityElectricityTariff.upsert({
-    where: {
-      communityId_periodYear_periodMonth: {
-        communityId,
-        periodYear: period.year,
-        periodMonth: period.month,
-      },
-    },
-    create: {
-      communityId,
-      periodYear: period.year,
-      periodMonth: period.month,
-      dayRateUah,
-      nightRateUah,
-    },
-    update: { dayRateUah, nightRateUah },
+  await prisma.community.update({
+    where: { id: communityId },
+    data: { electricityDayRateUah: dayRateUah, electricityNightRateUah: nightRateUah },
   });
 
   revalidateAllLocales("/payments");
-  revalidateAllLocales("/payments/settings");
   return { ok: true as const };
 }
 
@@ -91,8 +76,8 @@ export async function saveHouseholdMeterReading(formData: FormData) {
     return { error: "badReadings" as const };
   }
 
-  const tariff = await getElectricityTariff(communityId, period);
-  if (!tariff || (tariff.dayRateUah <= 0 && tariff.nightRateUah <= 0)) {
+  const rates = await getCommunityElectricityRates(communityId);
+  if (rates.dayRateUah <= 0 && rates.nightRateUah <= 0) {
     return { error: "noTariff" as const };
   }
 
@@ -110,7 +95,7 @@ export async function saveHouseholdMeterReading(formData: FormData) {
   const { totalUah, deltaDay, deltaNight } = computeElectricityCharge(
     { day: dayReading, night: nightReading },
     prev,
-    { dayRateUah: tariff.dayRateUah, nightRateUah: tariff.nightRateUah },
+    rates,
   );
 
   await prisma.householdMeterReading.upsert({
@@ -136,7 +121,6 @@ export async function saveHouseholdMeterReading(formData: FormData) {
   );
 
   revalidateAllLocales("/payments");
-  revalidateAllLocales("/payments/settings");
   revalidateAllLocales("/dashboard");
 
   return {

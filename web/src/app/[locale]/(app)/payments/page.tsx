@@ -3,8 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { PageTitle, Card, ButtonLink } from "@/components/Ui";
 import { HubPulseBanner, HubSection } from "@/components/hub/hubUi";
 import { ResidentPaymentsHubBar } from "@/components/ResidentPaymentsHubBar";
-import { PaymentEditForm } from "@/components/PaymentEditForm";
-import { PaymentPaidToggle } from "@/components/PaymentPaidToggle";
 import { PaymentPeriodNav } from "@/components/PaymentPeriodNav";
 import { getLocale, getTranslations } from "next-intl/server";
 import { formatUah } from "@/lib/money";
@@ -27,7 +25,7 @@ import { CopyRequisitesButton } from "@/components/CopyRequisitesButton";
 import { ChairPaymentRequisitesForm } from "@/components/ChairPaymentRequisitesForm";
 import { CopyBillingFromPrevMonth } from "@/components/CopyBillingFromPrevMonth";
 import { ElectricityTariffForm } from "@/components/ElectricityTariffForm";
-import { HouseholdMeterForm } from "@/components/HouseholdMeterForm";
+import { HouseholdPaymentEditor } from "@/components/HouseholdPaymentEditor";
 import { computeElectricityCharge } from "@/lib/electricity";
 import { getPaymentsHubStats } from "@/lib/hubStats";
 import {
@@ -489,33 +487,20 @@ async function ChairPaymentsManageView({
                 </p>
               </div>
               <div className="mt-4 space-y-3 border-t border-zinc-100 pt-3 dark:border-zinc-800">
-                <HouseholdMeterForm
-                  street={h.street}
-                  houseNumber={h.houseNumber}
-                  periodYear={period.year}
-                  periodMonth={period.month}
-                  dayReading={meter?.dayReading ?? null}
-                  nightReading={meter?.nightReading ?? null}
-                  prevDayReading={prevMeter?.dayReading ?? null}
-                  prevNightReading={prevMeter?.nightReading ?? null}
-                  dayRateUah={dayRateUah}
-                  nightRateUah={nightRateUah}
-                  electricityUah={h.electricityUah}
-                />
-                <PaymentPaidToggle
-                  street={h.street}
-                  houseNumber={h.houseNumber}
-                  periodYear={period.year}
-                  periodMonth={period.month}
-                  paid={h.paidAt != null}
-                />
-                <PaymentEditForm
+                <HouseholdPaymentEditor
                   street={h.street}
                   houseNumber={h.houseNumber}
                   periodYear={period.year}
                   periodMonth={period.month}
                   subscriptionFeeUah={h.subscriptionFeeUah}
                   electricityUah={h.electricityUah}
+                  paid={h.paidAt != null}
+                  dayReading={meter?.dayReading ?? null}
+                  nightReading={meter?.nightReading ?? null}
+                  prevDayReading={prevMeter?.dayReading ?? null}
+                  prevNightReading={prevMeter?.nightReading ?? null}
+                  dayRateUah={dayRateUah}
+                  nightRateUah={nightRateUah}
                 />
               </div>
             </Card>

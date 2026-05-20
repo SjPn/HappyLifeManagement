@@ -3,7 +3,7 @@
 import { setHouseholdPayments } from "@/actions/chair";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function PaymentEditForm({
   street,
@@ -24,6 +24,11 @@ export function PaymentEditForm({
   const t = useTranslations("chair");
   const tc = useTranslations("common");
   const [loading, setLoading] = useState(false);
+  const [electricity, setElectricity] = useState(String(electricityUah));
+
+  useEffect(() => {
+    setElectricity(String(electricityUah));
+  }, [electricityUah]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -56,7 +61,8 @@ export function PaymentEditForm({
           name="electricityUah"
           type="text"
           inputMode="decimal"
-          defaultValue={String(electricityUah)}
+          value={electricity}
+          onChange={(e) => setElectricity(e.target.value)}
           className="w-28 rounded border border-zinc-300 bg-white px-2 py-1 dark:border-zinc-600 dark:bg-zinc-900"
           aria-label={t("electricityFee")}
         />

@@ -24,6 +24,7 @@ export function HouseholdMeterForm({
   dayRateUah,
   nightRateUah,
   electricityUah,
+  onElectricityCalculated,
 }: {
   street: string;
   houseNumber: string;
@@ -36,6 +37,7 @@ export function HouseholdMeterForm({
   dayRateUah: number;
   nightRateUah: number;
   electricityUah: number;
+  onElectricityCalculated?: (amount: number) => void;
 }) {
   const router = useRouter();
   const t = useTranslations("payments.electricityMeter");
@@ -87,6 +89,9 @@ export function HouseholdMeterForm({
       else if (res.error === "badReadings") setError(t("errorBadReadings"));
       else setError(t("errorSave"));
       return;
+    }
+    if (res && "electricityUah" in res && typeof res.electricityUah === "number") {
+      onElectricityCalculated?.(res.electricityUah);
     }
     router.refresh();
   }

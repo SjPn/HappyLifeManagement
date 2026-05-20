@@ -21,6 +21,7 @@ export async function updatePaymentRequisites(formData: FormData) {
   });
 
   revalidateAllLocales("/payments");
+  revalidateAllLocales("/payments/settings");
   revalidateAllLocales("/chair");
   return { ok: true as const };
 }

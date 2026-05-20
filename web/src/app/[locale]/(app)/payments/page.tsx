@@ -22,9 +22,7 @@ import { communityWhere, requireCommunityId } from "@/lib/tenant";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
 import { PaymentsHubStatsBar } from "@/components/PaymentsHubStats";
 import { CopyRequisitesButton } from "@/components/CopyRequisitesButton";
-import { ChairPaymentRequisitesForm } from "@/components/ChairPaymentRequisitesForm";
 import { CopyBillingFromPrevMonth } from "@/components/CopyBillingFromPrevMonth";
-import { ElectricityTariffForm } from "@/components/ElectricityTariffForm";
 import { HouseholdPaymentEditor } from "@/components/HouseholdPaymentEditor";
 import { computeElectricityCharge } from "@/lib/electricity";
 import { getPaymentsHubStats } from "@/lib/hubStats";
@@ -302,11 +300,9 @@ type HouseholdRow = {
 async function ChairPaymentsManageView({
   communityId,
   period,
-  paymentRequisites,
 }: {
   communityId: string;
   period: BillingPeriod;
-  paymentRequisites: string | null;
 }) {
   const locale = await getLocale();
   const t = await getTranslations("payments");
@@ -427,6 +423,7 @@ async function ChairPaymentsManageView({
   );
 
   const hubStats = await getPaymentsHubStats(communityId, period);
+  const periodQuery = `?y=${period.year}&m=${period.month}`;
 
   return (
     <>
@@ -443,18 +440,11 @@ async function ChairPaymentsManageView({
         periodMonth={period.month}
       />
 
-      <Card className="mb-4">
-        <ElectricityTariffForm
-          periodYear={period.year}
-          periodMonth={period.month}
-          dayRateUah={dayRateUah}
-          nightRateUah={nightRateUah}
-        />
-      </Card>
-
-      <Card className="mb-4">
-        <ChairPaymentRequisitesForm initialRequisites={paymentRequisites} />
-      </Card>
+      <div className="mb-4">
+        <ButtonLink href={`/payments/settings${periodQuery}`} variant="secondary">
+          {t("tariffsAndRequisitesLink")}
+        </ButtonLink>
+      </div>
 
       <PaymentsHubStatsBar stats={hubStats} />
 
@@ -562,11 +552,7 @@ export default async function PaymentsPage({
 
   if (isChair) {
     return (
-      <ChairPaymentsManageView
-        communityId={communityId}
-        period={period}
-        paymentRequisites={paymentRequisites}
-      />
+      <ChairPaymentsManageView communityId={communityId} period={period} />
     );
   }
 

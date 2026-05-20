@@ -61,6 +61,7 @@ export async function saveElectricityTariff(formData: FormData) {
   });
 
   revalidateAllLocales("/payments");
+  revalidateAllLocales("/payments/settings");
   return { ok: true as const };
 }
 
@@ -135,6 +136,7 @@ export async function saveHouseholdMeterReading(formData: FormData) {
   );
 
   revalidateAllLocales("/payments");
+  revalidateAllLocales("/payments/settings");
   revalidateAllLocales("/dashboard");
 
   return {

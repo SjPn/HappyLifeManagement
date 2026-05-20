@@ -416,6 +416,11 @@
     "debtReminderText": "For {period} you owe: {amount}.",
     "debtReminderLink": "Go to payments →",
     "debtReminderDismiss": "Dismiss",
+    "sendPayment": "Send",
+    "sendSuccessTitle": "Sent",
+    "sendSuccessMessage": "Payment amounts sent: {address} · {residents}",
+    "sendSuccessClose": "OK",
+    "sentToResidentBadge": "Sent to resident",
     "electricityMeter": {
       "tariffTitle": "Electricity rates for this period",
       "tariffHint": "UAH per kWh (day and night). Required for automatic meter billing.",

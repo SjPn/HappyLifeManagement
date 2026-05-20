@@ -416,6 +416,11 @@
     "debtReminderText": "За {period} до сплати: {amount}.",
     "debtReminderLink": "Перейти до платежів →",
     "debtReminderDismiss": "Закрити",
+    "sendPayment": "Надіслати",
+    "sendSuccessTitle": "Надіслано",
+    "sendSuccessMessage": "Суми до сплати надіслано: {address} · {residents}",
+    "sendSuccessClose": "Добре",
+    "sentToResidentBadge": "Надіслано мешканцю",
     "electricityMeter": {
       "tariffTitle": "Тарифи електроенергії за період",
       "tariffHint": "₴ за 1 кВт·год (день і ніч). Потрібні для автоматичного розрахунку за лічильником.",

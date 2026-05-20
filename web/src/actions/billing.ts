@@ -58,6 +58,7 @@ export async function copyBillingFromPreviousMonth(
         subscriptionFeeUah: row.subscriptionFeeUah,
         electricityUah: row.electricityUah,
         paidAt: null,
+        paymentSentAt: null,
       },
     });
     copied += 1;

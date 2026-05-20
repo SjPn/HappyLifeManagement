@@ -160,10 +160,12 @@ export async function setHouseholdPayments(formData: FormData) {
       periodMonth: period.month,
       subscriptionFeeUah,
       electricityUah,
+      paymentSentAt: new Date(),
     },
     update: {
       subscriptionFeeUah,
       electricityUah,
+      paymentSentAt: new Date(),
       ...(amountsChanged ? { paidAt: null } : {}),
     },
   });
@@ -172,7 +174,7 @@ export async function setHouseholdPayments(formData: FormData) {
   revalidateAllLocales("/chair/users");
   revalidateAllLocales("/payments");
   revalidateAllLocales("/dashboard");
-  return { ok: true as const };
+  return { ok: true as const, paymentSentAt: new Date().toISOString() };
 }
 
 export async function setHouseholdPaid(formData: FormData) {

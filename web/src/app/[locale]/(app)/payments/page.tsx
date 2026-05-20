@@ -296,6 +296,7 @@ type HouseholdRow = {
   subscriptionFeeUah: number;
   electricityUah: number;
   paidAt: Date | null;
+  paymentSentAt: Date | null;
 };
 
 async function ChairPaymentsManageView({
@@ -389,6 +390,7 @@ async function ChairPaymentsManageView({
         subscriptionFeeUah: bill?.subscriptionFeeUah ?? 0,
         electricityUah: bill?.electricityUah ?? 0,
         paidAt: bill?.paidAt ?? null,
+        paymentSentAt: bill?.paymentSentAt ?? null,
       });
     } else {
       existing.residents.push({
@@ -396,6 +398,9 @@ async function ChairPaymentsManageView({
         tenancyType: u.tenancyType,
         status: u.status,
       });
+      if (bill?.paymentSentAt) {
+        existing.paymentSentAt = bill.paymentSentAt;
+      }
     }
   }
 
@@ -409,6 +414,7 @@ async function ChairPaymentsManageView({
         subscriptionFeeUah: b.subscriptionFeeUah,
         electricityUah: b.electricityUah,
         paidAt: b.paidAt,
+        paymentSentAt: b.paymentSentAt,
       });
     }
   }
@@ -456,23 +462,32 @@ async function ChairPaymentsManageView({
         {list.map((h) => {
           const total = h.subscriptionFeeUah + h.electricityUah;
           const residentNames = h.residents.map((r) => r.name).join(", ");
+          const addressLabel = formatAddressLine(h.street, h.houseNumber);
           const key = householdAddressKey(h.street, h.houseNumber);
           const meter = meterByKey.get(key);
           const prevMeter = prevMeterByKey.get(key);
+          const sentToResident = h.paymentSentAt != null && h.paidAt == null;
           return (
             <Card
               key={householdAddressKey(h.street, h.houseNumber)}
               className={
                 h.paidAt
                   ? "border-blue-200 dark:border-blue-800"
-                  : undefined
+                  : sentToResident
+                    ? "border-emerald-200 dark:border-emerald-900/60"
+                    : undefined
               }
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <p className="text-lg font-semibold">
-                    {formatAddressLine(h.street, h.houseNumber)}
-                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-lg font-semibold">{addressLabel}</p>
+                    {sentToResident && (
+                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
+                        {t("sentToResidentBadge")}
+                      </span>
+                    )}
+                  </div>
                   <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
                     {t("registeredResidents")}: {residentNames || "—"}
                   </p>
@@ -495,6 +510,9 @@ async function ChairPaymentsManageView({
                   subscriptionFeeUah={h.subscriptionFeeUah}
                   electricityUah={h.electricityUah}
                   paid={h.paidAt != null}
+                  paymentSent={sentToResident}
+                  addressLabel={addressLabel}
+                  residentNames={residentNames}
                   dayReading={meter?.dayReading ?? null}
                   nightReading={meter?.nightReading ?? null}
                   prevDayReading={prevMeter?.dayReading ?? null}

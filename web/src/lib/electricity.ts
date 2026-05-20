@@ -111,7 +111,7 @@ export async function applyElectricityToBilling(
     },
     update: {
       electricityUah,
-      ...(amountsChanged ? { paidAt: null } : {}),
+      ...(amountsChanged ? { paidAt: null, paymentSentAt: null } : {}),
     },
   });
 }

@@ -13,6 +13,9 @@ export function HouseholdPaymentEditor({
   subscriptionFeeUah,
   electricityUah: electricityUahProp,
   paid,
+  paymentSent: paymentSentProp,
+  addressLabel,
+  residentNames,
   dayReading,
   nightReading,
   prevDayReading,
@@ -27,6 +30,9 @@ export function HouseholdPaymentEditor({
   subscriptionFeeUah: number;
   electricityUah: number;
   paid: boolean;
+  paymentSent: boolean;
+  addressLabel: string;
+  residentNames: string;
   dayReading: number | null;
   nightReading: number | null;
   prevDayReading: number | null;
@@ -35,10 +41,15 @@ export function HouseholdPaymentEditor({
   nightRateUah: number;
 }) {
   const [electricityUah, setElectricityUah] = useState(electricityUahProp);
+  const [paymentSent, setPaymentSent] = useState(paymentSentProp);
 
   useEffect(() => {
     setElectricityUah(electricityUahProp);
   }, [electricityUahProp]);
+
+  useEffect(() => {
+    setPaymentSent(paymentSentProp);
+  }, [paymentSentProp]);
 
   return (
     <>
@@ -54,7 +65,10 @@ export function HouseholdPaymentEditor({
         dayRateUah={dayRateUah}
         nightRateUah={nightRateUah}
         electricityUah={electricityUah}
-        onElectricityCalculated={setElectricityUah}
+        onElectricityCalculated={(amount) => {
+          setElectricityUah(amount);
+          setPaymentSent(false);
+        }}
       />
       <PaymentPaidToggle
         street={street}
@@ -70,6 +84,10 @@ export function HouseholdPaymentEditor({
         periodMonth={periodMonth}
         subscriptionFeeUah={subscriptionFeeUah}
         electricityUah={electricityUah}
+        addressLabel={addressLabel}
+        residentNames={residentNames}
+        paymentSent={paymentSent}
+        onPaymentSent={() => setPaymentSent(true)}
       />
     </>
   );

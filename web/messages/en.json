@@ -415,7 +415,28 @@
     "debtReminderTitle": "Payment due",
     "debtReminderText": "For {period} you owe: {amount}.",
     "debtReminderLink": "Go to payments →",
-    "debtReminderDismiss": "Dismiss"
+    "debtReminderDismiss": "Dismiss",
+    "electricityMeter": {
+      "tariffTitle": "Electricity rates for this period",
+      "tariffHint": "UAH per kWh (day and night). Required for automatic meter billing.",
+      "dayRate": "Day rate UAH/kWh",
+      "nightRate": "Night rate UAH/kWh",
+      "meterTitle": "Meter (day / night)",
+      "dayReading": "Day zone",
+      "nightReading": "Night zone",
+      "prevReadings": "Previous month: day {day}, night {night}",
+      "noPrevHint": "No readings for the previous month — usage is calculated from zero.",
+      "calcSave": "Calculate and save",
+      "preview": "Usage: day {dayKwh} kWh, night {nightKwh} kWh → {amount} UAH",
+      "currentCharge": "Current charge: {amount} UAH (electricity)",
+      "setTariffFirst": "Save period rates above first.",
+      "errorNoTariff": "Set a day or night rate for this month.",
+      "errorBadReadings": "Enter valid meter readings.",
+      "errorSave": "Could not save",
+      "residentBreakdownTitle": "Meter calculation",
+      "residentDay": "Day: reading {reading}, usage {kwh} kWh",
+      "residentNight": "Night: reading {reading}, usage {kwh} kWh"
+    }
   },
   "documents": {
     "title": "Community documents",

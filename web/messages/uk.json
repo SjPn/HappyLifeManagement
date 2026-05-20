@@ -415,7 +415,28 @@
     "debtReminderTitle": "Є заборгованість",
     "debtReminderText": "За {period} до сплати: {amount}.",
     "debtReminderLink": "Перейти до платежів →",
-    "debtReminderDismiss": "Закрити"
+    "debtReminderDismiss": "Закрити",
+    "electricityMeter": {
+      "tariffTitle": "Тарифи електроенергії за період",
+      "tariffHint": "₴ за 1 кВт·год (день і ніч). Потрібні для автоматичного розрахунку за лічильником.",
+      "dayRate": "Денний тариф ₴/кВт·год",
+      "nightRate": "Нічний тариф ₴/кВт·год",
+      "meterTitle": "Лічильник (день / ніч)",
+      "dayReading": "Денна зона",
+      "nightReading": "Нічна зона",
+      "prevReadings": "Минулий місяць: день {day}, ніч {night}",
+      "noPrevHint": "Немає показань за минулий місяць — різниця рахується від нуля.",
+      "calcSave": "Розрахувати й зберегти",
+      "preview": "Споживання: день {dayKwh} кВт·год, ніч {nightKwh} кВт·год → {amount} ₴",
+      "currentCharge": "У нарахуванні зараз: {amount} ₴ (електроенергія)",
+      "setTariffFirst": "Спочатку збережіть тарифи за період вище.",
+      "errorNoTariff": "Задайте денний або нічний тариф за цей місяць.",
+      "errorBadReadings": "Введіть коректні показання лічильника.",
+      "errorSave": "Не вдалося зберегти",
+      "residentBreakdownTitle": "Розрахунок за лічильником",
+      "residentDay": "День: показання {reading}, споживання {kwh} кВт·год",
+      "residentNight": "Ніч: показання {reading}, споживання {kwh} кВт·год"
+    }
   },
   "documents": {
     "title": "Документи поселення",

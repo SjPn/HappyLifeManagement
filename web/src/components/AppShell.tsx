@@ -59,9 +59,12 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen flex-col pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))]">
-      <main className="relative mx-auto w-full min-w-0 max-w-lg flex-1 px-4 pb-2 pt-5 sm:px-5">
+      <main className="relative mx-auto w-full min-w-0 max-w-lg flex-1 px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top,0px))] sm:px-5">
         {communityName ? (
-          <p className="mb-3 truncate text-center text-xs font-semibold uppercase tracking-wide text-blue-700/90 dark:text-blue-300/90">
+          <p
+            className="mb-4 line-clamp-2 px-1 text-center text-[0.65rem] font-semibold leading-snug tracking-wide text-blue-700/90 dark:text-blue-300/90"
+            title={communityName}
+          >
             {communityName}
           </p>
         ) : null}

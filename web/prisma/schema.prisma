@@ -33,7 +33,9 @@ model Community {
   forumTopics        ForumTopic[]
   forumPosts         ForumPost[]
   reports            ConfidentialReport[]
-  householdBillings  HouseholdBilling[]
+  householdBillings       HouseholdBilling[]
+  electricityTariffs      CommunityElectricityTariff[]
+  householdMeterReadings  HouseholdMeterReading[]
   directMessages     DirectMessage[]
   documents          CommunityDocument[]
 }
@@ -287,6 +289,39 @@ model HouseholdBilling {
 
   @@unique([communityId, street, houseNumber, periodYear, periodMonth])
   @@index([communityId, street, houseNumber, periodYear, periodMonth])
+}
+
+/// Тарифы электроэнергии за период (₴/кВт·ч), для расчёта по двухтарифному счётчику.
+model CommunityElectricityTariff {
+  id           String    @id @default(cuid())
+  communityId  String
+  community    Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  periodYear   Int
+  periodMonth  Int
+  dayRateUah   Float     @default(0)
+  nightRateUah Float     @default(0)
+  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime  @default(now())
+
+  @@unique([communityId, periodYear, periodMonth])
+}
+
+/// Показания счётчика (накопительные) по дому за период.
+model HouseholdMeterReading {
+  id            String    @id @default(cuid())
+  communityId   String
+  community     Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  street        String
+  houseNumber   String
+  periodYear    Int
+  periodMonth   Int
+  dayReading    Float?
+  nightReading  Float?
+  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime  @default(now())
+
+  @@unique([communityId, street, houseNumber, periodYear, periodMonth])
+  @@index([communityId, periodYear, periodMonth])
 }
 
 model ConfidentialReport {

@@ -415,7 +415,28 @@
     "debtReminderTitle": "Есть задолженность",
     "debtReminderText": "За {period} к оплате: {amount}.",
     "debtReminderLink": "Перейти к платежам →",
-    "debtReminderDismiss": "Закрыть"
+    "debtReminderDismiss": "Закрыть",
+    "electricityMeter": {
+      "tariffTitle": "Тарифы на электроэнергию за период",
+      "tariffHint": "₴ за 1 кВт·ч (день и ночь). Нужны для автоматического расчёта по счётчику.",
+      "dayRate": "Дневной тариф ₴/кВт·ч",
+      "nightRate": "Ночной тариф ₴/кВт·ч",
+      "meterTitle": "Счётчик (день / ночь)",
+      "dayReading": "Дневная зона",
+      "nightReading": "Ночная зона",
+      "prevReadings": "Прошлый месяц: день {day}, ночь {night}",
+      "noPrevHint": "Нет показаний за прошлый месяц — разница считается от нуля.",
+      "calcSave": "Рассчитать и сохранить",
+      "preview": "Потребление: день {dayKwh} кВт·ч, ночь {nightKwh} кВт·ч → {amount} ₴",
+      "currentCharge": "В начислении сейчас: {amount} ₴ (электроэнергия)",
+      "setTariffFirst": "Сначала сохраните тарифы за период выше.",
+      "errorNoTariff": "Задайте дневной или ночной тариф за этот месяц.",
+      "errorBadReadings": "Введите корректные показания счётчика.",
+      "errorSave": "Не удалось сохранить",
+      "residentBreakdownTitle": "Расчёт по счётчику",
+      "residentDay": "День: показание {reading}, потребление {kwh} кВт·ч",
+      "residentNight": "Ночь: показание {reading}, потребление {kwh} кВт·ч"
+    }
   },
   "documents": {
     "title": "Документы посёлка",

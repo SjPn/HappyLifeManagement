@@ -17,6 +17,7 @@ import {
   billingUniqueWhere,
   formatBillingPeriodLabel,
   parseBillingPeriod,
+  previousBillingPeriod,
   type BillingPeriod,
 } from "@/lib/billing";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
@@ -25,6 +26,9 @@ import { PaymentsHubStatsBar } from "@/components/PaymentsHubStats";
 import { CopyRequisitesButton } from "@/components/CopyRequisitesButton";
 import { ChairPaymentRequisitesForm } from "@/components/ChairPaymentRequisitesForm";
 import { CopyBillingFromPrevMonth } from "@/components/CopyBillingFromPrevMonth";
+import { ElectricityTariffForm } from "@/components/ElectricityTariffForm";
+import { HouseholdMeterForm } from "@/components/HouseholdMeterForm";
+import { computeElectricityCharge } from "@/lib/electricity";
 import { getPaymentsHubStats } from "@/lib/hubStats";
 import {
   formatAddressLine,
@@ -58,6 +62,7 @@ async function ResidentPaymentsView({
   paymentRequisites: string | null;
 }) {
   const t = await getTranslations("payments");
+  const te = await getTranslations("payments.electricityMeter");
   const tp = await getTranslations("profile");
 
   const user = await prisma.user.findUnique({
@@ -72,7 +77,9 @@ async function ResidentPaymentsView({
   const street = user ? normalizeStreet(user.street) : "";
   const houseNumber = user ? normalizeHouseNumber(user.houseNumber) : "";
 
-  const [billing, history] = user
+  const prevPeriod = previousBillingPeriod(period);
+
+  const [billing, history, meterReading, prevMeter, tariff] = user
     ? await Promise.all([
         getBillingForAddress(communityId, user.street, user.houseNumber, period),
         prisma.householdBilling.findMany({
@@ -80,8 +87,33 @@ async function ResidentPaymentsView({
           orderBy: [{ periodYear: "desc" }, { periodMonth: "desc" }],
           take: 24,
         }),
+        prisma.householdMeterReading.findUnique({
+          where: billingUniqueWhere(
+            communityId,
+            user.street,
+            user.houseNumber,
+            period,
+          ),
+        }),
+        prisma.householdMeterReading.findUnique({
+          where: billingUniqueWhere(
+            communityId,
+            user.street,
+            user.houseNumber,
+            prevPeriod,
+          ),
+        }),
+        prisma.communityElectricityTariff.findUnique({
+          where: {
+            communityId_periodYear_periodMonth: {
+              communityId,
+              periodYear: period.year,
+              periodMonth: period.month,
+            },
+          },
+        }),
       ])
-    : [null, []];
+    : [null, [], null, null, null];
 
   const historyRows = history.filter(
     (h) => billingPeriodKey({ year: h.periodYear, month: h.periodMonth }) !== billingPeriodKey(period),
@@ -90,6 +122,26 @@ async function ResidentPaymentsView({
   const subscription = billing?.subscriptionFeeUah ?? 0;
   const electricity = billing?.electricityUah ?? 0;
   const total = subscription + electricity;
+
+  const meterBreakdown =
+    meterReading?.dayReading != null &&
+    meterReading?.nightReading != null &&
+    tariff &&
+    (tariff.dayRateUah > 0 || tariff.nightRateUah > 0)
+      ? computeElectricityCharge(
+          {
+            day: meterReading.dayReading,
+            night: meterReading.nightReading,
+          },
+          prevMeter?.dayReading != null && prevMeter?.nightReading != null
+            ? { day: prevMeter.dayReading, night: prevMeter.nightReading }
+            : null,
+          {
+            dayRateUah: tariff.dayRateUah,
+            nightRateUah: tariff.nightRateUah,
+          },
+        )
+      : null;
   const isPaid = billing?.paidAt != null;
   const periodLabel = formatBillingPeriodLabel(locale, period);
 
@@ -133,6 +185,29 @@ async function ResidentPaymentsView({
             totalLabel={formatUah(total, locale)}
             highlightTotal={total > 0}
           />
+          {meterBreakdown &&
+            meterReading?.dayReading != null &&
+            meterReading?.nightReading != null && (
+            <Card className="mt-3 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                {te("residentBreakdownTitle")}
+              </p>
+              <ul className="mt-2 space-y-1 text-xs text-zinc-700 dark:text-zinc-300">
+                <li>
+                  {te("residentDay", {
+                    reading: meterReading.dayReading,
+                    kwh: meterBreakdown.deltaDay,
+                  })}
+                </li>
+                <li>
+                  {te("residentNight", {
+                    reading: meterReading.nightReading,
+                    kwh: meterBreakdown.deltaNight,
+                  })}
+                </li>
+              </ul>
+            </Card>
+          )}
         </div>
       )}
 
@@ -238,22 +313,40 @@ async function ChairPaymentsManageView({
   const t = await getTranslations("payments");
   const periodLabel = formatBillingPeriodLabel(locale, period);
 
-  const [residents, billings] = await Promise.all([
-    prisma.user.findMany({
-      where: { ...communityWhere(communityId), role: Role.RESIDENT },
-      orderBy: [{ street: "asc" }, { houseNumber: "asc" }, { name: "asc" }],
-      select: {
-        name: true,
-        street: true,
-        houseNumber: true,
-        tenancyType: true,
-        status: true,
-      },
-    }),
-    prisma.householdBilling.findMany({
-      where: billingPeriodWhere(communityId, period),
-    }),
-  ]);
+  const prevPeriod = previousBillingPeriod(period);
+
+  const [residents, billings, tariff, meterReadings, prevMeters] =
+    await Promise.all([
+      prisma.user.findMany({
+        where: { ...communityWhere(communityId), role: Role.RESIDENT },
+        orderBy: [{ street: "asc" }, { houseNumber: "asc" }, { name: "asc" }],
+        select: {
+          name: true,
+          street: true,
+          houseNumber: true,
+          tenancyType: true,
+          status: true,
+        },
+      }),
+      prisma.householdBilling.findMany({
+        where: billingPeriodWhere(communityId, period),
+      }),
+      prisma.communityElectricityTariff.findUnique({
+        where: {
+          communityId_periodYear_periodMonth: {
+            communityId,
+            periodYear: period.year,
+            periodMonth: period.month,
+          },
+        },
+      }),
+      prisma.householdMeterReading.findMany({
+        where: billingPeriodWhere(communityId, period),
+      }),
+      prisma.householdMeterReading.findMany({
+        where: billingPeriodWhere(communityId, prevPeriod),
+      }),
+    ]);
 
   const billingByKey = new Map(
     billings.map((p) => [
@@ -261,6 +354,23 @@ async function ChairPaymentsManageView({
       p,
     ]),
   );
+
+  const meterByKey = new Map(
+    meterReadings.map((m) => [
+      householdAddressKey(m.street, m.houseNumber),
+      m,
+    ]),
+  );
+
+  const prevMeterByKey = new Map(
+    prevMeters.map((m) => [
+      householdAddressKey(m.street, m.houseNumber),
+      m,
+    ]),
+  );
+
+  const dayRateUah = tariff?.dayRateUah ?? 0;
+  const nightRateUah = tariff?.nightRateUah ?? 0;
 
   const households = new Map<string, HouseholdRow>();
 
@@ -330,6 +440,15 @@ async function ChairPaymentsManageView({
       />
 
       <Card className="mb-4">
+        <ElectricityTariffForm
+          periodYear={period.year}
+          periodMonth={period.month}
+          dayRateUah={dayRateUah}
+          nightRateUah={nightRateUah}
+        />
+      </Card>
+
+      <Card className="mb-4">
         <ChairPaymentRequisitesForm initialRequisites={paymentRequisites} />
       </Card>
 
@@ -339,6 +458,9 @@ async function ChairPaymentsManageView({
         {list.map((h) => {
           const total = h.subscriptionFeeUah + h.electricityUah;
           const residentNames = h.residents.map((r) => r.name).join(", ");
+          const key = householdAddressKey(h.street, h.houseNumber);
+          const meter = meterByKey.get(key);
+          const prevMeter = prevMeterByKey.get(key);
           return (
             <Card
               key={householdAddressKey(h.street, h.houseNumber)}
@@ -367,6 +489,19 @@ async function ChairPaymentsManageView({
                 </p>
               </div>
               <div className="mt-4 space-y-3 border-t border-zinc-100 pt-3 dark:border-zinc-800">
+                <HouseholdMeterForm
+                  street={h.street}
+                  houseNumber={h.houseNumber}
+                  periodYear={period.year}
+                  periodMonth={period.month}
+                  dayReading={meter?.dayReading ?? null}
+                  nightReading={meter?.nightReading ?? null}
+                  prevDayReading={prevMeter?.dayReading ?? null}
+                  prevNightReading={prevMeter?.nightReading ?? null}
+                  dayRateUah={dayRateUah}
+                  nightRateUah={nightRateUah}
+                  electricityUah={h.electricityUah}
+                />
                 <PaymentPaidToggle
                   street={h.street}
                   houseNumber={h.houseNumber}

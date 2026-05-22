@@ -11,6 +11,11 @@ import {
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
 import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
 import { requireCommunityId } from "@/lib/tenant";
+import {
+  BillingAuditAction,
+  logHouseholdBillingChange,
+  type BillingAuditActor,
+} from "@/lib/billingAudit";
 
 export async function copyBillingFromPreviousMonth(
   targetPeriod: BillingPeriod,
@@ -30,6 +35,14 @@ export async function copyBillingFromPreviousMonth(
   if (sourceRows.length === 0) {
     return { error: "noSourceMonth" as const };
   }
+
+  const actor: BillingAuditActor = {
+    id: session.user.id!,
+    name:
+      session.user.name?.trim() ||
+      session.user.email?.trim() ||
+      "—",
+  };
 
   let copied = 0;
   for (const row of sourceRows) {
@@ -59,6 +72,20 @@ export async function copyBillingFromPreviousMonth(
         electricityUah: row.electricityUah,
         paidAt: null,
         paymentSentAt: null,
+      },
+    });
+    await logHouseholdBillingChange({
+      communityId,
+      street,
+      houseNumber,
+      period: targetPeriod,
+      actor,
+      action: BillingAuditAction.COPIED_FROM_PREV,
+      details: {
+        sourcePeriodYear: source.year,
+        sourcePeriodMonth: source.month,
+        subscriptionFeeUah: row.subscriptionFeeUah,
+        electricityUah: row.electricityUah,
       },
     });
     copied += 1;

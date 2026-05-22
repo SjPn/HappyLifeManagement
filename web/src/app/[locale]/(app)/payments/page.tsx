@@ -24,6 +24,7 @@ import { PaymentsHubStatsBar } from "@/components/PaymentsHubStats";
 import { CopyRequisitesButton } from "@/components/CopyRequisitesButton";
 import { CopyBillingFromPrevMonth } from "@/components/CopyBillingFromPrevMonth";
 import { HouseholdPaymentEditor } from "@/components/HouseholdPaymentEditor";
+import { HouseholdBillingHistoryLink } from "@/components/HouseholdBillingHistoryModal";
 import { PaymentsTariffsRequisitesPanel } from "@/components/PaymentsTariffsRequisitesPanel";
 import { computeElectricityCharge } from "@/lib/electricity";
 import { getPaymentsHubStats } from "@/lib/hubStats";
@@ -452,9 +453,9 @@ async function ChairPaymentsManageView({
               key={householdAddressKey(h.street, h.houseNumber)}
               className={
                 h.paidAt
-                  ? "border-blue-200 dark:border-blue-800"
+                  ? "border-emerald-200 dark:border-emerald-900/60"
                   : sentToResident
-                    ? "border-emerald-200 dark:border-emerald-900/60"
+                    ? "border-amber-200 dark:border-amber-900/50"
                     : undefined
               }
             >
@@ -462,8 +463,13 @@ async function ChairPaymentsManageView({
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-lg font-semibold">{addressLabel}</p>
-                    {sentToResident && (
+                    {h.paidAt && (
                       <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
+                        {t("paidBadge")}
+                      </span>
+                    )}
+                    {sentToResident && (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[0.65rem] font-medium text-amber-900 dark:bg-amber-950/70 dark:text-amber-200">
                         {t("sentToResidentBadge")}
                       </span>
                     )}
@@ -471,11 +477,16 @@ async function ChairPaymentsManageView({
                   <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
                     {t("registeredResidents")}: {residentNames || "—"}
                   </p>
-                  {h.paidAt && (
-                    <p className="mt-1 text-xs font-medium text-blue-700 dark:text-blue-300">
-                      {t("paidBadge")}
-                    </p>
-                  )}
+                  <p className="mt-1">
+                    <HouseholdBillingHistoryLink
+                      street={h.street}
+                      houseNumber={h.houseNumber}
+                      periodYear={period.year}
+                      periodMonth={period.month}
+                      addressLabel={addressLabel}
+                      periodLabel={periodLabel}
+                    />
+                  </p>
                 </div>
                 <p className="text-right text-sm font-semibold tabular-nums">
                   {formatUah(total, locale)}

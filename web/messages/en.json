@@ -422,6 +422,21 @@
     "sendSuccessMessage": "Payment amounts sent: {address} · {residents}",
     "sendSuccessClose": "OK",
     "sentToResidentBadge": "Sent to resident",
+    "sentToResidentHint": "Amounts sent to resident — payment pending",
+    "auditHistoryLink": "Change history",
+    "auditHistoryTitle": "{address} · {period}",
+    "auditHistoryEmpty": "No chair changes for this month yet",
+    "auditHistoryLoading": "Loading…",
+    "auditHistoryClose": "Close",
+    "audit": {
+      "paid_marked": "Marked as paid",
+      "paid_unmarked": "Unmarked as paid",
+      "payment_sent": "Sent to resident: subscription {subscription} UAH, electricity {electricity} UAH",
+      "paidResetNote": "(paid flag cleared after amount change)",
+      "sentResetNote": "(send status updated)",
+      "meter_saved": "Meter: day {day}, night {night} → electricity {electricity} UAH (usage: day {deltaDay} kWh, night {deltaNight} kWh)",
+      "copied_from_prev": "Copied from {source}: subscription {subscription} UAH, electricity {electricity} UAH"
+    },
     "electricityMeter": {
       "tariffTitle": "Electricity rates",
       "tariffHint": "UAH per kWh (day and night). Set once for the community; save again when rates change.",

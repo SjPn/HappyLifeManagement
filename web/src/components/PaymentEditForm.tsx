@@ -60,8 +60,8 @@ export function PaymentEditForm({
         <input type="hidden" name="periodYear" value={periodYear} />
         <input type="hidden" name="periodMonth" value={periodMonth} />
         {paymentSent && (
-          <p className="mb-1 w-full text-xs font-medium text-emerald-700 dark:text-emerald-400">
-            {tp("sentToResidentBadge")}
+          <p className="mb-1 w-full text-xs font-medium text-amber-800 dark:text-amber-300">
+            {tp("sentToResidentHint")}
           </p>
         )}
         <label className="flex flex-col gap-1 text-xs">

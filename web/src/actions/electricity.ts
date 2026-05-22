@@ -9,11 +9,20 @@ import {
   meterUniqueWhere,
   parseMeterReading,
 } from "@/lib/electricity";
-import { parseBillingPeriod, type BillingPeriod } from "@/lib/billing";
+import {
+  billingUniqueWhere,
+  parseBillingPeriod,
+  type BillingPeriod,
+} from "@/lib/billing";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
 import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
 import { requireCommunityId } from "@/lib/tenant";
 import { prisma } from "@/lib/prisma";
+import {
+  BillingAuditAction,
+  logHouseholdBillingChange,
+  type BillingAuditActor,
+} from "@/lib/billingAudit";
 
 function parsePeriodFromForm(formData: FormData): BillingPeriod | null {
   const year = Number(formData.get("periodYear"));
@@ -112,6 +121,10 @@ export async function saveHouseholdMeterReading(formData: FormData) {
     update: { dayReading, nightReading },
   });
 
+  const prevBilling = await prisma.householdBilling.findUnique({
+    where: billingUniqueWhere(communityId, street, houseNumber, period),
+  });
+
   await applyElectricityToBilling(
     communityId,
     street,
@@ -119,6 +132,29 @@ export async function saveHouseholdMeterReading(formData: FormData) {
     period,
     totalUah,
   );
+
+  const actor: BillingAuditActor = {
+    id: session.user.id!,
+    name:
+      session.user.name?.trim() ||
+      session.user.email?.trim() ||
+      "—",
+  };
+  await logHouseholdBillingChange({
+    communityId,
+    street,
+    houseNumber,
+    period,
+    actor,
+    action: BillingAuditAction.METER_SAVED,
+    details: {
+      dayReading: { from: prevRow?.dayReading ?? null, to: dayReading },
+      nightReading: { from: prevRow?.nightReading ?? null, to: nightReading },
+      electricityUah: { from: prevBilling?.electricityUah ?? null, to: totalUah },
+      deltaDay,
+      deltaNight,
+    },
+  });
 
   revalidateAllLocales("/payments");
   revalidateAllLocales("/dashboard");

@@ -422,6 +422,21 @@
     "sendSuccessMessage": "Суммы для оплаты отправлены: {address} · {residents}",
     "sendSuccessClose": "Хорошо",
     "sentToResidentBadge": "Отправлено жителю",
+    "sentToResidentHint": "Суммы отправлены жителю — ожидается оплата",
+    "auditHistoryLink": "История изменений",
+    "auditHistoryTitle": "{address} · {period}",
+    "auditHistoryEmpty": "Изменений председателем за этот месяц пока нет",
+    "auditHistoryLoading": "Загрузка…",
+    "auditHistoryClose": "Закрыть",
+    "audit": {
+      "paid_marked": "Отмечено «Оплачено»",
+      "paid_unmarked": "Снята отметка «Оплачено»",
+      "payment_sent": "Отправлено жителю: абонплата {subscription} ₴, электро {electricity} ₴",
+      "paidResetNote": "(сброшено «Оплачено» из‑за изменения сумм)",
+      "sentResetNote": "(статус отправки обновлён)",
+      "meter_saved": "Счётчик: день {day}, ночь {night} → электро {electricity} ₴ (потребление: день {deltaDay} кВт·ч, ночь {deltaNight} кВт·ч)",
+      "copied_from_prev": "Скопировано с {source}: абонплата {subscription} ₴, электро {electricity} ₴"
+    },
     "electricityMeter": {
       "tariffTitle": "Тарифы на электроэнергию",
       "tariffHint": "₴ за 1 кВт·ч (день и ночь). Вводятся один раз для КГ; при изменении тарифа сохраните снова.",

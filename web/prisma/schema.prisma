@@ -35,8 +35,9 @@ model Community {
   forumTopics        ForumTopic[]
   forumPosts         ForumPost[]
   reports            ConfidentialReport[]
-  householdBillings       HouseholdBilling[]
-  householdMeterReadings  HouseholdMeterReading[]
+  householdBillings           HouseholdBilling[]
+  householdMeterReadings      HouseholdMeterReading[]
+  householdBillingAuditLogs   HouseholdBillingAuditLog[]
   directMessages     DirectMessage[]
   documents          CommunityDocument[]
 }
@@ -292,6 +293,24 @@ model HouseholdBilling {
 
   @@unique([communityId, street, houseNumber, periodYear, periodMonth])
   @@index([communityId, street, houseNumber, periodYear, periodMonth])
+}
+
+/// Журнал змін нарахувань / оплати по дому (дії голови).
+model HouseholdBillingAuditLog {
+  id          String    @id @default(cuid())
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  street      String
+  houseNumber String
+  periodYear  Int
+  periodMonth Int
+  actorUserId String
+  actorName   String
+  action      String
+  details     Json?
+  createdAt   DateTime  @default(now())
+
+  @@index([communityId, street, houseNumber, periodYear, periodMonth, createdAt])
 }
 
 /// Показания счётчика (накопительные) по дому за период.

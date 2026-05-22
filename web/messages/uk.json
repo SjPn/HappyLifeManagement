@@ -422,6 +422,21 @@
     "sendSuccessMessage": "Суми до сплати надіслано: {address} · {residents}",
     "sendSuccessClose": "Добре",
     "sentToResidentBadge": "Надіслано мешканцю",
+    "sentToResidentHint": "Суми надіслані мешканцю — очікується оплата",
+    "auditHistoryLink": "Історія змін",
+    "auditHistoryTitle": "{address} · {period}",
+    "auditHistoryEmpty": "Змін від голови за цей місяць ще немає",
+    "auditHistoryLoading": "Завантаження…",
+    "auditHistoryClose": "Закрити",
+    "audit": {
+      "paid_marked": "Поставлено «Оплачено»",
+      "paid_unmarked": "Знято «Оплачено»",
+      "payment_sent": "Надіслано мешканцю: абонплата {subscription} ₴, електро {electricity} ₴",
+      "paidResetNote": "(скинуто «Оплачено» через зміну сум)",
+      "sentResetNote": "(статус надсилання оновлено)",
+      "meter_saved": "Лічильник: день {day}, ніч {night} → електро {electricity} ₴ (споживання: день {deltaDay} кВт·год, ніч {deltaNight} кВт·год)",
+      "copied_from_prev": "Скопійовано з {source}: абонплата {subscription} ₴, електро {electricity} ₴"
+    },
     "electricityMeter": {
       "tariffTitle": "Тарифи на електроенергію",
       "tariffHint": "₴ за 1 кВт·год (день і ніч). Вводяться один раз для КГ; при зміні тарифу збережіть знову.",

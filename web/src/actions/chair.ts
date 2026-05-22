@@ -10,6 +10,11 @@ import {
   billingUniqueWhere,
   type BillingPeriod,
 } from "@/lib/billing";
+import {
+  BillingAuditAction,
+  logHouseholdBillingChange,
+  type BillingAuditActor,
+} from "@/lib/billingAudit";
 import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
 import {
   communityWhere,
@@ -91,6 +96,17 @@ function parseUah(raw: string) {
   return Number.isFinite(n) && n >= 0 ? n : null;
 }
 
+function auditActor(user: {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+}): BillingAuditActor {
+  return {
+    id: user.id,
+    name: user.name?.trim() || user.email?.trim() || "—",
+  };
+}
+
 function parseBillingPeriodFromForm(
   formData: FormData,
 ): BillingPeriod | null {
@@ -170,6 +186,27 @@ export async function setHouseholdPayments(formData: FormData) {
     },
   });
 
+  await logHouseholdBillingChange({
+    communityId,
+    street,
+    houseNumber,
+    period,
+    actor: auditActor(session.user),
+    action: BillingAuditAction.PAYMENT_SENT,
+    details: {
+      subscriptionFeeUah: {
+        from: existing?.subscriptionFeeUah ?? null,
+        to: subscriptionFeeUah,
+      },
+      electricityUah: {
+        from: existing?.electricityUah ?? null,
+        to: electricityUah,
+      },
+      paidReset: amountsChanged && existing?.paidAt != null,
+      sentReset: amountsChanged && existing?.paymentSentAt != null,
+    },
+  });
+
   revalidateAllLocales("/chair");
   revalidateAllLocales("/chair/users");
   revalidateAllLocales("/payments");
@@ -202,6 +239,11 @@ export async function setHouseholdPaid(formData: FormData) {
     period,
   );
 
+  const existing = await prisma.householdBilling.findUnique({
+    where: uniqueWhere,
+  });
+  const wasPaid = existing?.paidAt != null;
+
   await prisma.householdBilling.upsert({
     where: uniqueWhere,
     create: {
@@ -216,6 +258,19 @@ export async function setHouseholdPaid(formData: FormData) {
       paidAt: paid ? new Date() : null,
     },
   });
+
+  if (paid !== wasPaid) {
+    await logHouseholdBillingChange({
+      communityId,
+      street,
+      houseNumber,
+      period,
+      actor: auditActor(session.user),
+      action: paid
+        ? BillingAuditAction.PAID_MARKED
+        : BillingAuditAction.PAID_UNMARKED,
+    });
+  }
 
   revalidateAllLocales("/payments");
   revalidateAllLocales("/dashboard");

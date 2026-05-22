@@ -4,6 +4,10 @@ export type ForumPostWithImages = {
 };
 
 /** Ordered URLs: relation first, then legacy imageUrl if no rows yet. */
+export function countForumPostImages(post: ForumPostWithImages): number {
+  return forumPostImageUrls(post).length;
+}
+
 export function forumPostImageUrls(post: ForumPostWithImages): string[] {
   if (post.images.length > 0) {
     return [...post.images]

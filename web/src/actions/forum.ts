@@ -172,7 +172,9 @@ export async function updateForumTopic(formData: FormData) {
       posts: {
         orderBy: { createdAt: "asc" },
         take: 1,
-        include: { images: { select: { id: true } } },
+        include: {
+          images: { orderBy: { sortOrder: "asc" }, select: { imageUrl: true, sortOrder: true } },
+        },
       },
     },
   });

@@ -1,10 +1,10 @@
-# Happy Life — mobile (Capacitor)
+# Happy Life — mobile
 
-Android-оболочка для [https://happylife.estate](https://happylife.estate). Полная инструкция: [../docs/HANDBOOK.md](../docs/HANDBOOK.md) §5.
+Capacitor APK для [happylife.estate](https://happylife.estate). [Посібник користувача](../docs/USER_GUIDE.md)
 
 ```powershell
 npm install
 npx cap sync android
 ```
 
-APK для сайта: `../web/public/downloads/happylife.apk`.
+APK для сайту: `../web/public/downloads/happylife.apk`

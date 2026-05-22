@@ -2,3 +2,11 @@
 .idea/
 .vscode/
 *.log
+
+# Внутренняя документация и учётные данные (только локально)
+docs/HANDBOOK.md
+docs/HANDBOOK.local.md
+docs/TEST_CREDENTIALS.local.md
+docs/TEST_CREDENTIALS.local.md.example
+TEST_CREDENTIALS.local.md
+internal/

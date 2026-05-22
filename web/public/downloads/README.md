@@ -1,1 +1,1 @@
-Положить сюда `happylife.apk`. Инструкция: [../../../docs/HANDBOOK.md](../../../docs/HANDBOOK.md) §5.
+Файл `happylife.apk` для кнопки «Завантажити» на сайті.

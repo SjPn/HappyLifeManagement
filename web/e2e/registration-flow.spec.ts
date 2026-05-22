@@ -4,11 +4,14 @@ import { test, expect } from "@playwright/test";
  * Requires seeded DB with community invite code in E2E_INVITE_CODE
  * and chair credentials for approval step.
  */
-const invite = process.env.E2E_INVITE_CODE ?? "DEMO-E2E-INVITE";
-const chairEmail = process.env.E2E_CHAIR_EMAIL ?? "chair@hlm.kiev.ua";
-const chairPassword = process.env.E2E_CHAIR_PASSWORD ?? "H@ppYL!fe";
+const invite = process.env.E2E_INVITE_CODE?.trim();
+const chairEmail = process.env.E2E_CHAIR_EMAIL?.trim();
+const chairPassword = process.env.E2E_CHAIR_PASSWORD?.trim();
+
+const e2eReady = Boolean(invite && chairEmail && chairPassword);
 
 test.describe("registration → ticket flow", () => {
+  test.skip(!e2eReady, "Set E2E_INVITE_CODE, E2E_CHAIR_EMAIL, E2E_CHAIR_PASSWORD in env");
 
   test("register, approve, create ticket, change status", async ({ page }) => {
     const email = `e2e-${Date.now()}@happylife.test`;

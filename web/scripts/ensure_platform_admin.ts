@@ -10,7 +10,11 @@ import { TenancyType } from "../src/lib/audience";
 const EMAIL = (process.env.PLATFORM_ADMIN_EMAIL ?? "admin@happylife.demo")
   .trim()
   .toLowerCase();
-const PASSWORD = process.env.PLATFORM_ADMIN_PASSWORD ?? "Pl@tf0rmAdm1n";
+const PASSWORD = process.env.PLATFORM_ADMIN_PASSWORD?.trim();
+if (!PASSWORD) {
+  console.error("Missing PLATFORM_ADMIN_PASSWORD in env.");
+  process.exit(1);
+}
 
 const prisma = new PrismaClient();
 
@@ -43,7 +47,7 @@ async function main() {
   console.log("  email:", user.email);
   console.log("  role:", user.role);
   console.log("  id:", user.id);
-  console.log("  password: (as in PLATFORM_ADMIN_PASSWORD or default seed)");
+  console.log("  password: (from PLATFORM_ADMIN_PASSWORD)");
 }
 
 main()

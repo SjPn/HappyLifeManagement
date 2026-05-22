@@ -9,7 +9,11 @@ import { PrismaClient } from "@prisma/client";
 const COMMUNITY_ID = "cm_shchaslyve_zhyttya";
 const COMMUNITY_NAME = "Щасливе Життя";
 const COMMUNITY_SLUG = "shchaslyve-zhyttya";
-const INVITE_CODE = process.env.INVITE_CODE?.trim() || "HAPPY2026";
+const INVITE_CODE = process.env.INVITE_CODE?.trim();
+if (!INVITE_CODE) {
+  console.error("Missing INVITE_CODE in env.");
+  process.exit(1);
+}
 const OLD_DEFAULT_ID = "cm_default_community";
 
 const prisma = new PrismaClient();

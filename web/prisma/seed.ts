@@ -10,7 +10,7 @@ import {
 } from "../src/lib/enums";
 import { AudienceScope, TenancyType } from "../src/lib/audience";
 import { normalizeHouseNumber, normalizeStreet } from "../src/lib/household";
-import { generateInviteCode } from "../src/lib/tenant";
+import { seedInviteCode, seedPasswords } from "./seedConfig";
 
 const prisma = new PrismaClient();
 
@@ -55,19 +55,21 @@ async function linkUserAddress(
 
 async function main() {
   const hash = (p: string) => bcrypt.hashSync(p, 10);
+  const inviteCode = seedInviteCode();
+  const passwords = seedPasswords();
 
   const community = await prisma.community.upsert({
     where: { id: "cm_shchaslyve_zhyttya" },
     update: {
       name: "Щасливе Життя",
       slug: "shchaslyve-zhyttya",
-      inviteCode: process.env.INVITE_CODE?.trim() || "HAPPY2026",
+      inviteCode,
     },
     create: {
       id: "cm_shchaslyve_zhyttya",
       slug: "shchaslyve-zhyttya",
       name: "Щасливе Життя",
-      inviteCode: process.env.INVITE_CODE?.trim() || "HAPPY2026",
+      inviteCode,
       defaultLocale: "uk",
     },
   });
@@ -77,7 +79,7 @@ async function main() {
     update: { role: Role.PLATFORM_ADMIN, communityId: null },
     create: {
       email: "admin@happylife.demo",
-      passwordHash: hash("Pl@tf0rmAdm1n"),
+      passwordHash: hash(passwords.admin),
       name: "Platform Admin",
       street: "—",
       houseNumber: "—",
@@ -90,11 +92,11 @@ async function main() {
   });
 
   const chair = await prisma.user.upsert({
-    where: { email: "chair@hlm.kiev.ua" },
+    where: { email: "chair@happylife.demo" },
     update: { tenancyType: TenancyType.OWNER, communityId: community.id },
     create: {
-      email: "chair@hlm.kiev.ua",
-      passwordHash: hash("H@ppYL!fe"),
+      email: "chair@happylife.demo",
+      passwordHash: hash(passwords.chair),
       name: "Иван Председателев",
       street: "Лесная",
       houseNumber: "1",
@@ -107,11 +109,11 @@ async function main() {
   });
 
   const mod = await prisma.user.upsert({
-    where: { email: "mod@hlm.kiev.ua" },
+    where: { email: "mod@happylife.demo" },
     update: { tenancyType: TenancyType.OWNER, communityId: community.id },
     create: {
-      email: "mod@hlm.kiev.ua",
-      passwordHash: hash("M0deR@toR$"),
+      email: "mod@happylife.demo",
+      passwordHash: hash(passwords.mod),
       name: "Мария Модераторова",
       street: "Лесная",
       houseNumber: "2",
@@ -128,7 +130,7 @@ async function main() {
     update: { tenancyType: TenancyType.TENANT, communityId: community.id },
     create: {
       email: "neighbor@happylife.demo",
-      passwordHash: hash("demo123"),
+      passwordHash: hash(passwords.resident),
       name: "Пётр Соседкин",
       street: "Берёзовая",
       houseNumber: "15",

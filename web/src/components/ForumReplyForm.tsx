@@ -7,7 +7,7 @@ import { useState } from "react";
 import { translateActionError } from "@/lib/actionError";
 import { inputClass, primaryButtonClass } from "@/lib/formStyles";
 import { ForumImageInput } from "@/components/ForumImageInput";
-import { appendForumImages } from "@/lib/appendForumImages";
+import { uploadForumPhotos } from "@/lib/forumUploadClient";
 
 export function ForumReplyForm({ topicId }: { topicId: string }) {
   const router = useRouter();
@@ -16,17 +16,33 @@ export function ForumReplyForm({ topicId }: { topicId: string }) {
   const te = useTranslations("errors");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [uploadLabel, setUploadLabel] = useState<string | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setUploadLabel(null);
     const fd = new FormData(e.currentTarget);
     fd.set("topicId", topicId);
-    appendForumImages(fd, photos);
+
+    if (photos.length > 0) {
+      const up = await uploadForumPhotos(photos, 0, (current, total) => {
+        setUploadLabel(t("uploadingPhotos", { current, total }));
+      });
+      if ("error" in up) {
+        setError(translateActionError(te, up.error));
+        setLoading(false);
+        setUploadLabel(null);
+        return;
+      }
+      fd.set("imageUrls", JSON.stringify(up.urls));
+    }
+
     const res = await createForumReply(fd);
     setLoading(false);
+    setUploadLabel(null);
     if (res && "error" in res && res.error) {
       setError(translateActionError(te, res.error));
       return;
@@ -37,11 +53,7 @@ export function ForumReplyForm({ topicId }: { topicId: string }) {
   }
 
   return (
-    <form
-      onSubmit={onSubmit}
-      encType="multipart/form-data"
-      className="flex flex-col gap-3"
-    >
+    <form onSubmit={onSubmit} className="flex flex-col gap-3">
       <input type="hidden" name="topicId" value={topicId} />
       <label className="flex flex-col gap-1 text-sm">
         <span className="sr-only">{t("reply")}</span>
@@ -54,6 +66,9 @@ export function ForumReplyForm({ topicId }: { topicId: string }) {
         />
       </label>
       <ForumImageInput onFilesChange={setPhotos} />
+      {uploadLabel && (
+        <p className="text-sm text-blue-700 dark:text-blue-300">{uploadLabel}</p>
+      )}
       {error && (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
@@ -62,7 +77,7 @@ export function ForumReplyForm({ topicId }: { topicId: string }) {
         disabled={loading}
         className={primaryButtonClass}
       >
-        {loading ? tc("sending") : t("reply")}
+        {loading ? (uploadLabel ?? tc("sending")) : t("reply")}
       </button>
     </form>
   );

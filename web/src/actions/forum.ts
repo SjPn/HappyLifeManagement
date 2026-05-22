@@ -3,7 +3,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
-import { mapUploadError } from "@/lib/uploadErrors";
 import {
   parseAudienceScope,
   userMatchesAudience,
@@ -11,32 +10,10 @@ import {
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 import { forumPostImageUrls } from "@/lib/forumPostImages";
 import {
-  createForumPostImages,
-  parseForumImageFiles,
-  saveForumImages,
-  validateForumImages,
-} from "@/lib/forumUpload";
-
-async function attachNewForumImages(
-  postId: string,
-  formData: FormData,
-  existingCount: number,
-): Promise<{ error?: string } | { urls: string[] }> {
-  const files = parseForumImageFiles(formData);
-  const validation = validateForumImages(files, existingCount);
-  if (validation) return { error: validation };
-
-  if (files.length === 0) return { urls: [] };
-
-  try {
-    const urls = await saveForumImages(files);
-    const startOrder = existingCount;
-    await createForumPostImages(postId, urls, startOrder);
-    return { urls };
-  } catch (e) {
-    return { error: mapUploadError(e) };
-  }
-}
+  parseUploadedImageUrls,
+  validateImageUrlCount,
+} from "@/lib/forumImageUrls";
+import { createForumPostImages } from "@/lib/forumUpload";
 
 export async function createForumTopic(formData: FormData) {
   const session = await auth();
@@ -53,12 +30,12 @@ export async function createForumTopic(formData: FormData) {
   const body = String(formData.get("body") || "").trim();
   const audience = parseAudienceScope(String(formData.get("audience") || ""));
   const isAnonymous = formData.get("isAnonymous") === "on";
+  const imageUrls = parseUploadedImageUrls(formData);
 
   if (!title || !body) return { error: "topicRequired" as const };
 
-  const files = parseForumImageFiles(formData);
-  const validation = validateForumImages(files, 0);
-  if (validation) return { error: validation };
+  const countErr = validateImageUrlCount(imageUrls.length, 0);
+  if (countErr) return { error: countErr };
 
   const topic = await prisma.forumTopic.create({
     data: {
@@ -81,11 +58,12 @@ export async function createForumTopic(formData: FormData) {
   });
 
   const firstPost = topic.posts[0];
-  if (firstPost && files.length > 0) {
-    const attached = await attachNewForumImages(firstPost.id, formData, 0);
-    if ("error" in attached && attached.error) {
+  if (firstPost && imageUrls.length > 0) {
+    try {
+      await createForumPostImages(firstPost.id, imageUrls, 0);
+    } catch {
       await prisma.forumTopic.delete({ where: { id: topic.id } });
-      return { error: attached.error };
+      return { error: "generic" as const };
     }
   }
 
@@ -107,6 +85,7 @@ export async function createForumReply(formData: FormData) {
 
   const topicId = String(formData.get("topicId") || "");
   const body = String(formData.get("body") || "").trim();
+  const imageUrls = parseUploadedImageUrls(formData);
 
   if (!topicId || !body) return { error: "emptyMessage" as const };
 
@@ -125,9 +104,8 @@ export async function createForumReply(formData: FormData) {
     return { error: "audienceDenied" as const };
   }
 
-  const files = parseForumImageFiles(formData);
-  const validation = validateForumImages(files, 0);
-  if (validation) return { error: validation };
+  const countErr = validateImageUrlCount(imageUrls.length, 0);
+  if (countErr) return { error: countErr };
 
   const post = await prisma.forumPost.create({
     data: {
@@ -138,11 +116,12 @@ export async function createForumReply(formData: FormData) {
     },
   });
 
-  if (files.length > 0) {
-    const attached = await attachNewForumImages(post.id, formData, 0);
-    if ("error" in attached && attached.error) {
+  if (imageUrls.length > 0) {
+    try {
+      await createForumPostImages(post.id, imageUrls, 0);
+    } catch {
       await prisma.forumPost.delete({ where: { id: post.id } });
-      return { error: attached.error };
+      return { error: "generic" as const };
     }
   }
 
@@ -163,6 +142,7 @@ export async function updateForumTopic(formData: FormData) {
   const title = String(formData.get("title") || "").trim();
   const body = String(formData.get("body") || "").trim();
   const audience = parseAudienceScope(String(formData.get("audience") || ""));
+  const imageUrls = parseUploadedImageUrls(formData);
 
   if (!topicId || !title || !body) return { error: "requiredFields" as const };
 
@@ -189,9 +169,8 @@ export async function updateForumTopic(formData: FormData) {
   const first = topic.posts[0];
   const existingCount = first ? forumPostImageUrls(first).length : 0;
 
-  const files = parseForumImageFiles(formData);
-  const validation = validateForumImages(files, existingCount);
-  if (validation) return { error: validation };
+  const countErr = validateImageUrlCount(imageUrls.length, existingCount);
+  if (countErr) return { error: countErr };
 
   await prisma.$transaction(async (tx) => {
     await tx.forumTopic.update({
@@ -206,10 +185,11 @@ export async function updateForumTopic(formData: FormData) {
     }
   });
 
-  if (first && files.length > 0) {
-    const attached = await attachNewForumImages(first.id, formData, existingCount);
-    if ("error" in attached && attached.error) {
-      return { error: attached.error };
+  if (first && imageUrls.length > 0) {
+    try {
+      await createForumPostImages(first.id, imageUrls, existingCount);
+    } catch {
+      return { error: "generic" as const };
     }
   }
 

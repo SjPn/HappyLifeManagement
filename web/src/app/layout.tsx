@@ -2,8 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Onest } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-
 const onest = Onest({
   subsets: ["latin", "cyrillic"],
   variable: "--font-onest",
@@ -39,7 +37,6 @@ export default function RootLayout({
     >
       <body className="min-h-full font-sans text-slate-900 dark:text-slate-50">
         <Providers>{children}</Providers>
-        <SpeedInsights />
       </body>
     </html>
   );

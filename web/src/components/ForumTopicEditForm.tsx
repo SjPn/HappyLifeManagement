@@ -8,7 +8,7 @@ import { translateActionError } from "@/lib/actionError";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
 import { AudienceScope } from "@/lib/audience";
 import { ForumImageInput } from "@/components/ForumImageInput";
-import { appendForumImages } from "@/lib/appendForumImages";
+import { uploadForumPhotos } from "@/lib/forumUploadClient";
 
 export function ForumTopicEditForm(props: {
   topicId: string;
@@ -23,17 +23,34 @@ export function ForumTopicEditForm(props: {
   const te = useTranslations("errors");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [uploadLabel, setUploadLabel] = useState<string | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
+  const existingCount = props.existingPhotoCount ?? 0;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setUploadLabel(null);
     const fd = new FormData(e.currentTarget);
     fd.set("topicId", props.topicId);
-    appendForumImages(fd, photos);
+
+    if (photos.length > 0) {
+      const up = await uploadForumPhotos(photos, existingCount, (current, total) => {
+        setUploadLabel(t("uploadingPhotos", { current, total }));
+      });
+      if ("error" in up) {
+        setError(translateActionError(te, up.error));
+        setLoading(false);
+        setUploadLabel(null);
+        return;
+      }
+      fd.set("imageUrls", JSON.stringify(up.urls));
+    }
+
     const res = await updateForumTopic(fd);
     setLoading(false);
+    setUploadLabel(null);
     if (res && "error" in res && res.error) {
       setError(translateActionError(te, res.error));
       return;
@@ -43,11 +60,7 @@ export function ForumTopicEditForm(props: {
   }
 
   return (
-    <form
-      onSubmit={onSubmit}
-      encType="multipart/form-data"
-      className="flex flex-col gap-4"
-    >
+    <form onSubmit={onSubmit} className="flex flex-col gap-4">
       <label className="flex flex-col gap-1 text-sm">
         <span className={labelClass}>{t("topicTitle")}</span>
         <input name="title" required className={inputClass} defaultValue={props.title} />
@@ -75,9 +88,12 @@ export function ForumTopicEditForm(props: {
         </select>
       </label>
       <ForumImageInput
-        existingCount={props.existingPhotoCount ?? 0}
+        existingCount={existingCount}
         onFilesChange={setPhotos}
       />
+      {uploadLabel && (
+        <p className="text-sm text-blue-700 dark:text-blue-300">{uploadLabel}</p>
+      )}
       {error && (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
@@ -86,7 +102,7 @@ export function ForumTopicEditForm(props: {
         disabled={loading}
         className={primaryButtonClass}
       >
-        {loading ? t("creating") : t("saveEdit")}
+        {loading ? (uploadLabel ?? t("creating")) : t("saveEdit")}
       </button>
     </form>
   );

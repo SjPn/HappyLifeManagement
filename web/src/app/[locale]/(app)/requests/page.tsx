@@ -9,6 +9,7 @@ import { ticketListInclude, toTicketRows } from "@/lib/ticketRows";
 import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
+import { getNotificationSeenAt } from "@/lib/notifications";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function RequestsPage() {
@@ -27,18 +28,20 @@ export default async function RequestsPage() {
     ? communityWhere(communityId)
     : { ...communityWhere(communityId), userId };
 
-  const [activeTickets, archiveCount, hubStats] = await Promise.all([
-    prisma.ticket.findMany({
-      where: { ...baseWhere, status: { not: "RESOLVED" } },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-      include: ticketListInclude,
-    }),
-    prisma.ticket.count({
-      where: { ...baseWhere, status: "RESOLVED" },
-    }),
-    getRequestsHubStats(communityId, staff, userId),
-  ]);
+  const [activeTickets, archiveCount, hubStats, ticketsUnreadSince] =
+    await Promise.all([
+      prisma.ticket.findMany({
+        where: { ...baseWhere, status: { not: "RESOLVED" } },
+        orderBy: { createdAt: "desc" },
+        take: 50,
+        include: ticketListInclude,
+      }),
+      prisma.ticket.count({
+        where: { ...baseWhere, status: "RESOLVED" },
+      }),
+      getRequestsHubStats(communityId, staff, userId),
+      getNotificationSeenAt(userId, "tickets"),
+    ]);
 
   return (
     <>
@@ -55,6 +58,7 @@ export default async function RequestsPage() {
         tickets={toTicketRows(activeTickets)}
         staff={staff}
         currentUserId={userId}
+        ticketsUnreadSince={ticketsUnreadSince.toISOString()}
         emptyMessage={t("activeEmpty")}
         archiveHref="/requests/archive"
         archiveCount={archiveCount}

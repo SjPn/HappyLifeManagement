@@ -418,7 +418,6 @@ async function ChairPaymentsManageView({
 
   return (
     <>
-      <MarkNotificationsSeen scopes={["payments"]} />
       <PageTitle
         title={t("chairTitle")}
         subtitle={t("chairSubtitle", { period: periodLabel })}

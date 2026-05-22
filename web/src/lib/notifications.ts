@@ -185,20 +185,27 @@ async function countTickets(user: SessionUser, since: Date) {
 }
 
 async function countPayments(user: SessionUser, since: Date) {
-  const tenant = communityWhere(user.communityId);
   if (user.role === Role.CHAIR) {
-    return prisma.householdBilling.count({
-      where: { ...tenant, updatedAt: { gt: since } },
-    });
+    return 0;
   }
+  const tenant = communityWhere(user.communityId);
   if (!user.street || !user.houseNumber) return 0;
   return prisma.householdBilling.count({
     where: {
       ...tenant,
-      updatedAt: { gt: since },
       street: normalizeStreet(user.street),
       houseNumber: normalizeHouseNumber(user.houseNumber),
+      paymentSentAt: { gt: since },
     },
   });
+}
+
+/** Snapshot «прочитано до» для подсветки элементов на странице до markNotificationSeen. */
+export async function getNotificationSeenAt(
+  userId: string,
+  scope: "tickets" | "payments",
+): Promise<Date> {
+  const seen = await getSeenState(userId);
+  return scope === "tickets" ? seen.ticketsAt : seen.paymentsAt;
 }
 

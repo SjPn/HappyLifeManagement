@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { NotificationBadge } from "@/components/NotificationBadge";
 import { Card } from "@/components/Ui";
 import { TicketCategory } from "@/lib/enums";
 import { ticketCategoryLabel } from "@/lib/ticketDisplay";
@@ -257,10 +258,16 @@ function TicketDetailModal({
   );
 }
 
+function isTicketUnread(ticket: TicketRow, unreadSince?: string) {
+  if (!unreadSince) return false;
+  return new Date(ticket.updatedAt).getTime() > new Date(unreadSince).getTime();
+}
+
 export function RequestsPanel({
   tickets,
   staff,
   currentUserId,
+  ticketsUnreadSince,
   emptyMessage,
   archiveHref,
   archiveCount,
@@ -270,6 +277,8 @@ export function RequestsPanel({
   tickets: TicketRow[];
   staff: boolean;
   currentUserId: string;
+  /** ISO timestamp: заявки с updatedAt позже считаются «новыми» на этом заходе. */
+  ticketsUnreadSince?: string;
   emptyMessage: string;
   archiveHref?: string;
   archiveCount?: number;
@@ -299,19 +308,27 @@ export function RequestsPanel({
         <div className="flex flex-col gap-2.5">
           {tickets.map((tk) => {
             const Icon = ticketCategoryIcon[tk.category] ?? HelpCircle;
+            const unread = isTicketUnread(tk, ticketsUnreadSince);
             return (
               <button
                 key={tk.id}
                 type="button"
                 onClick={() => setSelectedId(tk.id)}
-                className="hl-glass group flex w-full items-center gap-3 rounded-2xl p-4 text-left transition hover:-translate-y-0.5 hover:border-blue-300/50 hover:shadow-lg"
+                className={`hl-glass group flex w-full items-center gap-3 rounded-2xl p-4 text-left transition hover:-translate-y-0.5 hover:shadow-lg ${
+                  unread
+                    ? "border-amber-300/70 ring-1 ring-amber-400/40 hover:border-amber-400/80 dark:border-amber-700/60 dark:ring-amber-600/30"
+                    : "hover:border-blue-300/50"
+                }`}
               >
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-sky-600 text-white shadow-md shadow-blue-500/25">
                   <Icon className="h-5 w-5" strokeWidth={2.25} aria-hidden />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block font-medium text-slate-900 group-hover:text-blue-800 dark:text-slate-100">
-                    {ticketTitle(tk.description)}
+                  <span className="flex items-center gap-2 font-medium text-slate-900 group-hover:text-blue-800 dark:text-slate-100">
+                    <span className="min-w-0 truncate">
+                      {ticketTitle(tk.description)}
+                    </span>
+                    {unread ? <NotificationBadge count={1} inline /> : null}
                   </span>
                   <span className="mt-0.5 block text-xs text-slate-500">
                     {ticketCategoryLabel(tc, tk.category)}

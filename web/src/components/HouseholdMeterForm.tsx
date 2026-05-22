@@ -3,6 +3,7 @@
 import { saveHouseholdMeterReading } from "@/actions/electricity";
 import { computeElectricityCharge } from "@/lib/electricity";
 import { useRouter } from "@/i18n/navigation";
+import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
@@ -42,6 +43,7 @@ export function HouseholdMeterForm({
   const router = useRouter();
   const t = useTranslations("payments.electricityMeter");
   const tc = useTranslations("common");
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dayVal, setDayVal] = useState(
@@ -97,10 +99,26 @@ export function HouseholdMeterForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-2 rounded-xl border border-amber-200/80 bg-amber-50/40 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
-      <p className="text-xs font-semibold uppercase tracking-wide text-amber-900/90 dark:text-amber-200/90">
-        {t("meterTitle")}
-      </p>
+    <div className="hl-glass overflow-hidden rounded-2xl">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition hover:bg-white/50 dark:hover:bg-white/5"
+        aria-expanded={open}
+      >
+        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+          {t("meterTitle")}
+        </span>
+        <ChevronDown
+          className={`h-5 w-5 shrink-0 text-slate-500 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          aria-hidden
+        />
+      </button>
+      {open && (
+        <form
+          onSubmit={onSubmit}
+          className="space-y-2 border-t border-zinc-100 px-4 py-4 dark:border-zinc-800"
+        >
       <input type="hidden" name="street" value={street} />
       <input type="hidden" name="houseNumber" value={houseNumber} />
       <input type="hidden" name="periodYear" value={periodYear} />
@@ -177,6 +195,8 @@ export function HouseholdMeterForm({
       {error && (
         <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
       )}
-    </form>
+        </form>
+      )}
+    </div>
   );
 }

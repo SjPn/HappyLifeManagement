@@ -22,6 +22,7 @@ export function HubStatTile({
   displayValue,
   label,
   highlight,
+  dense,
 }: {
   href?: string;
   value: number;
@@ -29,12 +30,20 @@ export function HubStatTile({
   displayValue?: string;
   label: string;
   highlight?: boolean;
+  /** Narrow tiles (e.g. three currency columns on mobile). */
+  dense?: boolean;
 }) {
   const shown = displayValue ?? String(value);
+  const valueClass = dense
+    ? "text-sm font-bold leading-tight sm:text-base"
+    : "text-xl font-bold tracking-tight sm:text-2xl";
+  const labelClass = dense
+    ? "text-[0.58rem] font-semibold uppercase leading-tight tracking-wide"
+    : "text-[0.65rem] font-semibold uppercase leading-tight tracking-wide";
   const inner = (
     <>
       <span
-        className={`text-xl font-bold tabular-nums tracking-tight sm:text-2xl ${
+        className={`${valueClass} tabular-nums ${
           highlight
             ? "text-amber-700 dark:text-amber-300"
             : "bg-gradient-to-br from-blue-600 to-sky-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-sky-300"
@@ -42,13 +51,17 @@ export function HubStatTile({
       >
         {shown}
       </span>
-      <span className="mt-1 text-[0.65rem] font-semibold uppercase leading-tight tracking-wide text-slate-500 dark:text-slate-400">
+      <span
+        className={`mt-1 ${labelClass} text-slate-500 dark:text-slate-400`}
+      >
         {label}
       </span>
     </>
   );
 
-  const className = `hl-glass flex min-w-0 flex-1 flex-col items-center rounded-2xl px-2 py-3 text-center sm:px-3 ${
+  const className = `hl-glass flex min-w-0 flex-1 flex-col items-center rounded-2xl ${
+    dense ? "px-1 py-2.5 sm:px-2" : "px-2 py-3 sm:px-3"
+  } text-center ${
     highlight ? "ring-2 ring-amber-400/50 dark:ring-amber-500/40" : ""
   } ${
     href

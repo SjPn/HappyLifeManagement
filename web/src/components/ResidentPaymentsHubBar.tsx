@@ -19,16 +19,19 @@ export function ResidentPaymentsHubBar({
   return (
     <HubStatsRow>
       <HubStatTile
+        dense
         value={0}
         displayValue={subscriptionLabel}
         label={t("subscription")}
       />
       <HubStatTile
+        dense
         value={0}
         displayValue={electricityLabel}
         label={t("electricity")}
       />
       <HubStatTile
+        dense
         value={0}
         displayValue={totalLabel}
         label={t("total")}

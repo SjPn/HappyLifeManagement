@@ -5,9 +5,9 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
   experimental: {
-    // Default 1 MB breaks phone photos in server-action uploads.
+    // Forum: up to 25 photos, 150 MB total per message.
     serverActions: {
-      bodySizeLimit: "6mb",
+      bodySizeLimit: "160mb",
     },
   },
 };

@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { PageTitle, Card } from "@/components/Ui";
 import { ForumTopicEditForm } from "@/components/ForumTopicEditForm";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
+import { forumPostImageUrls } from "@/lib/forumPostImages";
 
 export default async function ForumTopicEditPage({
   params,
@@ -21,7 +22,13 @@ export default async function ForumTopicEditPage({
   const communityId = requireCommunityId(session!.user!);
   const topic = await prisma.forumTopic.findFirst({
     where: { id: topicId, ...communityWhere(communityId) },
-    include: { posts: { orderBy: { createdAt: "asc" }, take: 1 } },
+    include: {
+      posts: {
+        orderBy: { createdAt: "asc" },
+        take: 1,
+        include: { images: { orderBy: { sortOrder: "asc" } } },
+      },
+    },
   });
   if (!topic) notFound();
 
@@ -48,6 +55,7 @@ export default async function ForumTopicEditPage({
           title={topic.title}
           body={first?.body ?? ""}
           audience={topic.audience}
+          existingPhotoCount={first ? forumPostImageUrls(first).length : 0}
         />
       </Card>
     </>

@@ -7,12 +7,15 @@ import { useState } from "react";
 import { translateActionError } from "@/lib/actionError";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
 import { AudienceScope } from "@/lib/audience";
+import { ForumImageInput } from "@/components/ForumImageInput";
+import { appendForumImages } from "@/lib/appendForumImages";
 
 export function ForumTopicEditForm(props: {
   topicId: string;
   title: string;
   body: string;
   audience: string;
+  existingPhotoCount?: number;
 }) {
   const router = useRouter();
   const t = useTranslations("forum");
@@ -20,6 +23,7 @@ export function ForumTopicEditForm(props: {
   const te = useTranslations("errors");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -27,6 +31,7 @@ export function ForumTopicEditForm(props: {
     setError(null);
     const fd = new FormData(e.currentTarget);
     fd.set("topicId", props.topicId);
+    appendForumImages(fd, photos);
     const res = await updateForumTopic(fd);
     setLoading(false);
     if (res && "error" in res && res.error) {
@@ -69,16 +74,10 @@ export function ForumTopicEditForm(props: {
           <option value={AudienceScope.TENANTS_ONLY}>{ta("TENANTS_ONLY")}</option>
         </select>
       </label>
-      <label className="flex flex-col gap-1 text-sm">
-        <span className={labelClass}>{t("image")}</span>
-        <input
-          name="image"
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
-          className="text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-blue-800 hover:file:bg-blue-100 dark:file:bg-blue-950/50 dark:file:text-blue-200"
-        />
-        <span className="text-xs text-zinc-500">{t("photoHint")}</span>
-      </label>
+      <ForumImageInput
+        existingCount={props.existingPhotoCount ?? 0}
+        onFilesChange={setPhotos}
+      />
       {error && (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
@@ -92,4 +91,3 @@ export function ForumTopicEditForm(props: {
     </form>
   );
 }
-

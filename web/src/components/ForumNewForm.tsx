@@ -7,6 +7,8 @@ import { useState } from "react";
 import { inputClass, labelClass, primaryButtonClass } from "@/lib/formStyles";
 import { AudienceScope } from "@/lib/audience";
 import { translateActionError } from "@/lib/actionError";
+import { ForumImageInput } from "@/components/ForumImageInput";
+import { appendForumImages } from "@/lib/appendForumImages";
 
 export function ForumNewForm() {
   const router = useRouter();
@@ -15,12 +17,15 @@ export function ForumNewForm() {
   const te = useTranslations("errors");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const res = await createForumTopic(new FormData(e.currentTarget));
+    const fd = new FormData(e.currentTarget);
+    appendForumImages(fd, photos);
+    const res = await createForumTopic(fd);
     setLoading(false);
     if (res && "error" in res && res.error) {
       setError(translateActionError(te, res.error));
@@ -70,16 +75,7 @@ export function ForumNewForm() {
           </span>
         </span>
       </label>
-      <label className="flex flex-col gap-1 text-sm">
-        <span className={labelClass}>{t("image")}</span>
-        <input
-          name="image"
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
-          className="text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-blue-800 hover:file:bg-blue-100 dark:file:bg-blue-950/50 dark:file:text-blue-200"
-        />
-        <span className="text-xs text-zinc-500">{t("photoHint")}</span>
-      </label>
+      <ForumImageInput onFilesChange={setPhotos} />
       {error && (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       )}

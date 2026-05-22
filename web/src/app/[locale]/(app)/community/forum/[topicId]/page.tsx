@@ -13,6 +13,7 @@ import {
   forumTopicAuthorLabel,
 } from "@/lib/forumDisplay";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
+import { ForumPostGallery } from "@/components/ForumPostGallery";
 
 export default async function ForumTopicPage({
   params,
@@ -35,7 +36,10 @@ export default async function ForumTopicPage({
       user: { select: { name: true } },
       posts: {
         orderBy: { createdAt: "asc" },
-        include: { user: { select: { name: true } } },
+        include: {
+          user: { select: { name: true } },
+          images: { orderBy: { sortOrder: "asc" } },
+        },
       },
     },
   });
@@ -101,14 +105,7 @@ export default async function ForumTopicPage({
               )}
             </p>
             <p className="mt-2 whitespace-pre-wrap text-sm">{p.body}</p>
-            {p.imageUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={p.imageUrl}
-                alt=""
-                className="mt-3 max-h-72 w-full rounded-xl object-cover ring-1 ring-black/5"
-              />
-            )}
+            <ForumPostGallery post={p} />
             <p className="mt-2 text-xs text-zinc-400">
               {p.createdAt.toLocaleString(dateLocale)}
             </p>

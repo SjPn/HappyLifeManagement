@@ -35,12 +35,19 @@ function storageTarget(): "r2" | "local" {
   return "local";
 }
 
+export type SavePublicUploadOptions = {
+  /** Per-file cap; default 5 MB (tickets, news, etc.). */
+  maxBytes?: number;
+};
+
 /** JPEG/PNG/WEBP/GIF → URL (R2 на Vercel, локально `public/uploads`). */
 export async function savePublicUpload(
   file: File | null | undefined,
+  options?: SavePublicUploadOptions,
 ): Promise<string | null> {
   if (!file || !(file instanceof File) || file.size === 0) return null;
-  if (file.size > MAX_UPLOAD_BYTES) {
+  const maxBytes = options?.maxBytes ?? MAX_UPLOAD_BYTES;
+  if (file.size > maxBytes) {
     throw new Error("FILE_TOO_LARGE");
   }
 

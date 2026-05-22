@@ -3,13 +3,40 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidateAllLocales } from "@/lib/revalidateI18n";
-import { savePublicUpload } from "@/lib/upload";
 import { mapUploadError } from "@/lib/uploadErrors";
 import {
   parseAudienceScope,
   userMatchesAudience,
 } from "@/lib/audience";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
+import { forumPostImageUrls } from "@/lib/forumPostImages";
+import {
+  createForumPostImages,
+  parseForumImageFiles,
+  saveForumImages,
+  validateForumImages,
+} from "@/lib/forumUpload";
+
+async function attachNewForumImages(
+  postId: string,
+  formData: FormData,
+  existingCount: number,
+): Promise<{ error?: string } | { urls: string[] }> {
+  const files = parseForumImageFiles(formData);
+  const validation = validateForumImages(files, existingCount);
+  if (validation) return { error: validation };
+
+  if (files.length === 0) return { urls: [] };
+
+  try {
+    const urls = await saveForumImages(files);
+    const startOrder = existingCount;
+    await createForumPostImages(postId, urls, startOrder);
+    return { urls };
+  } catch (e) {
+    return { error: mapUploadError(e) };
+  }
+}
 
 export async function createForumTopic(formData: FormData) {
   const session = await auth();
@@ -24,22 +51,16 @@ export async function createForumTopic(formData: FormData) {
 
   const title = String(formData.get("title") || "").trim();
   const body = String(formData.get("body") || "").trim();
-  const img = formData.get("image");
   const audience = parseAudienceScope(String(formData.get("audience") || ""));
   const isAnonymous = formData.get("isAnonymous") === "on";
 
   if (!title || !body) return { error: "topicRequired" as const };
 
-  let imageUrl: string | null = null;
-  if (img instanceof File && img.size > 0) {
-    try {
-      imageUrl = await savePublicUpload(img);
-    } catch (e) {
-      return { error: mapUploadError(e) };
-    }
-  }
+  const files = parseForumImageFiles(formData);
+  const validation = validateForumImages(files, 0);
+  if (validation) return { error: validation };
 
-  await prisma.forumTopic.create({
+  const topic = await prisma.forumTopic.create({
     data: {
       communityId,
       title,
@@ -50,12 +71,23 @@ export async function createForumTopic(formData: FormData) {
         create: {
           communityId,
           body,
-          imageUrl,
           userId: session.user.id,
         },
       },
     },
+    include: {
+      posts: { orderBy: { createdAt: "asc" }, take: 1 },
+    },
   });
+
+  const firstPost = topic.posts[0];
+  if (firstPost && files.length > 0) {
+    const attached = await attachNewForumImages(firstPost.id, formData, 0);
+    if ("error" in attached && attached.error) {
+      await prisma.forumTopic.delete({ where: { id: topic.id } });
+      return { error: attached.error };
+    }
+  }
 
   revalidateAllLocales("/community/forum");
   revalidateAllLocales("/community");
@@ -75,7 +107,6 @@ export async function createForumReply(formData: FormData) {
 
   const topicId = String(formData.get("topicId") || "");
   const body = String(formData.get("body") || "").trim();
-  const img = formData.get("image");
 
   if (!topicId || !body) return { error: "emptyMessage" as const };
 
@@ -94,24 +125,26 @@ export async function createForumReply(formData: FormData) {
     return { error: "audienceDenied" as const };
   }
 
-  let imageUrl: string | null = null;
-  if (img instanceof File && img.size > 0) {
-    try {
-      imageUrl = await savePublicUpload(img);
-    } catch (e) {
-      return { error: mapUploadError(e) };
-    }
-  }
+  const files = parseForumImageFiles(formData);
+  const validation = validateForumImages(files, 0);
+  if (validation) return { error: validation };
 
-  await prisma.forumPost.create({
+  const post = await prisma.forumPost.create({
     data: {
       communityId,
       topicId,
       body,
-      imageUrl,
       userId: session.user.id,
     },
   });
+
+  if (files.length > 0) {
+    const attached = await attachNewForumImages(post.id, formData, 0);
+    if ("error" in attached && attached.error) {
+      await prisma.forumPost.delete({ where: { id: post.id } });
+      return { error: attached.error };
+    }
+  }
 
   revalidateAllLocales(`/community/forum/${topicId}`);
   revalidateAllLocales("/community/forum");
@@ -129,14 +162,19 @@ export async function updateForumTopic(formData: FormData) {
   const topicId = String(formData.get("topicId") || "");
   const title = String(formData.get("title") || "").trim();
   const body = String(formData.get("body") || "").trim();
-  const img = formData.get("image");
   const audience = parseAudienceScope(String(formData.get("audience") || ""));
 
   if (!topicId || !title || !body) return { error: "requiredFields" as const };
 
   const topic = await prisma.forumTopic.findFirst({
     where: { id: topicId, ...communityWhere(communityId) },
-    include: { posts: { orderBy: { createdAt: "asc" }, take: 1 } },
+    include: {
+      posts: {
+        orderBy: { createdAt: "asc" },
+        take: 1,
+        include: { images: { select: { id: true } } },
+      },
+    },
   });
   if (!topic) return { error: "noTopic" as const };
 
@@ -146,31 +184,32 @@ export async function updateForumTopic(formData: FormData) {
     session.user.role === "MODERATOR";
   if (!canEdit) return { error: "forbidden" as const };
 
-  let imageUrl: string | null | undefined = undefined;
-  if (img instanceof File && img.size > 0) {
-    try {
-      imageUrl = await savePublicUpload(img);
-    } catch (e) {
-      return { error: mapUploadError(e) };
-    }
-  }
+  const first = topic.posts[0];
+  const existingCount = first ? forumPostImageUrls(first).length : 0;
+
+  const files = parseForumImageFiles(formData);
+  const validation = validateForumImages(files, existingCount);
+  if (validation) return { error: validation };
 
   await prisma.$transaction(async (tx) => {
     await tx.forumTopic.update({
       where: { id: topicId },
       data: { title, audience },
     });
-    const first = topic.posts[0];
     if (first) {
       await tx.forumPost.update({
         where: { id: first.id },
-        data: {
-          body,
-          ...(imageUrl !== undefined ? { imageUrl } : {}),
-        },
+        data: { body },
       });
     }
   });
+
+  if (first && files.length > 0) {
+    const attached = await attachNewForumImages(first.id, formData, existingCount);
+    if ("error" in attached && attached.error) {
+      return { error: attached.error };
+    }
+  }
 
   revalidateAllLocales(`/community/forum/${topicId}`);
   revalidateAllLocales("/community/forum");

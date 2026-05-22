@@ -250,16 +250,28 @@ model ForumTopic {
 }
 
 model ForumPost {
-  id          String     @id @default(cuid())
+  id          String           @id @default(cuid())
   communityId String
-  community   Community  @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  community   Community        @relation(fields: [communityId], references: [id], onDelete: Cascade)
   body        String
   imageUrl    String?
   topicId     String
-  topic       ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  topic       ForumTopic       @relation(fields: [topicId], references: [id], onDelete: Cascade)
   userId      String
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime   @default(now())
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime         @default(now())
+  images      ForumPostImage[]
+}
+
+model ForumPostImage {
+  id        String    @id @default(cuid())
+  postId    String
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  imageUrl  String
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  @@index([postId])
 }
 
 model CommunityAddress {

@@ -4,6 +4,6 @@ export function getAppBaseUrl(): string {
     process.env.NEXT_PUBLIC_APP_URL?.trim() ||
     process.env.AUTH_URL?.trim() ||
     process.env.NEXTAUTH_URL?.trim() ||
-    "https://hlm-nu.vercel.app";
+    "https://happylife.estate";
   return raw.replace(/\/$/, "");
 }

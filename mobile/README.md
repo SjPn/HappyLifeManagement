@@ -1,6 +1,6 @@
 # Happy Life — Android (Capacitor)
 
-Оболочка открывает продакшен-сайт в WebView (`https://hlm-nu.vercel.app` по умолчанию).
+Оболочка открывает продакшен-сайт в WebView (`https://happylife.estate` по умолчанию).
 
 ## Иконка приложения
 
@@ -27,7 +27,7 @@ npm run icons
 ```bash
 npm install
 npx cap add android   # первый раз
-export CAPACITOR_SERVER_URL=https://hlm-nu.vercel.app   # Git Bash
+export CAPACITOR_SERVER_URL=https://happylife.estate   # Git Bash
 npm run sync
 npm run open:android
 ```
@@ -66,7 +66,7 @@ CAPACITOR_SERVER_URL=http://10.0.2.2:3000 npm run sync
 1. [Firebase Console](https://console.firebase.google.com/) → проект → **Add app** → Android, package `ua.happylife.app`.
 2. Скачайте `google-services.json` → положите в `mobile/android/app/google-services.json` (не коммитьте секреты в публичный репо при необходимости).
 3. **Project settings → Service accounts** → Generate new private key → содержимое JSON одной строкой в Vercel: `FIREBASE_SERVICE_ACCOUNT_JSON`.
-4. На Vercel также: `NEXT_PUBLIC_APP_URL=https://hlm-nu.vercel.app`.
+4. На сервере (Coolify): `NEXT_PUBLIC_APP_URL=https://happylife.estate`, `AUTH_URL` / `NEXTAUTH_URL` — тот же origin.
 5. После добавления плагина:
 
 ```bash

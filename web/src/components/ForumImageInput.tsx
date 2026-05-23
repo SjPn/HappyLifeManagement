@@ -86,7 +86,7 @@ export function ForumImageInput({
           {t("selectedPhotos", {
             count: files.length,
             size: formatMb(totalBytes),
-            max: FORUM_MAX_PHOTOS - existingCount,
+            max: Math.max(0, slotsLeft),
           })}
         </p>
       )}

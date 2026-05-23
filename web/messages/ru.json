@@ -6,6 +6,8 @@
     "forumTotalTooLarge": "Суммарный размер фото не больше 150 МБ",
     "forumBadFile": "Недопустимый тип файла или слишком большое фото",
     "uploadFailed": "Не удалось загрузить фото. Попробуйте меньше файлов или проверьте соединение.",
+    "networkError": "Нет связи с сервером. Если в браузере «Не защищено» — обновите HTTPS-сертификат в Coolify или очистите данные сайта.",
+    "uploadTimeout": "Загрузка слишком долгая. Попробуйте файлы поменьше или другой интернет.",
     "storageNotConfigured": "Загрузка фото не настроена: в Vercel добавьте R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME=hems и R2_PUBLIC_BASE_URL (токен — в R2 → Manage API tokens, не Agent Token).",
     "noDescription": "Укажите описание",
     "requiredFields": "Заполните обязательные поля",

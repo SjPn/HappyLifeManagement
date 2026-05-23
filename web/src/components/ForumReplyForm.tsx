@@ -24,32 +24,34 @@ export function ForumReplyForm({ topicId }: { topicId: string }) {
     setLoading(true);
     setError(null);
     setUploadLabel(null);
-    const fd = new FormData(e.currentTarget);
-    fd.set("topicId", topicId);
+    const form = e.currentTarget;
+    try {
+      const fd = new FormData(form);
+      fd.set("topicId", topicId);
 
-    if (photos.length > 0) {
-      const up = await uploadForumPhotos(photos, 0, (current, total) => {
-        setUploadLabel(t("uploadingPhotos", { current, total }));
-      });
-      if ("error" in up) {
-        setError(translateActionError(te, up.error));
-        setLoading(false);
-        setUploadLabel(null);
+      if (photos.length > 0) {
+        const up = await uploadForumPhotos(photos, 0, (current, total) => {
+          setUploadLabel(t("uploadingPhotos", { current, total }));
+        });
+        if ("error" in up) {
+          setError(translateActionError(te, up.error));
+          return;
+        }
+        fd.set("imageUrls", JSON.stringify(up.urls));
+      }
+
+      const res = await createForumReply(fd);
+      if (res && "error" in res && res.error) {
+        setError(translateActionError(te, res.error));
         return;
       }
-      fd.set("imageUrls", JSON.stringify(up.urls));
+      form.reset();
+      setPhotos([]);
+      router.refresh();
+    } finally {
+      setLoading(false);
+      setUploadLabel(null);
     }
-
-    const res = await createForumReply(fd);
-    setLoading(false);
-    setUploadLabel(null);
-    if (res && "error" in res && res.error) {
-      setError(translateActionError(te, res.error));
-      return;
-    }
-    e.currentTarget.reset();
-    setPhotos([]);
-    router.refresh();
   }
 
   return (

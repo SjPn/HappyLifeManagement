@@ -26,3 +26,14 @@ npm run dev
 ```
 
 Секрети — тільки в `web/.env`.
+
+**Демо на головній (прод):** після деплою коду з кнопками «Председатель / Собственник / Арендатор» один раз:
+
+```powershell
+cd web
+# у .env або в Coolify: DEMO_AUTO_LOGIN_PASSWORD=<довгий-секрет>
+# також INVITE_CODE, SEED_ADMIN_PASSWORD, SEED_CHAIR_PASSWORD, SEED_MOD_PASSWORD, SEED_RESIDENT_PASSWORD
+npm run db:seed
+```
+
+Той самий `DEMO_AUTO_LOGIN_PASSWORD` має бути в Coolify (`DEMO_ENABLED` не `false`). Деталі — `web/.env.example`, локально `docs/HANDBOOK.md`.

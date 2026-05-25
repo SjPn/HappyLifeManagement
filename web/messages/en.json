@@ -93,7 +93,7 @@
     "notChat": "Neighbor chat stays for urgent day-to-day matters. The portal is for what must stay official and easy to find a month later.",
     "login": "Log in",
     "register": "Sign up",
-    "createCommunity": "Create a new community",
+    "createCommunity": "Register a cottage community",
     "createCommunityHint": "For the chair: register your cottage community in the system",
     "demoLine": "Demo:",
     "feat1t": "News & votes",
@@ -112,7 +112,7 @@
     "toLogin": "Log in",
     "eyebrow": "Account",
     "registerHint": "Join an existing community. You need an invite code from the chair.",
-    "createCommunityLink": "Create a new community (I'm the chair)",
+    "createCommunityLink": "Register a cottage community (I'm the chair)",
     "email": "Email",
     "password": "Password",
     "name": "Full name",
@@ -138,7 +138,7 @@
     "signUp": "Sign up",
     "signingUp": "Signing up…",
     "errorLogin": "Invalid email or password",
-    "registerCommunity": "Create a new community"
+    "registerCommunity": "Register a cottage community"
   },
   "pending": {
     "title": "Registration submitted",

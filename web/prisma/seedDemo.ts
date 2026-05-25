@@ -58,7 +58,7 @@ export async function seedDemoCommunity(prisma: PrismaClient) {
       electricityNightRateUah: 2.16,
       paymentRequisites: "Демо-реквізити (не для реальних платежів)",
       memorandumBody:
-        "Демонстраційний меморандум. У реальному поселенні тут правила вашого КГ.",
+        "Демонстраційний меморандум. У реальному котеджному містечку тут правила вашого КГ.",
     },
   });
 
@@ -118,7 +118,7 @@ export async function seedDemoCommunity(prisma: PrismaClient) {
       data: {
         communityId: community.id,
         title: "Ласкаво просимо в демо-портал",
-        body: "Це тестове поселення. Спробуйте заявки, новини та платежі — без реєстрації вашого КГ.",
+        body: "Це демо-котеджне містечко. Спробуйте заявки, новини та платежі — без реєстрації вашого КГ.",
         authorId: chairId,
       },
     });

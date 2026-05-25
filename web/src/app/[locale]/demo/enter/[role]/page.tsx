@@ -1,8 +1,14 @@
 import { DemoEnterFailed } from "./DemoEnterFailed";
 import { performDemoEnter } from "@/lib/demoEnter";
-import { isDemoEnabled, type DemoRoleKey } from "@/lib/demo";
+import {
+  demoPasswordDiagnostics,
+  isDemoEnabled,
+  type DemoRoleKey,
+} from "@/lib/demo";
 import { getLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 const roles = new Set<string>(["chair", "resident", "tenant"]);
 
@@ -18,7 +24,7 @@ export default async function DemoEnterPage({
 
   const result = await performDemoEnter(role as DemoRoleKey);
   if (result.error === "sign_in_failed") {
-    return <DemoEnterFailed />;
+    return <DemoEnterFailed diagnostics={demoPasswordDiagnostics()} />;
   }
   if (result.error) notFound();
 

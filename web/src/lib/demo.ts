@@ -16,10 +16,37 @@ export function isDemoEnabled(): boolean {
   return process.env.DEMO_ENABLED !== "false";
 }
 
+function normalizeDemoPassword(raw: string | undefined): string {
+  if (!raw) return "";
+  let v = raw.trim();
+  if (
+    (v.startsWith('"') && v.endsWith('"')) ||
+    (v.startsWith("'") && v.endsWith("'"))
+  ) {
+    v = v.slice(1, -1).trim();
+  }
+  return v.replace(/\r/g, "");
+}
+
 export function demoAutoLoginPassword(): string {
-  const fromEnv = process.env.DEMO_AUTO_LOGIN_PASSWORD?.trim();
+  const fromEnv = normalizeDemoPassword(process.env.DEMO_AUTO_LOGIN_PASSWORD);
   if (fromEnv) return fromEnv;
   return "happylife-demo-preview-local";
+}
+
+/** Safe hints for the failed-demo page (no full secret). */
+export function demoPasswordDiagnostics() {
+  const raw = process.env.DEMO_AUTO_LOGIN_PASSWORD;
+  const normalized = normalizeDemoPassword(raw);
+  const usingFallback = !normalized;
+  const pwd = demoAutoLoginPassword();
+  return {
+    usingFallback,
+    configured: Boolean(raw?.trim()),
+    length: pwd.length,
+    prefix: pwd.slice(0, 2),
+    suffix: pwd.slice(-2),
+  };
 }
 
 export function demoEmailForRole(role: string): string | null {

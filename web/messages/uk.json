@@ -77,6 +77,8 @@
     "enterFailedHint": "У Coolify задайте DEMO_AUTO_LOGIN_PASSWORD — той самий, що в .env при seed. Потім знову npm run db:seed на Neon і перезапустіть застосунок. Або приберіть змінну на сервері й пересійте з порожнім DEMO_AUTO_LOGIN_PASSWORD (стандартний локальний пароль).",
     "enterFailedBack": "На головну",
     "enterFailedRedeploy": "Після зміни змінних у Coolify натисніть Redeploy — без перезапуску контейнер не підхопить нові значення.",
+    "enterFailedDiagFallback": "Сервер: DEMO_AUTO_LOGIN_PASSWORD не задано (запасний пароль). У Coolify увімкніть Runtime і зробіть Redeploy.",
+    "enterFailedDiagEnv": "Сервер бачить пароль: довжина {len}, початок «{prefix}…{suffix}». Порівняйте з .env (npm run demo:verify). У Coolify для секрета краще лише Runtime, не Buildtime.",
     "role_chair": "Голова",
     "role_resident": "Власник",
     "role_tenant": "Орендар"

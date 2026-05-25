@@ -77,6 +77,8 @@
     "enterFailedHint": "In Coolify set DEMO_AUTO_LOGIN_PASSWORD to the same value used in .env when seeding. Then run npm run db:seed on Neon again and restart the app. Or remove the env var and re-seed with an empty DEMO_AUTO_LOGIN_PASSWORD (default local password).",
     "enterFailedBack": "Back to home",
     "enterFailedRedeploy": "After changing Coolify env vars, click Redeploy — the container must restart to pick up new values.",
+    "enterFailedDiagFallback": "Server: DEMO_AUTO_LOGIN_PASSWORD is unset (using fallback password). Enable Runtime in Coolify and Redeploy.",
+    "enterFailedDiagEnv": "Server password: length {len}, starts with «{prefix}…{suffix}». Compare with .env (npm run demo:verify). Prefer Runtime only, not Buildtime.",
     "role_chair": "Chair",
     "role_resident": "Owner",
     "role_tenant": "Tenant"

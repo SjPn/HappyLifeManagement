@@ -96,7 +96,7 @@ export function HubActionCard({
   href?: string;
   icon: LucideIcon;
   title: string;
-  description?: string;
+  description?: React.ReactNode;
   badge?: number;
   tone: HubAccentTone;
   onClick?: () => void;
@@ -193,15 +193,22 @@ export function HubContentCard({
   href,
   children,
   className = "",
+  badge,
 }: {
   href?: string;
   children: React.ReactNode;
   className?: string;
+  badge?: number;
 }) {
   const body = (
     <div
-      className={`hl-glass rounded-2xl p-4 transition hover:-translate-y-0.5 hover:border-blue-300/50 hover:shadow-lg ${className}`}
+      className={`hl-glass relative rounded-2xl p-4 transition hover:-translate-y-0.5 hover:border-blue-300/50 hover:shadow-lg ${className}`}
     >
+      {badge != null && badge > 0 && (
+        <span className="absolute right-3 top-3 z-10">
+          <NotificationBadge count={badge} />
+        </span>
+      )}
       {children}
     </div>
   );

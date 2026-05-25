@@ -87,6 +87,7 @@ model User {
   newsLikes         NewsPostLike[]
   ticketComments    TicketComment[]
   seenState         UserSeenState?
+  entitySeen        UserEntitySeen[]
   messagesSent      DirectMessage[]      @relation("SentMessages")
   messagesReceived  DirectMessage[]      @relation("ReceivedMessages")
   documentsUploaded CommunityDocument[]
@@ -115,6 +116,18 @@ model UserSeenState {
   forumAt    DateTime @default(now())
   reportsAt  DateTime @default(now())
   messagesAt DateTime @default(now())
+}
+
+// Per-topic / per-ticket seen (badge clears only when opening that item).
+model UserEntitySeen {
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entityType String
+  entityId   String
+  seenAt     DateTime @default(now())
+
+  @@id([userId, entityType, entityId])
+  @@index([userId, entityType])
 }
 
 model NewsPost {

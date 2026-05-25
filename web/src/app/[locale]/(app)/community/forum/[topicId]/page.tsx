@@ -14,6 +14,7 @@ import {
 } from "@/lib/forumDisplay";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 import { ForumPostGallery } from "@/components/ForumPostGallery";
+import { MarkEntitySeen } from "@/components/MarkEntitySeen";
 
 export default async function ForumTopicPage({
   params,
@@ -58,6 +59,7 @@ export default async function ForumTopicPage({
 
   return (
     <>
+      <MarkEntitySeen entityType="forum_topic" entityId={topicId} />
       <PageTitle
         title={topic.title}
         backHref="/community/forum"

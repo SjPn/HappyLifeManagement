@@ -22,6 +22,7 @@ import { newsPostCardProps, newsPostListInclude } from "@/lib/newsPosts";
 import { HubActionCard, HubContentCard, HubSection } from "@/components/hub/hubUi";
 import { DashboardGlance } from "@/components/DashboardGlance";
 import { DebtReminderBanner } from "@/components/DebtReminderBanner";
+import { getTicketUnreadCounts } from "@/lib/ticketUnread";
 import { Shield, Vote } from "lucide-react";
 
 export default async function DashboardPage() {
@@ -73,7 +74,11 @@ export default async function DashboardPage() {
 
   const billingPeriod = currentBillingPeriod();
 
-  const [news, votes, user, chairStats, residentStats, glanceTickets, glanceVote] =
+  const ticketUnreadPromise = !isChair
+    ? getTicketUnreadCounts(userId, communityId, session!.user!.role)
+    : Promise.resolve(new Map<string, number>());
+
+  const [news, votes, user, chairStats, residentStats, glanceTickets, glanceVote, ticketUnread] =
     await Promise.all([
     isChair
       ? Promise.resolve([])
@@ -148,6 +153,7 @@ export default async function DashboardPage() {
           select: { id: true, title: true },
         })
       : Promise.resolve(null),
+    ticketUnreadPromise,
   ]);
 
   const householdBilling =
@@ -169,8 +175,13 @@ export default async function DashboardPage() {
   const paymentPeriodLabel = formatBillingPeriodLabel(locale, billingPeriod);
   const showResidentPaymentsCard =
     !isChair && Boolean(user?.street && user?.houseNumber);
+  const paymentSent = householdBilling?.paymentSentAt != null;
   const showPaymentsPulse =
-    showResidentPaymentsCard && !paymentPaid && paymentTotal > 0;
+    showResidentPaymentsCard &&
+    paymentSent &&
+    !paymentPaid &&
+    paymentTotal > 0;
+  const showPaymentInImportant = showPaymentsPulse;
 
   const displayName = user?.name?.trim() || t("neighbor");
 
@@ -208,12 +219,15 @@ export default async function DashboardPage() {
 
       {!isChair && (
         <DashboardGlance
-          tickets={glanceTickets}
+          tickets={glanceTickets.map((tk) => ({
+            ...tk,
+            unread: (ticketUnread.get(tk.id) ?? 0) > 0,
+          }))}
           payment={{
             periodLabel: paymentPeriodLabel,
             totalLabel: formatUah(paymentTotal, locale),
             paid: paymentPaid,
-            show: showResidentPaymentsCard,
+            showInImportant: showPaymentInImportant,
           }}
           vote={glanceVote}
         />
@@ -227,30 +241,32 @@ export default async function DashboardPage() {
         />
       )}
 
-      {!isChair && (showResidentPaymentsCard || (user?.balanceUah ?? 0) > 0) && (
-        <PaymentsReminderCard
-          title={t("paymentsReminderTitle")}
-          periodLabel={paymentPeriodLabel}
-          description={[
-            showResidentPaymentsCard
-              ? paymentPaid
-                ? t("paymentsPaidOnHome")
-                : paymentTotal > 0
-                  ? t("paymentsReminderText", {
-                      amount: formatUah(paymentTotal, locale),
-                    })
-                  : t("paymentsReminderZero")
-              : null,
-            (user?.balanceUah ?? 0) > 0
-              ? t("duesText", {
-                  amount: formatUah(user!.balanceUah, locale),
-                })
-              : null,
-          ]
-            .filter(Boolean)
-            .join(" ")}
-        />
-      )}
+      {!isChair &&
+        (showResidentPaymentsCard || (user?.balanceUah ?? 0) > 0) && (
+          <PaymentsReminderCard
+            title={t("paymentsReminderTitle")}
+            periodLabel={paymentPeriodLabel}
+            paid={paymentPaid && paymentTotal > 0}
+            description={[
+              showResidentPaymentsCard
+                ? paymentPaid
+                  ? t("paymentsPaidOnHome")
+                  : paymentTotal > 0
+                    ? t("paymentsReminderText", {
+                        amount: formatUah(paymentTotal, locale),
+                      })
+                    : t("paymentsReminderZero")
+                : null,
+              (user?.balanceUah ?? 0) > 0
+                ? t("duesText", {
+                    amount: formatUah(user!.balanceUah, locale),
+                  })
+                : null,
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          />
+        )}
 
       {!isChair && (
         <>

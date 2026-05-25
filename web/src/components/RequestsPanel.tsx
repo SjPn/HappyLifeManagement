@@ -22,6 +22,8 @@ import { TicketTimeline } from "@/components/TicketTimeline";
 import { TicketRatingForm } from "@/components/TicketRatingForm";
 import { useTranslations } from "next-intl";
 import { bindModalOverlay, bottomNavClearanceClass } from "@/lib/modalOverlay";
+import { markEntitySeenAction } from "@/actions/entitySeen";
+import { useNotifications } from "@/components/NotificationProvider";
 
 export type TicketCommentRow = {
   id: string;
@@ -258,16 +260,11 @@ function TicketDetailModal({
   );
 }
 
-function isTicketUnread(ticket: TicketRow, unreadSince?: string) {
-  if (!unreadSince) return false;
-  return new Date(ticket.updatedAt).getTime() > new Date(unreadSince).getTime();
-}
-
 export function RequestsPanel({
   tickets,
   staff,
   currentUserId,
-  ticketsUnreadSince,
+  ticketUnreadMap,
   emptyMessage,
   archiveHref,
   archiveCount,
@@ -277,8 +274,8 @@ export function RequestsPanel({
   tickets: TicketRow[];
   staff: boolean;
   currentUserId: string;
-  /** ISO timestamp: заявки с updatedAt позже считаются «новыми» на этом заходе. */
-  ticketsUnreadSince?: string;
+  /** ticketId → 1 если есть непрочитанные обновления. */
+  ticketUnreadMap?: Record<string, number>;
   emptyMessage: string;
   archiveHref?: string;
   archiveCount?: number;
@@ -288,11 +285,28 @@ export function RequestsPanel({
   const tst = useTranslations("categories.ticketStatus");
   const tc = useTranslations("categories.ticket");
   const t = useTranslations("requests");
+  const { refresh } = useNotifications();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [localUnread, setLocalUnread] = useState<Record<string, number>>(
+    () => ticketUnreadMap ?? {},
+  );
 
   const selected = selectedId
     ? tickets.find((tk) => tk.id === selectedId) ?? null
     : null;
+
+  const openTicket = useCallback(
+    (id: string) => {
+      setSelectedId(id);
+      setLocalUnread((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+      void markEntitySeenAction("ticket", id).then(() => refresh());
+    },
+    [refresh],
+  );
 
   const close = useCallback(() => setSelectedId(null), []);
 
@@ -308,12 +322,12 @@ export function RequestsPanel({
         <div className="flex flex-col gap-2.5">
           {tickets.map((tk) => {
             const Icon = ticketCategoryIcon[tk.category] ?? HelpCircle;
-            const unread = isTicketUnread(tk, ticketsUnreadSince);
+            const unread = (localUnread[tk.id] ?? 0) > 0;
             return (
               <button
                 key={tk.id}
                 type="button"
-                onClick={() => setSelectedId(tk.id)}
+                onClick={() => openTicket(tk.id)}
                 className={`hl-glass group flex w-full items-center gap-3 rounded-2xl p-4 text-left transition hover:-translate-y-0.5 hover:shadow-lg ${
                   unread
                     ? "border-amber-300/70 ring-1 ring-amber-400/40 hover:border-amber-400/80 dark:border-amber-700/60 dark:ring-amber-600/30"
@@ -328,7 +342,12 @@ export function RequestsPanel({
                     <span className="min-w-0 truncate">
                       {ticketTitle(tk.description)}
                     </span>
-                    {unread ? <NotificationBadge count={1} inline /> : null}
+                    {unread ? (
+                      <NotificationBadge
+                        count={localUnread[tk.id] ?? 1}
+                        inline
+                      />
+                    ) : null}
                   </span>
                   <span className="mt-0.5 block text-xs text-slate-500">
                     {ticketCategoryLabel(tc, tk.category)}

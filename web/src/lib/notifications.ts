@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { forumTopicAudienceWhere, voteAudienceWhere } from "@/lib/audience";
+import { voteAudienceWhere } from "@/lib/audience";
 import { Role, UserStatus } from "@/lib/enums";
+import { countForumUnreadTotal } from "@/lib/forumUnread";
 import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
+import { countTicketsUnread } from "@/lib/ticketUnread";
 import { communityWhere } from "@/lib/tenant";
 
 export const NotificationScope = {
@@ -82,55 +84,34 @@ export async function getNotificationCounts(
   const now = new Date();
   const tenant = communityWhere(user.communityId);
 
-  const [news, votes, tickets, payments, board, forumTopics, forumPosts] =
-    await Promise.all([
-      prisma.newsPost.count({
-        where: { ...tenant, createdAt: { gt: seen.newsAt } },
-      }),
-      prisma.vote.count({
-        where: {
-          ...tenant,
-          createdAt: { gt: seen.votesAt },
-          AND: [
-            { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
-            voteAudienceWhere({
-              role: user.role,
-              tenancyType: user.tenancyType,
-            }),
-          ],
-        },
-      }),
-      countTickets(user, seen.ticketsAt),
-      countPayments(user, seen.paymentsAt),
-      prisma.boardPost.count({
-        where: { ...tenant, createdAt: { gt: seen.boardAt } },
-      }),
-      prisma.forumTopic.count({
-        where: {
-          ...tenant,
-          createdAt: { gt: seen.forumAt },
-          ...forumTopicAudienceWhere({
+  const [news, votes, tickets, payments, board, forum] = await Promise.all([
+    prisma.newsPost.count({
+      where: { ...tenant, createdAt: { gt: seen.newsAt } },
+    }),
+    prisma.vote.count({
+      where: {
+        ...tenant,
+        createdAt: { gt: seen.votesAt },
+        AND: [
+          { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
+          voteAudienceWhere({
             role: user.role,
             tenancyType: user.tenancyType,
           }),
-        },
-      }),
-      prisma.forumPost.count({
-        where: {
-          ...tenant,
-          createdAt: { gt: seen.forumAt },
-          topic: {
-            ...tenant,
-            ...forumTopicAudienceWhere({
-              role: user.role,
-              tenancyType: user.tenancyType,
-            }),
-          },
-        },
-      }),
-    ]);
+        ],
+      },
+    }),
+    countTicketsUnread(user.id, user.communityId, user.role),
+    countPayments(user, seen.paymentsAt),
+    prisma.boardPost.count({
+      where: { ...tenant, createdAt: { gt: seen.boardAt } },
+    }),
+    countForumUnreadTotal(user.id, user.communityId, {
+      role: user.role,
+      tenancyType: user.tenancyType,
+    }),
+  ]);
 
-  const forum = forumTopics + forumPosts;
   const requests = tickets;
 
   const messages = await prisma.directMessage.count({
@@ -172,18 +153,6 @@ export async function getNotificationCounts(
   };
 }
 
-async function countTickets(user: SessionUser, since: Date) {
-  const tenant = communityWhere(user.communityId);
-  if (user.role === Role.CHAIR || user.role === Role.MODERATOR) {
-    return prisma.ticket.count({
-      where: { ...tenant, updatedAt: { gt: since } },
-    });
-  }
-  return prisma.ticket.count({
-    where: { ...tenant, userId: user.id, updatedAt: { gt: since } },
-  });
-}
-
 async function countPayments(user: SessionUser, since: Date) {
   if (user.role === Role.CHAIR) {
     return 0;
@@ -196,6 +165,7 @@ async function countPayments(user: SessionUser, since: Date) {
       street: normalizeStreet(user.street),
       houseNumber: normalizeHouseNumber(user.houseNumber),
       paymentSentAt: { gt: since },
+      paidAt: null,
     },
   });
 }

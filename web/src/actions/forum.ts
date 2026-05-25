@@ -14,6 +14,7 @@ import {
   validateImageUrlCount,
 } from "@/lib/forumImageUrls";
 import { createForumPostImages } from "@/lib/forumUpload";
+import { EntitySeenType, markEntitySeen } from "@/lib/entitySeen";
 
 export async function createForumTopic(formData: FormData) {
   const session = await auth();
@@ -58,12 +59,19 @@ export async function createForumTopic(formData: FormData) {
   });
 
   const firstPost = topic.posts[0];
-  if (firstPost && imageUrls.length > 0) {
-    try {
-      await createForumPostImages(firstPost.id, imageUrls, 0);
-    } catch {
-      await prisma.forumTopic.delete({ where: { id: topic.id } });
-      return { error: "generic" as const };
+  if (firstPost) {
+    await markEntitySeen(
+      session.user.id,
+      EntitySeenType.forumTopic,
+      topic.id,
+    );
+    if (imageUrls.length > 0) {
+      try {
+        await createForumPostImages(firstPost.id, imageUrls, 0);
+      } catch {
+        await prisma.forumTopic.delete({ where: { id: topic.id } });
+        return { error: "generic" as const };
+      }
     }
   }
 

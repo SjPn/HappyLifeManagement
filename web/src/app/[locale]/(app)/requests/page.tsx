@@ -8,8 +8,7 @@ import { getRequestsHubStats } from "@/lib/hubStats";
 import { ticketListInclude, toTicketRows } from "@/lib/ticketRows";
 import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
-import { getNotificationSeenAt } from "@/lib/notifications";
+import { getTicketUnreadCounts } from "@/lib/ticketUnread";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function RequestsPage() {
@@ -28,7 +27,7 @@ export default async function RequestsPage() {
     ? communityWhere(communityId)
     : { ...communityWhere(communityId), userId };
 
-  const [activeTickets, archiveCount, hubStats, ticketsUnreadSince] =
+  const [activeTickets, archiveCount, hubStats, ticketUnread] =
     await Promise.all([
       prisma.ticket.findMany({
         where: { ...baseWhere, status: { not: "RESOLVED" } },
@@ -40,12 +39,13 @@ export default async function RequestsPage() {
         where: { ...baseWhere, status: "RESOLVED" },
       }),
       getRequestsHubStats(communityId, staff, userId),
-      getNotificationSeenAt(userId, "tickets"),
+      getTicketUnreadCounts(userId, communityId, role),
     ]);
+
+  const ticketUnreadMap = Object.fromEntries(ticketUnread.entries());
 
   return (
     <>
-      <MarkNotificationsSeen scopes={["tickets"]} />
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
       <RequestsHubStatsBar stats={hubStats} />
       <div className="mb-5 mt-2">
@@ -58,7 +58,7 @@ export default async function RequestsPage() {
         tickets={toTicketRows(activeTickets)}
         staff={staff}
         currentUserId={userId}
-        ticketsUnreadSince={ticketsUnreadSince.toISOString()}
+        ticketUnreadMap={ticketUnreadMap}
         emptyMessage={t("activeEmpty")}
         archiveHref="/requests/archive"
         archiveCount={archiveCount}

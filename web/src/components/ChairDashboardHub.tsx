@@ -57,11 +57,19 @@ export function ChairDashboardHub({
           label={t("statPending")}
           highlight={stats.pendingResidents > 0}
         />
-        <HubStatTile
-          href="/votes"
-          value={stats.activeVotes}
-          label={t("statVotes")}
-        />
+        {isChair ? (
+          <HubStatTile
+            href="/votes"
+            value={stats.activeVotes}
+            label={t("statVotes")}
+          />
+        ) : (
+          <HubStatTile
+            href="/chair/moderation"
+            value={stats.activeVotes}
+            label={tChair("moderation")}
+          />
+        )}
         <HubStatTile
           href="/requests"
           value={stats.openTickets}

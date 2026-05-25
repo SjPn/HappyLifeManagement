@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PageTitle, Card, DashboardGreeting } from "@/components/Ui";
 import { getLocale, getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 import { formatUah } from "@/lib/money";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { voteAudienceWhere } from "@/lib/audience";
@@ -20,50 +21,29 @@ import { getChairDashboardStats } from "@/lib/chairDashboard";
 import { getResidentDashboardStats } from "@/lib/hubStats";
 import { NewsPostCard } from "@/components/NewsPostCard";
 import { newsPostCardProps, newsPostListInclude } from "@/lib/newsPosts";
-import { HubActionCard, HubContentCard, HubSection } from "@/components/hub/hubUi";
+import { HubContentCard, HubSection } from "@/components/hub/hubUi";
 import { DashboardGlance } from "@/components/DashboardGlance";
 import { FirstStepsCard } from "@/components/FirstStepsCard";
 import { MarkDashboardSeen } from "@/components/MarkDashboardSeen";
 import { DebtReminderBanner } from "@/components/DebtReminderBanner";
 import { getTicketUnreadCounts } from "@/lib/ticketUnread";
-import { Shield, Vote } from "lucide-react";
+import { Vote } from "lucide-react";
 
 export default async function DashboardPage() {
   const session = await auth();
+  const locale = await getLocale();
+  if (session!.user!.role === "MODERATOR") {
+    redirect(`/${locale}/chair`);
+  }
+
   const communityId = await requireCommunityIdFromSession(session!.user!);
   const userId = session!.user!.id;
   const isChair = session!.user!.role === "CHAIR";
-  const isModerator = session!.user!.role === "MODERATOR";
   const canLikeNews =
-    !isChair &&
-    session!.user!.status === "APPROVED" &&
-    !isModerator;
-  const locale = await getLocale();
+    !isChair && session!.user!.status === "APPROVED";
   const t = await getTranslations("dashboard");
   const tLikes = await getTranslations("newsLikes");
-  const tMod = await getTranslations("dashboard.residentHub");
-  const tn = await getTranslations("nav");
   const dateLocale = dateLocaleForUi(locale);
-
-  if (isModerator) {
-    return (
-      <>
-        <PageTitle
-          title={t("greeting", { name: "MODERATOR" })}
-          subtitle={t("addressLine", { street: "", house: "" })}
-        />
-        <HubSection title={tMod("sectionQuick")} className="mt-4">
-          <HubActionCard
-            href="/chair/moderation"
-            icon={Shield}
-            title={tn("community")}
-            description={t("quickReport")}
-            tone="rose"
-          />
-        </HubSection>
-      </>
-    );
-  }
 
   const chairStatsPromise = isChair
     ? getChairDashboardStats(communityId)

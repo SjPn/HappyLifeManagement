@@ -30,6 +30,7 @@ export default async function ProfilePage() {
   ]);
 
   const isChair = session!.user!.role === Role.CHAIR;
+  const isModerator = session!.user!.role === Role.MODERATOR;
 
   return (
     <>
@@ -65,7 +66,7 @@ export default async function ProfilePage() {
       )}
 
       <ProfileHubLinks
-        showChairLinks={isChair}
+        showChairLinks={isChair || isModerator}
         role={session!.user!.role}
         pushPrefs={{
           pushNotifyNewTickets: user?.pushNotifyNewTickets ?? true,

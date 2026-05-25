@@ -3,16 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { PageTitle } from "@/components/Ui";
 import { RequestsPanel } from "@/components/RequestsPanel";
 import { ticketListInclude, toTicketRows } from "@/lib/ticketRows";
-import { getLocale, getTranslations } from "next-intl/server";
-import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 
 export default async function RequestsArchivePage() {
   const session = await auth();
-  if (session!.user!.role === "MODERATOR") {
-    const locale = await getLocale();
-    redirect(`/${locale}/chair`);
-  }
   const role = session!.user!.role;
   const staff = role === "CHAIR" || role === "MODERATOR";
   const t = await getTranslations("requests");

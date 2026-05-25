@@ -61,7 +61,11 @@ export function AppShell({
   const isModerator = role === "MODERATOR";
   const { counts } = useNotifications();
   const visibleTabs = isModerator
-    ? tabs.filter((x) => x.href !== "/requests" && x.href !== "/community")
+    ? tabs
+        .filter((x) => x.href !== "/community")
+        .map((tab) =>
+          tab.href === "/dashboard" ? { ...tab, href: "/chair" as const } : tab,
+        )
     : tabs;
 
   return (
@@ -85,8 +89,10 @@ export function AppShell({
         <div className="mx-auto flex max-w-lg items-end justify-between gap-1">
           {visibleTabs.map((tab) => {
             const active =
-              tab.href === "/dashboard"
-                ? pathname === "/dashboard"
+              tab.href === "/dashboard" || tab.href === "/chair"
+                ? pathname === "/dashboard" ||
+                  pathname === "/chair" ||
+                  pathname.startsWith("/chair/")
                 : pathname.startsWith(tab.href);
             const Icon = tab.Icon;
             const badgeCount = tab.countKey ? counts[tab.countKey] : 0;

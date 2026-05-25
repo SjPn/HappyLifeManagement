@@ -4,6 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { NotificationProvider } from "@/components/NotificationProvider";
 import { PushNotificationsProvider } from "@/components/PushNotificationsProvider";
 import { Role } from "@/lib/enums";
+import { demoRoleFromEmail, isDemoSessionUser } from "@/lib/demo";
 import { getCommunityForSession } from "@/lib/tenant";
 
 export default async function AppGroupLayout({
@@ -38,10 +39,19 @@ export default async function AppGroupLayout({
     redirect(`/${locale}/blocked`);
   }
 
+  const isDemo = isDemoSessionUser(session.user);
+  const demoRole = demoRoleFromEmail(session.user.email);
+
   return (
     <NotificationProvider>
       <PushNotificationsProvider>
-        <AppShell communityName={community.name}>{children}</AppShell>
+        <AppShell
+          communityName={community.name}
+          isDemo={isDemo}
+          demoRole={demoRole}
+        >
+          {children}
+        </AppShell>
       </PushNotificationsProvider>
     </NotificationProvider>
   );

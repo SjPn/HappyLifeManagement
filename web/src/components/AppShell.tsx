@@ -15,6 +15,8 @@ import { AndroidBackButtonHandler } from "@/components/AndroidBackButtonHandler"
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { useNotifications } from "@/components/NotificationProvider";
 import type { NotificationCounts } from "@/lib/notifications";
+import { DemoRolePicker } from "@/components/DemoRolePicker";
+import type { DemoRoleKey } from "@/lib/demo";
 
 const tabs: {
   href: string;
@@ -44,9 +46,13 @@ const tabs: {
 export function AppShell({
   children,
   communityName,
+  isDemo,
+  demoRole,
 }: {
   children: React.ReactNode;
   communityName?: string;
+  isDemo?: boolean;
+  demoRole?: DemoRoleKey | null;
 }) {
   const pathname = usePathname();
   const t = useTranslations("nav");
@@ -62,7 +68,9 @@ export function AppShell({
     <div className="flex min-h-screen flex-col pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))]">
       <AndroidBackButtonHandler />
       <main className="relative mx-auto w-full min-w-0 max-w-lg flex-1 px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top,0px))] sm:px-5">
-        {communityName ? (
+        {isDemo ? (
+          <DemoRolePicker activeRole={demoRole ?? null} variant="app" />
+        ) : communityName ? (
           <p
             className="mb-4 line-clamp-2 px-1 text-center text-[0.65rem] font-semibold leading-snug tracking-wide text-blue-700/90 dark:text-blue-300/90"
             title={communityName}

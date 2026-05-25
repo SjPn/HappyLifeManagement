@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Leaf, Sparkles, Shield, MessagesSquare } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { DemoRolePicker } from "@/components/DemoRolePicker";
+import { isDemoEnabled } from "@/lib/demo";
 
 export default async function HomePage({
   params,
@@ -112,6 +114,12 @@ export default async function HomePage({
         <p className="mt-6 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
           {t("notChat")}
         </p>
+
+        {isDemoEnabled() && (
+          <div className="mt-8">
+            <DemoRolePicker />
+          </div>
+        )}
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
           <Link

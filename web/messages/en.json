@@ -67,6 +67,15 @@
     "en": "English",
     "label": "Language"
   },
+  "demo": {
+    "landingTitle": "Try without signing up",
+    "landingHint": "A test community with sample data. Pick a role — you get a ready dashboard. No login or password.",
+    "appBanner": "Demo mode · switch role",
+    "exitDemo": "Leave demo",
+    "role_chair": "Chair",
+    "role_resident": "Owner",
+    "role_tenant": "Tenant"
+  },
   "currency": {
     "uah": "₴"
   },

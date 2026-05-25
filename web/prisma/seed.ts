@@ -11,6 +11,7 @@ import {
 import { AudienceScope, TenancyType } from "../src/lib/audience";
 import { normalizeHouseNumber, normalizeStreet } from "../src/lib/household";
 import { seedInviteCode, seedPasswords } from "./seedConfig";
+import { seedDemoCommunity } from "./seedDemo";
 
 const prisma = new PrismaClient();
 
@@ -242,6 +243,8 @@ async function main() {
     },
   });
 
+  const demo = await seedDemoCommunity(prisma);
+
   console.log("Seed OK:", {
     community: community.slug,
     inviteCode: community.inviteCode,
@@ -250,6 +253,7 @@ async function main() {
     resident: resident.email,
     vote: vote.id,
     topic: topic.id,
+    demo: demo.slug,
   });
 }
 

@@ -11,7 +11,8 @@ import {
   formatBillingPeriodLabel,
 } from "@/lib/billing";
 import { communityWhere, requireCommunityIdFromSession } from "@/lib/tenant";
-import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
+import { getNewsUnreadMap } from "@/lib/newsUnread";
+import { getVoteUnreadMap } from "@/lib/voteUnread";
 import { PaymentsReminderCard } from "@/components/PaymentsReminderCard";
 import { ChairDashboardActions } from "@/components/ChairDashboardActions";
 import { ResidentDashboardHub } from "@/components/ResidentDashboardHub";
@@ -74,12 +75,33 @@ export default async function DashboardPage() {
 
   const billingPeriod = currentBillingPeriod();
 
+  const audience = {
+    role: session!.user!.role,
+    tenancyType: session!.user!.tenancyType,
+  };
+
   const ticketUnreadPromise = !isChair
     ? getTicketUnreadCounts(userId, communityId, session!.user!.role)
     : Promise.resolve(new Map<string, number>());
+  const newsUnreadPromise = !isChair
+    ? getNewsUnreadMap(userId, communityId)
+    : Promise.resolve(new Map<string, number>());
+  const voteUnreadPromise = !isChair
+    ? getVoteUnreadMap(userId, communityId, audience)
+    : Promise.resolve(new Map<string, number>());
 
-  const [news, votes, user, chairStats, residentStats, glanceTickets, glanceVote, ticketUnread] =
-    await Promise.all([
+  const [
+    news,
+    votes,
+    user,
+    chairStats,
+    residentStats,
+    glanceTickets,
+    glanceVote,
+    ticketUnread,
+    newsUnread,
+    voteUnread,
+  ] = await Promise.all([
     isChair
       ? Promise.resolve([])
       : prisma.newsPost.findMany({
@@ -154,6 +176,8 @@ export default async function DashboardPage() {
         })
       : Promise.resolve(null),
     ticketUnreadPromise,
+    newsUnreadPromise,
+    voteUnreadPromise,
   ]);
 
   const householdBilling =
@@ -187,7 +211,6 @@ export default async function DashboardPage() {
 
   return (
     <>
-      {!isChair && <MarkNotificationsSeen scopes={["news"]} />}
       <PageTitle
         eyebrow={t("eyebrow")}
         title={
@@ -292,6 +315,7 @@ export default async function DashboardPage() {
                     canLikeNews,
                     tLikes("popular"),
                   )}
+                  unreadBadge={newsUnread.get(n.id)}
                 />
               ))}
             </div>
@@ -309,7 +333,11 @@ export default async function DashboardPage() {
               {votes.map((v) => {
                 const voted = v.responses.length > 0;
                 return (
-                  <HubContentCard key={v.id} href={`/votes/${v.id}`}>
+                  <HubContentCard
+                    key={v.id}
+                    href={`/votes/${v.id}`}
+                    badge={voteUnread.get(v.id)}
+                  >
                     <div className="flex items-start gap-3">
                       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-md">
                         <Vote className="h-5 w-5" strokeWidth={2.25} />

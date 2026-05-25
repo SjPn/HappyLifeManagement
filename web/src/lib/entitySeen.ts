@@ -3,6 +3,12 @@ import { prisma } from "@/lib/prisma";
 export const EntitySeenType = {
   forumTopic: "forum_topic",
   ticket: "ticket",
+  vote: "vote",
+  news: "news",
+  boardPost: "board_post",
+  document: "document",
+  paymentBilling: "payment_billing",
+  messageThread: "message_thread",
 } as const;
 
 export type EntitySeenType =

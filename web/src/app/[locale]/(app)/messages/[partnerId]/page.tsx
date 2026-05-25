@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { Role } from "@/lib/enums";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 import { markMessagesRead } from "@/actions/messages";
+import { MarkEntitySeen } from "@/components/MarkEntitySeen";
+import { EntitySeenType } from "@/lib/entitySeen";
 import { getTranslations } from "next-intl/server";
 import { redirect, notFound } from "next/navigation";
 
@@ -55,6 +57,10 @@ export default async function MessageThreadPage({
 
   return (
     <>
+      <MarkEntitySeen
+        entityType={EntitySeenType.messageThread}
+        entityId={partnerId}
+      />
       <div className="mb-4">
         <ButtonLink href="/messages" variant="secondary">
           {t("back")}

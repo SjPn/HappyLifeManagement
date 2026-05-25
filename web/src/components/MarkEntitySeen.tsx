@@ -2,6 +2,7 @@
 
 import { markEntitySeenAction } from "@/actions/entitySeen";
 import { useNotifications } from "@/components/NotificationProvider";
+import type { EntitySeenType } from "@/lib/entitySeen";
 import { NOTIFICATIONS_REFRESH_EVENT } from "@/lib/notificationRefresh";
 import { useEffect, useRef } from "react";
 
@@ -9,7 +10,7 @@ export function MarkEntitySeen({
   entityType,
   entityId,
 }: {
-  entityType: "forum_topic" | "ticket";
+  entityType: EntitySeenType;
   entityId: string;
 }) {
   const { refresh } = useNotifications();

@@ -8,7 +8,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { voteAudienceWhere } from "@/lib/audience";
 import { redirect } from "next/navigation";
-import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
+import { getVoteUnreadMap } from "@/lib/voteUnread";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 import { Vote } from "lucide-react";
 
@@ -26,27 +26,31 @@ export default async function VotesListPage() {
   const tChair = await getTranslations("chair");
   const dateLocale = dateLocaleForUi(locale);
 
-  const votes = await prisma.vote.findMany({
-    where: {
-      ...communityWhere(communityId),
-      ...voteAudienceWhere({
-        role: session!.user!.role,
-        tenancyType: session!.user!.tenancyType,
-      }),
-    },
-    orderBy: { createdAt: "desc" },
-    include: {
-      options: { orderBy: { sortOrder: "asc" } },
-      responses: { where: { userId } },
-      _count: { select: { responses: true } },
-    },
-  });
+  const audience = {
+    role: session!.user!.role,
+    tenancyType: session!.user!.tenancyType,
+  };
+
+  const [votes, voteUnread] = await Promise.all([
+    prisma.vote.findMany({
+      where: {
+        ...communityWhere(communityId),
+        ...voteAudienceWhere(audience),
+      },
+      orderBy: { createdAt: "desc" },
+      include: {
+        options: { orderBy: { sortOrder: "asc" } },
+        responses: { where: { userId } },
+        _count: { select: { responses: true } },
+      },
+    }),
+    getVoteUnreadMap(userId, communityId, audience),
+  ]);
 
   const now = new Date();
 
   return (
     <>
-      <MarkNotificationsSeen scopes={["votes"]} />
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
 
       {isChair && (
@@ -63,7 +67,11 @@ export default async function VotesListPage() {
           const active = !v.endsAt || v.endsAt > now;
           const voted = v.responses.length > 0;
           return (
-            <HubContentCard key={v.id} href={`/votes/${v.id}`}>
+            <HubContentCard
+              key={v.id}
+              href={`/votes/${v.id}`}
+              badge={voteUnread.get(v.id)}
+            >
               <div className="flex items-start gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-md">
                   <Vote className="h-5 w-5" strokeWidth={2.25} />

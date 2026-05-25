@@ -19,7 +19,8 @@ import {
   type BillingPeriod,
 } from "@/lib/billing";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
-import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
+import { MarkEntitySeen } from "@/components/MarkEntitySeen";
+import { EntitySeenType } from "@/lib/entitySeen";
 import { PaymentsHubStatsBar } from "@/components/PaymentsHubStats";
 import { CopyRequisitesButton } from "@/components/CopyRequisitesButton";
 import { CopyBillingFromPrevMonth } from "@/components/CopyBillingFromPrevMonth";
@@ -142,7 +143,12 @@ async function ResidentPaymentsView({
 
   return (
     <>
-      <MarkNotificationsSeen scopes={["payments"]} />
+      {billing?.id && (
+        <MarkEntitySeen
+          entityType={EntitySeenType.paymentBilling}
+          entityId={billing.id}
+        />
+      )}
       <PageTitle title={t("title")} subtitle={t("subtitle")} />
 
       <PaymentPeriodNav period={period} />

@@ -6,6 +6,8 @@ import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Card } from "@/components/Ui";
+import { DocumentOpenLink } from "@/components/DocumentOpenLink";
+import { NotificationBadge } from "@/components/NotificationBadge";
 import { FileText, Trash2 } from "lucide-react";
 
 export type DocumentRow = {
@@ -19,9 +21,11 @@ export type DocumentRow = {
 export function CommunityDocumentsPanel({
   documents,
   isChair,
+  unreadById = new Map(),
 }: {
   documents: DocumentRow[];
   isChair: boolean;
+  unreadById?: Map<string, number>;
 }) {
   const t = useTranslations("documents");
   const te = useTranslations("errors");
@@ -93,20 +97,26 @@ export function CommunityDocumentsPanel({
         </Card>
       ) : (
         <div className="flex flex-col gap-2">
-          {documents.map((doc) => (
-            <Card key={doc.id} className="flex items-start gap-3">
+          {documents.map((doc) => {
+            const unread = unreadById.get(doc.id) ?? 0;
+            return (
+            <Card key={doc.id} className="relative flex items-start gap-3">
+              {unread > 0 && (
+                <span className="absolute right-3 top-3">
+                  <NotificationBadge count={unread} />
+                </span>
+              )}
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                 <FileText className="h-5 w-5" />
               </span>
-              <div className="min-w-0 flex-1">
-                <a
+              <div className="min-w-0 flex-1 pr-8">
+                <DocumentOpenLink
+                  documentId={doc.id}
                   href={doc.fileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="font-semibold text-blue-800 hover:underline dark:text-blue-200"
                 >
                   {doc.title}
-                </a>
+                </DocumentOpenLink>
                 <p className="mt-1 text-xs text-zinc-500">
                   {doc.authorName} · {new Date(doc.createdAt).toLocaleDateString()}
                 </p>
@@ -122,7 +132,8 @@ export function CommunityDocumentsPanel({
                 </button>
               )}
             </Card>
-          ))}
+          );
+          })}
         </div>
       )}
     </div>

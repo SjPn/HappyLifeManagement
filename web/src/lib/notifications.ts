@@ -1,9 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import { voteAudienceWhere } from "@/lib/audience";
 import { Role, UserStatus } from "@/lib/enums";
+import { countBoardUnread } from "@/lib/boardUnread";
+import { countDocumentsUnread } from "@/lib/documentUnread";
 import { countForumUnreadTotal } from "@/lib/forumUnread";
-import { normalizeHouseNumber, normalizeStreet } from "@/lib/household";
+import { countNewsUnread } from "@/lib/newsUnread";
+import { countPaymentsUnread } from "@/lib/paymentUnread";
 import { countTicketsUnread } from "@/lib/ticketUnread";
+import { countVotesUnread } from "@/lib/voteUnread";
 import { communityWhere } from "@/lib/tenant";
 
 export const NotificationScope = {
@@ -26,6 +29,7 @@ export type NotificationCounts = {
   payments: number;
   board: number;
   forum: number;
+  documents: number;
   reports: number;
   home: number;
   requests: number;
@@ -80,37 +84,23 @@ export async function markNotificationSeen(
 export async function getNotificationCounts(
   user: SessionUser,
 ): Promise<NotificationCounts> {
-  const seen = await getSeenState(user.id);
-  const now = new Date();
   const tenant = communityWhere(user.communityId);
 
-  const [news, votes, tickets, payments, board, forum] = await Promise.all([
-    prisma.newsPost.count({
-      where: { ...tenant, createdAt: { gt: seen.newsAt } },
-    }),
-    prisma.vote.count({
-      where: {
-        ...tenant,
-        createdAt: { gt: seen.votesAt },
-        AND: [
-          { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
-          voteAudienceWhere({
-            role: user.role,
-            tenancyType: user.tenancyType,
-          }),
-        ],
-      },
-    }),
-    countTicketsUnread(user.id, user.communityId, user.role),
-    countPayments(user, seen.paymentsAt),
-    prisma.boardPost.count({
-      where: { ...tenant, createdAt: { gt: seen.boardAt } },
-    }),
-    countForumUnreadTotal(user.id, user.communityId, {
-      role: user.role,
-      tenancyType: user.tenancyType,
-    }),
-  ]);
+  const audience = {
+    role: user.role,
+    tenancyType: user.tenancyType,
+  };
+
+  const [news, votes, tickets, payments, board, forum, documents] =
+    await Promise.all([
+      countNewsUnread(user.id, user.communityId),
+      countVotesUnread(user.id, user.communityId, audience),
+      countTicketsUnread(user.id, user.communityId, user.role),
+      countPaymentsUnread(user.id, user),
+      countBoardUnread(user.id, user.communityId),
+      countForumUnreadTotal(user.id, user.communityId, audience),
+      countDocumentsUnread(user.id, user.communityId),
+    ]);
 
   const requests = tickets;
 
@@ -134,7 +124,7 @@ export async function getNotificationCounts(
   }
 
   const home = news + votes + tickets + payments + pendingResidents;
-  const community = board + forum + messages;
+  const community = board + forum + messages + documents;
   const reports = 0;
 
   return {
@@ -144,6 +134,7 @@ export async function getNotificationCounts(
     payments,
     board,
     forum,
+    documents,
     reports,
     home,
     requests,
@@ -153,29 +144,4 @@ export async function getNotificationCounts(
   };
 }
 
-async function countPayments(user: SessionUser, since: Date) {
-  if (user.role === Role.CHAIR) {
-    return 0;
-  }
-  const tenant = communityWhere(user.communityId);
-  if (!user.street || !user.houseNumber) return 0;
-  return prisma.householdBilling.count({
-    where: {
-      ...tenant,
-      street: normalizeStreet(user.street),
-      houseNumber: normalizeHouseNumber(user.houseNumber),
-      paymentSentAt: { gt: since },
-      paidAt: null,
-    },
-  });
-}
-
-/** Snapshot «прочитано до» для подсветки элементов на странице до markNotificationSeen. */
-export async function getNotificationSeenAt(
-  userId: string,
-  scope: "tickets" | "payments",
-): Promise<Date> {
-  const seen = await getSeenState(userId);
-  return scope === "tickets" ? seen.ticketsAt : seen.paymentsAt;
-}
 

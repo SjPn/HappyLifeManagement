@@ -62,6 +62,7 @@ export default async function CommunityHubPage() {
             href: "/community/documents",
             title: t("documentsTitle"),
             desc: t("documentsDesc"),
+            countKey: "documents",
           },
         ]}
       />

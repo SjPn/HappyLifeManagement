@@ -23,7 +23,7 @@ import type { HubAccentTone } from "@/components/hub/hubUi";
 
 type CountKey = keyof Pick<
   NotificationCounts,
-  "news" | "board" | "forum" | "messages"
+  "news" | "board" | "forum" | "messages" | "documents"
 >;
 
 const itemMeta: Record<

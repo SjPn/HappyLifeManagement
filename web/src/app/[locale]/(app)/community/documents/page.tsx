@@ -5,6 +5,7 @@ import { CommunityDocumentsPanel } from "@/components/CommunityDocumentsPanel";
 import { getTranslations } from "next-intl/server";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 import { Role } from "@/lib/enums";
+import { getDocumentUnreadMap } from "@/lib/documentUnread";
 
 export default async function CommunityDocumentsPage() {
   const session = await auth();
@@ -13,11 +14,16 @@ export default async function CommunityDocumentsPage() {
   const t = await getTranslations("documents");
   const tc = await getTranslations("community");
 
-  const documents = await prisma.communityDocument.findMany({
-    where: communityWhere(communityId),
-    orderBy: { createdAt: "desc" },
-    include: { author: { select: { name: true } } },
-  });
+  const userId = session!.user!.id;
+
+  const [documents, docUnread] = await Promise.all([
+    prisma.communityDocument.findMany({
+      where: communityWhere(communityId),
+      orderBy: { createdAt: "desc" },
+      include: { author: { select: { name: true } } },
+    }),
+    getDocumentUnreadMap(userId, communityId),
+  ]);
 
   return (
     <>
@@ -29,6 +35,7 @@ export default async function CommunityDocumentsPage() {
       />
       <CommunityDocumentsPanel
         isChair={isChair}
+        unreadById={docUnread}
         documents={documents.map((d) => ({
           id: d.id,
           title: d.title,

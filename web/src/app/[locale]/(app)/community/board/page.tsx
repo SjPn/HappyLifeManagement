@@ -6,7 +6,7 @@ import { HubContentCard, HubMetaLine } from "@/components/hub/hubUi";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dateLocaleForUi } from "@/lib/dateLocale";
 import { redirect } from "next/navigation";
-import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
+import { getBoardUnreadMap } from "@/lib/boardUnread";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
 import { Megaphone } from "lucide-react";
 
@@ -23,16 +23,18 @@ export default async function BoardPage() {
   const tCat = await getTranslations("categories.board");
   const dateLocale = dateLocaleForUi(locale);
 
-  const posts = await prisma.boardPost.findMany({
-    where: communityWhere(communityId),
-    orderBy: { createdAt: "desc" },
-    take: 40,
-    include: { user: { select: { name: true } } },
-  });
+  const [posts, boardUnread] = await Promise.all([
+    prisma.boardPost.findMany({
+      where: communityWhere(communityId),
+      orderBy: { createdAt: "desc" },
+      take: 40,
+      include: { user: { select: { name: true } } },
+    }),
+    getBoardUnreadMap(userId, communityId),
+  ]);
 
   return (
     <>
-      <MarkNotificationsSeen scopes={["board"]} />
       <PageTitle
         title={t("title")}
         subtitle={t("subtitle")}
@@ -44,7 +46,11 @@ export default async function BoardPage() {
       </div>
       <div className="flex flex-col gap-2.5">
         {posts.map((p) => (
-          <HubContentCard key={p.id}>
+          <HubContentCard
+            key={p.id}
+            href={`/community/board/${p.id}`}
+            badge={boardUnread.get(p.id)}
+          >
             <div className="flex items-start gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-md">
                 <Megaphone className="h-5 w-5" strokeWidth={2.25} />

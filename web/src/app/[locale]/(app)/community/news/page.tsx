@@ -1,7 +1,7 @@
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { NewsCreateForm } from "@/components/NewsCreateForm";
-import { MarkNotificationsSeen } from "@/components/MarkNotificationsSeen";
+import { getNewsUnreadMap } from "@/lib/newsUnread";
 import { NewsPostCard } from "@/components/NewsPostCard";
 import { PageTitle, Card } from "@/components/Ui";
 import { newsPostCardProps, newsPostListInclude } from "@/lib/newsPosts";
@@ -30,16 +30,18 @@ export default async function CommunityNewsPage() {
   const tLikes = await getTranslations("newsLikes");
   const dateLocale = dateLocaleForUi(locale);
 
-  const news = await prisma.newsPost.findMany({
-    where: communityWhere(communityId),
-    orderBy: { createdAt: "desc" },
-    take: 50,
-    include: newsPostListInclude(userId),
-  });
+  const [news, newsUnread] = await Promise.all([
+    prisma.newsPost.findMany({
+      where: communityWhere(communityId),
+      orderBy: { createdAt: "desc" },
+      take: 50,
+      include: newsPostListInclude(userId),
+    }),
+    getNewsUnreadMap(userId, communityId),
+  ]);
 
   return (
     <>
-      <MarkNotificationsSeen scopes={["news"]} />
       <PageTitle
         title={t("newsTitle")}
         subtitle={t("newsSubtitle")}
@@ -77,6 +79,7 @@ export default async function CommunityNewsPage() {
               canLikeNews,
               tLikes("popular"),
             )}
+            unreadBadge={newsUnread.get(n.id)}
           />
         ))}
       </div>

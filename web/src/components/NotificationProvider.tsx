@@ -17,6 +17,7 @@ const empty: NotificationCounts = {
   payments: 0,
   board: 0,
   forum: 0,
+  documents: 0,
   reports: 0,
   home: 0,
   requests: 0,

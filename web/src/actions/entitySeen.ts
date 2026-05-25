@@ -26,14 +26,32 @@ export async function markEntitySeenAction(
   );
 
   const paths: Record<string, string[]> = {
-    forum_topic: ["/community", "/community/forum"],
-    ticket: ["/dashboard", "/requests"],
+    [EntitySeenType.forumTopic]: ["/community", "/community/forum"],
+    [EntitySeenType.ticket]: ["/dashboard", "/requests"],
+    [EntitySeenType.vote]: ["/dashboard", "/votes"],
+    [EntitySeenType.news]: ["/dashboard", "/community", "/community/news"],
+    [EntitySeenType.boardPost]: ["/community", "/community/board"],
+    [EntitySeenType.document]: ["/community", "/community/documents"],
+    [EntitySeenType.paymentBilling]: ["/dashboard", "/payments"],
+    [EntitySeenType.messageThread]: ["/community", "/messages"],
   };
   for (const p of paths[entityType] ?? []) {
     revalidateAllLocales(p);
   }
   if (entityType === EntitySeenType.forumTopic) {
     revalidateAllLocales(`/community/forum/${entityId}`);
+  }
+  if (entityType === EntitySeenType.vote) {
+    revalidateAllLocales(`/votes/${entityId}`);
+  }
+  if (entityType === EntitySeenType.news) {
+    revalidateAllLocales(`/community/news/${entityId}`);
+  }
+  if (entityType === EntitySeenType.boardPost) {
+    revalidateAllLocales(`/community/board/${entityId}`);
+  }
+  if (entityType === EntitySeenType.messageThread) {
+    revalidateAllLocales(`/messages/${entityId}`);
   }
 
   return { ok: true as const };

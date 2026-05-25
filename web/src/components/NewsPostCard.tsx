@@ -13,6 +13,7 @@ export function NewsPostCard({
   likedByMe,
   canLike,
   popularLabel,
+  unreadBadge,
 }: {
   id: string;
   title: string;
@@ -24,9 +25,10 @@ export function NewsPostCard({
   likedByMe: boolean;
   canLike: boolean;
   popularLabel?: string | null;
+  unreadBadge?: number;
 }) {
   return (
-    <HubContentCard>
+    <HubContentCard href={`/community/news/${id}`} badge={unreadBadge}>
       <div className="flex items-start gap-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-sky-600 text-white shadow-md shadow-blue-500/25">
           <Newspaper className="h-5 w-5" strokeWidth={2.25} aria-hidden />

@@ -8,6 +8,8 @@ import { getTranslations } from "next-intl/server";
 import { userMatchesAudience } from "@/lib/audience";
 import { getLocale } from "next-intl/server";
 import { communityWhere, requireCommunityId } from "@/lib/tenant";
+import { MarkEntitySeen } from "@/components/MarkEntitySeen";
+import { EntitySeenType } from "@/lib/entitySeen";
 
 export default async function VoteDetailPage({
   params,
@@ -59,6 +61,7 @@ export default async function VoteDetailPage({
 
   return (
     <>
+      <MarkEntitySeen entityType={EntitySeenType.vote} entityId={id} />
       <PageTitle
         title={vote.title}
         subtitle={vote.description ?? undefined}

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { LoginForm } from "@/components/LoginForm";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { isDemoEnabled } from "@/lib/demo";
 
 export default async function LoginPage({
   params,
@@ -20,6 +21,7 @@ export default async function LoginPage({
     redirect(`/${locale}/pending`);
 
   const t = await getTranslations("auth");
+  const tDemo = await getTranslations("demo");
 
   return (
     <div className="relative min-h-screen px-4 py-16">
@@ -37,6 +39,19 @@ export default async function LoginPage({
         <div className="mt-8 hl-glass rounded-2xl p-5 sm:p-6">
           <LoginForm />
         </div>
+        {isDemoEnabled() && (
+          <p className="mt-6 text-center">
+            <a
+              href={`/${locale}/demo`}
+              className="text-sm font-semibold text-blue-700 underline decoration-blue-700/30 underline-offset-2 hover:text-blue-600 dark:text-blue-400 dark:decoration-blue-400/40"
+            >
+              {tDemo("tryDemoLink")}
+            </a>
+            <span className="mt-1 block text-xs text-slate-500 dark:text-slate-400">
+              {tDemo("tryDemoHint")}
+            </span>
+          </p>
+        )}
         <p className="mt-8 text-center text-sm text-slate-500">
           {t("noAccount")}{" "}
           <Link

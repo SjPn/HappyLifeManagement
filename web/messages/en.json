@@ -68,6 +68,13 @@
     "label": "Language"
   },
   "demo": {
+    "tryDemoLink": "Try the demo",
+    "tryDemoHint": "Owner dashboard — no sign-up or password",
+    "pageTitle": "Demo cottage community",
+    "pageSubtitle": "Owner view is selected by default. Switch role below if needed.",
+    "continueAsResident": "Open owner dashboard",
+    "backToLogin": "Log in",
+    "backToHome": "Home",
     "landingTitle": "Try without signing up",
     "landingHint": "A test community with sample data. Pick a role — you get a ready dashboard. No login or password.",
     "appBanner": "Demo mode · switch role",

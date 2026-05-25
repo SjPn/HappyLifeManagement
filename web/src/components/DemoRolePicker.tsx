@@ -1,6 +1,5 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 
 const roles = [
@@ -59,9 +58,12 @@ export function DemoRolePicker({
       </div>
       {inApp && (
         <p className="mt-2 text-xs text-amber-900/80 dark:text-amber-200/90">
-          <Link href="/demo/exit" className="font-medium underline">
+          <a
+            href={`/${locale}/demo/exit`}
+            className="font-medium underline text-inherit"
+          >
             {t("exitDemo")}
-          </Link>
+          </a>
         </p>
       )}
     </div>

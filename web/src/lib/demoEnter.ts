@@ -107,11 +107,3 @@ export async function performDemoSignIn(
     return { error: "sign_in_failed" };
   }
 }
-
-export async function performDemoExit(): Promise<void> {
-  try {
-    await signOut({ redirect: false });
-  } catch {
-    /* ignore */
-  }
-}

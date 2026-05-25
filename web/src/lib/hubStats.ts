@@ -5,6 +5,8 @@ import {
   type BillingPeriod,
 } from "@/lib/billing";
 import { voteAudienceWhere } from "@/lib/audience";
+import { countNewsUnread } from "@/lib/newsUnread";
+import { countTicketsUnread } from "@/lib/ticketUnread";
 import { communityWhere } from "@/lib/tenant";
 
 export type CommunityHubStats = {
@@ -30,7 +32,10 @@ export type ResidentDashboardStats = {
   openTickets: number;
   activeVotes: number;
   unreadMessages: number;
-  newsPosts: number;
+  /** Непрочитані новини (не загальна кількість постів). */
+  unreadNews: number;
+  /** Заявки з оновленням після останнього перегляду. */
+  unreadTickets: number;
 };
 
 export async function getCommunityHubStats(
@@ -93,25 +98,33 @@ export async function getResidentDashboardStats(
 ): Promise<ResidentDashboardStats> {
   const tenant = communityWhere(communityId);
   const now = new Date();
-  const [openTickets, activeVotes, unreadMessages, newsPosts] = await Promise.all([
-    prisma.ticket.count({
-      where: { ...tenant, userId, status: { not: "RESOLVED" } },
-    }),
-    prisma.vote.count({
-      where: {
-        ...tenant,
-        AND: [
-          { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
-          voteAudienceWhere(audience),
-        ],
-      },
-    }),
-    prisma.directMessage.count({
-      where: { ...tenant, recipientId: userId, readAt: null },
-    }),
-    prisma.newsPost.count({ where: tenant }),
-  ]);
-  return { openTickets, activeVotes, unreadMessages, newsPosts };
+  const [openTickets, activeVotes, unreadMessages, unreadNews, unreadTickets] =
+    await Promise.all([
+      prisma.ticket.count({
+        where: { ...tenant, userId, status: { not: "RESOLVED" } },
+      }),
+      prisma.vote.count({
+        where: {
+          ...tenant,
+          AND: [
+            { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
+            voteAudienceWhere(audience),
+          ],
+        },
+      }),
+      prisma.directMessage.count({
+        where: { ...tenant, recipientId: userId, readAt: null },
+      }),
+      countNewsUnread(userId, communityId),
+      countTicketsUnread(userId, communityId, audience.role),
+    ]);
+  return {
+    openTickets,
+    activeVotes,
+    unreadMessages,
+    unreadNews,
+    unreadTickets,
+  };
 }
 
 export async function getPopularNewsId(communityId: string) {

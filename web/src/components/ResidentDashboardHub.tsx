@@ -48,7 +48,7 @@ export function ResidentDashboardHub({
           href="/requests"
           value={stats.openTickets}
           label={t("statTickets")}
-          highlight={stats.openTickets > 0}
+          highlight={stats.unreadTickets > 0}
         />
         <HubStatTile
           href="/votes"
@@ -57,8 +57,9 @@ export function ResidentDashboardHub({
         />
         <HubStatTile
           href="/community/news"
-          value={stats.newsPosts}
+          value={stats.unreadNews}
           label={t("statNews")}
+          highlight={stats.unreadNews > 0}
         />
       </HubStatsRow>
     </div>

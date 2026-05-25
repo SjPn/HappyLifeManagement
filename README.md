@@ -1,20 +1,21 @@
 # Happy Life
 
-Портал для **котеджних містечок і ОСМД** (Україна): [happylife.estate](https://happylife.estate)
+Портал для **котеджних містечок і ОСМД**: [happylife.estate](https://happylife.estate)
 
-**Як користуватися сайтом** → [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
+**Для мешканців і голови** — у застосунку: **Ще → Як користуватися**.  
+Коротка копія для чату КГ: [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
 
 ## Репозиторій
 
 | | |
 |---|---|
-| Код веб-додатку | `web/` |
+| Код | `web/` |
 | Android (Capacitor) | `mobile/` |
 | GitHub | [SjPn/HappyLifeManagement](https://github.com/SjPn/HappyLifeManagement) |
 
-Внутрішня документація (деплой, seed, бэклог) **не в git** — лише локально у власника проєкту.
+Внутрішній справочник розробника — локально `docs/HANDBOOK.md` (не в git).
 
-## Розробка (коротко)
+## Розробка
 
 ```powershell
 cd web
@@ -24,4 +25,4 @@ npx prisma db push
 npm run dev
 ```
 
-Секрети та коди КГ — тільки в `web/.env` (див. `.env.example`).
+Секрети — тільки в `web/.env`.

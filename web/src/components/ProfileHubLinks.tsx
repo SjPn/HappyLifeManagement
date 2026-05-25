@@ -2,7 +2,7 @@
 
 import { HubActionCard, HubSection } from "@/components/hub/hubUi";
 import { useTranslations } from "next-intl";
-import { FileText, ScrollText, User } from "lucide-react";
+import { CircleHelp, FileText, ScrollText, User } from "lucide-react";
 import { SignOutButton } from "@/components/AppShell";
 import { ApkDownloadLink } from "@/components/ApkDownloadLink";
 import { PushNotificationsSettings } from "@/components/PushNotificationsSettings";
@@ -27,6 +27,13 @@ export function ProfileHubLinks({
   return (
     <>
       <HubSection title={t("hubSectionInfo")} className="!mt-2">
+        <HubActionCard
+          href="/help"
+          icon={CircleHelp}
+          title={t("helpLink")}
+          description={t("helpDesc")}
+          tone="blue"
+        />
         <HubActionCard
           href="/info/memorandum"
           icon={ScrollText}

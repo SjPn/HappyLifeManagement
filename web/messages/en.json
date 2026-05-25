@@ -516,6 +516,8 @@
     "downloadApp": "Download app (APK)",
     "apkUnavailable": "The app file is not published yet. Contact your chair or administrator.",
     "apkOpenInBrowser": "Opens in your browser — confirm installation when prompted.",
+    "helpLink": "How to use",
+    "helpDesc": "Why this portal and where to tap",
     "hubSectionInfo": "Info",
     "hubSectionApp": "App",
     "hubSectionAccount": "Account",
@@ -531,6 +533,38 @@
       "debt": "Debt reminders",
       "unavailable": "Push is temporarily off (Firebase must be configured in the APK). The app works without it."
     }
+  },
+  "help": {
+    "title": "How to use",
+    "subtitle": "Your community portal in brief",
+    "why": "Official community matters live here — no digging through chats to learn what you owe or what happened to your request.",
+    "helpsTitle": "What it helps with",
+    "helps1": "Requests don’t get lost in messenger — status through “Resolved”",
+    "helps2": "News and votes — everyone sees the same feed",
+    "helps3": "Payments for your home — when the chair sends the bill",
+    "helps4": "Community documents — one place, not email threads",
+    "navTitle": "Bottom bar",
+    "navHome": "Home — news and overview",
+    "navRequests": "Requests — roads, water, safety, cleaning",
+    "navCommunity": "Community — board, forum, neighbors, documents",
+    "navMore": "More — payments, profile, download the app",
+    "badge": "Red badge — something new. Open that specific item and the badge clears.",
+    "notChat": "Neighbor chat stays for quick questions. The portal is for decisions, money, and requests you need later.",
+    "questions": "Still stuck? Ask your chair first; for technical issues contact the site owner."
+  },
+  "firstSteps": {
+    "title": "Start here",
+    "dismiss": "Got it",
+    "moreLink": "A bit more detail",
+    "resident1": "Read the latest news on Home",
+    "resident2": "Open Requests for issues to the chair",
+    "resident3": "Check Community for board posts and forum",
+    "resident4": "Payments under More — mark Paid after you transfer when the chair sent the amount",
+    "chair1": "Approve new residents after signup",
+    "chair2": "Post a short news item: “we use the portal”",
+    "chair3": "Reply to requests so residents see status",
+    "chair4": "Payments: tariff → meter readings → Send per household",
+    "chair5": "Invite code is under More — don’t post it publicly"
   },
   "messages": {
     "title": "Messages",

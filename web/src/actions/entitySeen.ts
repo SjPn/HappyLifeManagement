@@ -56,3 +56,47 @@ export async function markEntitySeenAction(
 
   return { ok: true as const };
 }
+
+export async function markDashboardSeenAction({
+  newsIds = [],
+  ticketIds = [],
+  voteId,
+}: {
+  newsIds?: string[];
+  ticketIds?: string[];
+  voteId?: string | null;
+}) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "forbidden" as const };
+
+  const userId = session.user.id;
+  const tasks: Promise<void>[] = [];
+
+  for (const id of newsIds) {
+    if (id) {
+      tasks.push(
+        markEntitySeen(userId, EntitySeenType.news, id),
+      );
+    }
+  }
+  for (const id of ticketIds) {
+    if (id) {
+      tasks.push(
+        markEntitySeen(userId, EntitySeenType.ticket, id),
+      );
+    }
+  }
+  if (voteId) {
+    tasks.push(markEntitySeen(userId, EntitySeenType.vote, voteId));
+  }
+
+  if (tasks.length === 0) return { ok: true as const };
+
+  await Promise.all(tasks);
+
+  for (const p of ["/dashboard", "/requests", "/votes", "/community/news"]) {
+    revalidateAllLocales(p);
+  }
+
+  return { ok: true as const };
+}

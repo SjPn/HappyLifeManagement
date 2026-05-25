@@ -22,6 +22,8 @@ import { NewsPostCard } from "@/components/NewsPostCard";
 import { newsPostCardProps, newsPostListInclude } from "@/lib/newsPosts";
 import { HubActionCard, HubContentCard, HubSection } from "@/components/hub/hubUi";
 import { DashboardGlance } from "@/components/DashboardGlance";
+import { FirstStepsCard } from "@/components/FirstStepsCard";
+import { MarkDashboardSeen } from "@/components/MarkDashboardSeen";
 import { DebtReminderBanner } from "@/components/DebtReminderBanner";
 import { getTicketUnreadCounts } from "@/lib/ticketUnread";
 import { Shield, Vote } from "lucide-react";
@@ -232,6 +234,18 @@ export default async function DashboardPage() {
           paymentsLabel={t("chairPaymentsButton")}
         />
       )}
+
+      {!isChair && (
+        <MarkDashboardSeen
+          newsIds={news.map((n) => n.id)}
+          ticketIds={glanceTickets.map((t) => t.id)}
+          voteId={glanceVote?.id}
+        />
+      )}
+
+      {isChair && <FirstStepsCard role="CHAIR" />}
+
+      {!isChair && <FirstStepsCard role="RESIDENT" />}
 
       {!isChair && showPaymentsPulse && paymentTotal > 0 && (
         <DebtReminderBanner

@@ -15,7 +15,7 @@ export function isTabRootPath(pathname: string): boolean {
 
 /** Fallback when browser history is empty (e.g. deep link in APK). */
 export function getBackFallback(pathname: string): string | null {
-  if (pathname.startsWith("/info/")) return "/profile";
+  if (pathname === "/help" || pathname.startsWith("/info/")) return "/profile";
   if (pathname.startsWith("/chair/")) return "/chair";
   if (/^\/votes\/[^/]+$/.test(pathname)) return "/votes";
   if (pathname === "/requests/new" || pathname === "/requests/archive") {

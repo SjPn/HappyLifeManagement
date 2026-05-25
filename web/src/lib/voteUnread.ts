@@ -4,6 +4,12 @@ import { prisma } from "@/lib/prisma";
 import { countSimpleUnread, getSimpleUnreadMap } from "@/lib/simpleEntityUnread";
 import { communityWhere } from "@/lib/tenant";
 
+function activeVotesWhere(now = new Date()) {
+  return {
+    OR: [{ endsAt: null }, { endsAt: { gt: now } }],
+  };
+}
+
 export async function getVoteUnreadMap(
   userId: string,
   communityId: string,
@@ -13,6 +19,7 @@ export async function getVoteUnreadMap(
     where: {
       ...communityWhere(communityId),
       ...voteAudienceWhere(audience),
+      ...activeVotesWhere(),
     },
     select: { id: true, createdAt: true },
   });
@@ -32,6 +39,7 @@ export async function countVotesUnread(
     where: {
       ...communityWhere(communityId),
       ...voteAudienceWhere(audience),
+      ...activeVotesWhere(),
     },
     select: { id: true, createdAt: true },
   });

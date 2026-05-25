@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Leaf, Sparkles, Shield, MessagesSquare } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { DemoRolePicker } from "@/components/DemoRolePicker";
 import { isDemoEnabled } from "@/lib/demo";
 
 export default async function HomePage({
@@ -22,6 +21,7 @@ export default async function HomePage({
   }
 
   const t = await getTranslations("landing");
+  const tDemo = await getTranslations("demo");
 
   const pains = [
     t("pain1"),
@@ -115,12 +115,6 @@ export default async function HomePage({
           {t("notChat")}
         </p>
 
-        {isDemoEnabled() && (
-          <div className="mt-8">
-            <DemoRolePicker />
-          </div>
-        )}
-
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
             href="/login"
@@ -135,6 +129,20 @@ export default async function HomePage({
             {t("register")}
           </Link>
         </div>
+
+        {isDemoEnabled() && (
+          <div className="mt-6 flex flex-col items-center">
+            <a
+              href={`/${locale}/demo`}
+              className="inline-flex h-12 min-w-[14rem] items-center justify-center rounded-2xl border-2 border-sky-500/50 bg-sky-50/90 px-8 text-sm font-semibold text-sky-900 shadow-sm transition hover:border-sky-500 hover:bg-sky-100 active:scale-[0.98] dark:border-sky-400/40 dark:bg-sky-950/50 dark:text-sky-100 dark:hover:bg-sky-900/60"
+            >
+              {tDemo("tryDemoLink")}
+            </a>
+            <p className="mt-2 max-w-xs text-center text-xs text-slate-500 dark:text-slate-400">
+              {tDemo("tryDemoHint")}
+            </p>
+          </div>
+        )}
 
         <p className="mt-5 text-center text-sm text-slate-600 dark:text-slate-400">
           <Link

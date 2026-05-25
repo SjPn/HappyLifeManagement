@@ -14,11 +14,22 @@ export function seedInviteCode(): string {
   return requireEnv("INVITE_CODE");
 }
 
+function normalizeSecret(raw: string): string {
+  let v = raw.trim();
+  if (
+    (v.startsWith('"') && v.endsWith('"')) ||
+    (v.startsWith("'") && v.endsWith("'"))
+  ) {
+    v = v.slice(1, -1).trim();
+  }
+  return v.replace(/\r/g, "");
+}
+
 export function seedPasswords() {
   return {
-    admin: requireEnv("SEED_ADMIN_PASSWORD"),
-    chair: requireEnv("SEED_CHAIR_PASSWORD"),
-    mod: requireEnv("SEED_MOD_PASSWORD"),
-    resident: requireEnv("SEED_RESIDENT_PASSWORD"),
+    admin: normalizeSecret(requireEnv("SEED_ADMIN_PASSWORD")),
+    chair: normalizeSecret(requireEnv("SEED_CHAIR_PASSWORD")),
+    mod: normalizeSecret(requireEnv("SEED_MOD_PASSWORD")),
+    resident: normalizeSecret(requireEnv("SEED_RESIDENT_PASSWORD")),
   };
 }

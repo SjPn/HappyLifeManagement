@@ -15,6 +15,7 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
     "demo:verify": "tsx scripts/demo-verify-password.ts",
+    "seed:verify": "tsx scripts/seed-verify-passwords.ts",
     "upload:apk": "tsx scripts/upload-apk-to-r2.ts",
     "db:migrate:production": "prisma migrate deploy && tsx scripts/migrate_shchaslyve_zhyttya.ts",
     "postinstall": "prisma generate"

@@ -77,7 +77,12 @@ async function main() {
 
   await prisma.user.upsert({
     where: { email: "admin@happylife.demo" },
-    update: { role: Role.PLATFORM_ADMIN, communityId: null },
+    update: {
+      role: Role.PLATFORM_ADMIN,
+      communityId: null,
+      status: UserStatus.APPROVED,
+      passwordHash: hash(passwords.admin),
+    },
     create: {
       email: "admin@happylife.demo",
       passwordHash: hash(passwords.admin),
@@ -94,7 +99,12 @@ async function main() {
 
   const chair = await prisma.user.upsert({
     where: { email: "chair@happylife.demo" },
-    update: { tenancyType: TenancyType.OWNER, communityId: community.id },
+    update: {
+      tenancyType: TenancyType.OWNER,
+      communityId: community.id,
+      status: UserStatus.APPROVED,
+      passwordHash: hash(passwords.chair),
+    },
     create: {
       email: "chair@happylife.demo",
       passwordHash: hash(passwords.chair),
@@ -111,7 +121,12 @@ async function main() {
 
   const mod = await prisma.user.upsert({
     where: { email: "mod@happylife.demo" },
-    update: { tenancyType: TenancyType.OWNER, communityId: community.id },
+    update: {
+      tenancyType: TenancyType.OWNER,
+      communityId: community.id,
+      status: UserStatus.APPROVED,
+      passwordHash: hash(passwords.mod),
+    },
     create: {
       email: "mod@happylife.demo",
       passwordHash: hash(passwords.mod),
@@ -128,7 +143,12 @@ async function main() {
 
   const resident = await prisma.user.upsert({
     where: { email: "neighbor@happylife.demo" },
-    update: { tenancyType: TenancyType.TENANT, communityId: community.id },
+    update: {
+      tenancyType: TenancyType.TENANT,
+      communityId: community.id,
+      status: UserStatus.APPROVED,
+      passwordHash: hash(passwords.resident),
+    },
     create: {
       email: "neighbor@happylife.demo",
       passwordHash: hash(passwords.resident),

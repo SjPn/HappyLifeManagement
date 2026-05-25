@@ -121,16 +121,16 @@ export default async function HomePage({
           </div>
         )}
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
             href="/login"
-            className="inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-sky-600 px-8 text-sm font-semibold text-white shadow-xl shadow-blue-600/30 transition hover:from-blue-500 hover:to-sky-500 active:scale-[0.98] dark:shadow-blue-900/40"
+            className="inline-flex h-12 min-w-[10.5rem] items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-sky-600 px-8 text-sm font-semibold text-white shadow-xl shadow-blue-600/30 transition hover:from-blue-500 hover:to-sky-500 active:scale-[0.98] dark:shadow-blue-900/40"
           >
             {t("login")}
           </Link>
           <Link
             href="/register"
-            className="inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200/90 bg-white/80 px-8 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur transition hover:border-blue-200 hover:bg-white active:scale-[0.98] dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:border-blue-800"
+            className="inline-flex h-12 min-w-[10.5rem] items-center justify-center rounded-2xl border border-slate-200/90 bg-white/80 px-8 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur transition hover:border-blue-200 hover:bg-white active:scale-[0.98] dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:border-blue-800"
           >
             {t("register")}
           </Link>

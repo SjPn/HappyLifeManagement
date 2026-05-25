@@ -1,13 +1,27 @@
 import { Link } from "@/i18n/navigation";
+import type { DemoDbCheck, DemoEnterError } from "@/lib/demoEnter";
 import type { demoPasswordDiagnostics } from "@/lib/demo";
 import { getTranslations } from "next-intl/server";
 
 export async function DemoEnterFailed({
+  reason,
   diagnostics,
+  dbCheck,
 }: {
+  reason: DemoEnterError;
   diagnostics: ReturnType<typeof demoPasswordDiagnostics>;
+  dbCheck: DemoDbCheck;
 }) {
   const t = await getTranslations("demo");
+
+  let detailKey: "enterFailedDetailMissing" | "enterFailedDetailMismatch" | "enterFailedDetailAuth" | "enterFailedDetailBlocked" =
+    "enterFailedDetailAuth";
+
+  if (!dbCheck.userFound) detailKey = "enterFailedDetailMissing";
+  else if (!dbCheck.bcryptOk) detailKey = "enterFailedDetailMismatch";
+  else if (dbCheck.communityBlocked || reason === "community_blocked")
+    detailKey = "enterFailedDetailBlocked";
+  else if (dbCheck.bcryptOk) detailKey = "enterFailedDetailAuth";
 
   return (
     <main className="mx-auto flex min-h-[50vh] max-w-lg flex-col items-center justify-center px-4 py-16 text-center">
@@ -15,7 +29,7 @@ export async function DemoEnterFailed({
         {t("enterFailedTitle")}
       </p>
       <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-        {t("enterFailedBody")}
+        {t(detailKey)}
       </p>
       <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-left text-xs leading-relaxed text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/50 dark:text-amber-100">
         {t("enterFailedHint")}
@@ -31,6 +45,11 @@ export async function DemoEnterFailed({
               prefix: diagnostics.prefix,
               suffix: diagnostics.suffix,
             })}
+        <br />
+        {t("enterFailedDiagDb", {
+          user: dbCheck.userFound ? "yes" : "no",
+          bcrypt: dbCheck.bcryptOk ? "yes" : "no",
+        })}
       </p>
       <Link
         href="/"

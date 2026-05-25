@@ -21,7 +21,13 @@ export default async function HomePage({
 
   const t = await getTranslations("landing");
 
-  const pains = [t("pain1"), t("pain2"), t("pain3"), t("pain4")] as const;
+  const pains = [
+    t("pain1"),
+    t("pain2"),
+    t("pain3"),
+    t("pain4"),
+    t("pain5"),
+  ] as const;
 
   const feats = [
     {

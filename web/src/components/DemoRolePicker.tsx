@@ -1,12 +1,12 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 const roles = [
-  { key: "chair", href: "/demo/enter/chair" },
-  { key: "resident", href: "/demo/enter/resident" },
-  { key: "tenant", href: "/demo/enter/tenant" },
+  { key: "chair" },
+  { key: "resident" },
+  { key: "tenant" },
 ] as const;
 
 export function DemoRolePicker({
@@ -17,6 +17,7 @@ export function DemoRolePicker({
   variant?: "landing" | "app";
 }) {
   const t = useTranslations("demo");
+  const locale = useLocale();
   const inApp = variant === "app";
 
   return (
@@ -40,11 +41,11 @@ export function DemoRolePicker({
       <div className="mt-3 flex flex-wrap gap-2">
         {roles.map((r) => {
           const active = activeRole === r.key;
+          const href = `/${locale}/demo/enter/${r.key}`;
           return (
-            <Link
+            <a
               key={r.key}
-              href={r.href}
-              prefetch={false}
+              href={href}
               className={`rounded-xl px-4 py-2.5 text-sm font-semibold no-underline transition ${
                 active
                   ? "bg-blue-600 text-white shadow-md"
@@ -52,7 +53,7 @@ export function DemoRolePicker({
               }`}
             >
               {t(`role_${r.key}`)}
-            </Link>
+            </a>
           );
         })}
       </div>

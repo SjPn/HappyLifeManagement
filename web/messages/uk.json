@@ -76,6 +76,7 @@
     "enterFailedBody": "Сервер не зміг увійти в тестовий обліковий запис. Зазвичай пароль на сайті не збігається з тим, що записано в БД під час npm run db:seed.",
     "enterFailedHint": "У Coolify задайте DEMO_AUTO_LOGIN_PASSWORD — той самий, що в .env при seed. Потім знову npm run db:seed на Neon і перезапустіть застосунок. Або приберіть змінну на сервері й пересійте з порожнім DEMO_AUTO_LOGIN_PASSWORD (стандартний локальний пароль).",
     "enterFailedBack": "На головну",
+    "enterFailedRedeploy": "Після зміни змінних у Coolify натисніть Redeploy — без перезапуску контейнер не підхопить нові значення.",
     "role_chair": "Голова",
     "role_resident": "Власник",
     "role_tenant": "Орендар"

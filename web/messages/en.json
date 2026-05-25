@@ -76,6 +76,7 @@
     "enterFailedBody": "The server could not sign in to the preview account. Usually the password on the server does not match what was hashed during npm run db:seed.",
     "enterFailedHint": "In Coolify set DEMO_AUTO_LOGIN_PASSWORD to the same value used in .env when seeding. Then run npm run db:seed on Neon again and restart the app. Or remove the env var and re-seed with an empty DEMO_AUTO_LOGIN_PASSWORD (default local password).",
     "enterFailedBack": "Back to home",
+    "enterFailedRedeploy": "After changing Coolify env vars, click Redeploy — the container must restart to pick up new values.",
     "role_chair": "Chair",
     "role_resident": "Owner",
     "role_tenant": "Tenant"

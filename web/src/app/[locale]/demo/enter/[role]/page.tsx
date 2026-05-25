@@ -1,6 +1,8 @@
-import { enterDemoAsRole } from "@/actions/demo";
+import { DemoEnterFailed } from "./DemoEnterFailed";
+import { performDemoEnter } from "@/lib/demoEnter";
 import { isDemoEnabled, type DemoRoleKey } from "@/lib/demo";
-import { notFound } from "next/navigation";
+import { getLocale } from "next-intl/server";
+import { notFound, redirect } from "next/navigation";
 
 const roles = new Set<string>(["chair", "resident", "tenant"]);
 
@@ -14,11 +16,12 @@ export default async function DemoEnterPage({
   const { role } = await params;
   if (!roles.has(role)) notFound();
 
-  const result = await enterDemoAsRole(role as DemoRoleKey);
-  if (result?.error === "sign_in_failed") {
-    throw new Error(
-      "Demo login failed. Run: npm run db:seed (and set DEMO_AUTO_LOGIN_PASSWORD if used on server).",
-    );
+  const result = await performDemoEnter(role as DemoRoleKey);
+  if (result.error === "sign_in_failed") {
+    return <DemoEnterFailed />;
   }
-  if (result?.error) notFound();
+  if (result.error) notFound();
+
+  const locale = await getLocale();
+  redirect(`/${locale}/dashboard`);
 }

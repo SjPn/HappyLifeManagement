@@ -13,7 +13,8 @@
 | Android (Capacitor) | `mobile/` |
 | GitHub | [SjPn/HappyLifeManagement](https://github.com/SjPn/HappyLifeManagement) |
 
-Внутрішній справочник розробника — локально `docs/HANDBOOK.md` (не в git).
+Внутрішній справочник розробника — локально `docs/HANDBOOK.md` (не в git).  
+Пароли після seed — `docs/TEST_CREDENTIALS.local.md` (не в git).
 
 ## Розробка
 
@@ -21,19 +22,27 @@
 cd web
 npm install
 copy .env.example .env
+# заповнити DATABASE_URL, DIRECT_URL, AUTH_SECRET, INVITE_CODE, SEED_*_PASSWORD, DEMO_AUTO_LOGIN_PASSWORD
 npx prisma db push
+npm run db:seed
+npm run seed:verify
 npm run dev
 ```
 
 Секрети — тільки в `web/.env`.
 
-**Демо на головній (прод):** після деплою коду з кнопками «Председатель / Собственник / Арендатор» один раз:
+## Публичное демо
+
+На **главной** и на **/login** — кнопка **«Попробовать демо»** → страница `/demo` (по умолчанию кабинет **собственника**).
+
+**Прод (один раз после деплоя):**
 
 ```powershell
 cd web
-# у .env або в Coolify: DEMO_AUTO_LOGIN_PASSWORD=<довгий-секрет>
-# також INVITE_CODE, SEED_ADMIN_PASSWORD, SEED_CHAIR_PASSWORD, SEED_MOD_PASSWORD, SEED_RESIDENT_PASSWORD
 npm run db:seed
+npm run demo:verify
 ```
 
-Той самий `DEMO_AUTO_LOGIN_PASSWORD` має бути в Coolify (`DEMO_ENABLED` не `false`). Деталі — `web/.env.example`, локально `docs/HANDBOOK.md`.
+В **Coolify**: `DEMO_AUTO_LOGIN_PASSWORD` — **то же значение**, что в `.env` при seed (Runtime, затем Redeploy). `DEMO_ENABLED=false` только чтобы выключить демо.
+
+Подробно — `web/.env.example`, локально `docs/HANDBOOK.md` §3 и §9.

@@ -45,4 +45,4 @@ npm run demo:verify
 
 В **Coolify**: `DEMO_AUTO_LOGIN_PASSWORD` — **то же значение**, что в `.env` при seed (Runtime, затем Redeploy). `DEMO_ENABLED=false` только чтобы выключить демо.
 
-Подробно — `web/.env.example`, локально `docs/HANDBOOK.md` §3 и §9.
+Подробно — `web/.env.example`, локально `docs/HANDBOOK.md` (§3 прод, **§8–10** безопасность / бэкапы / логи, §11 для AI).
